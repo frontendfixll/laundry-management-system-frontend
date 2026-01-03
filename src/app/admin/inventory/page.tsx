@@ -22,7 +22,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
 const getAuthToken = () => {
   try {
-    const data = localStorage.getItem('auth-storage')
+    // Check laundry-auth (main auth store)
+    const data = localStorage.getItem('laundry-auth')
     if (data) {
       const parsed = JSON.parse(data)
       return parsed.state?.token || parsed.token
