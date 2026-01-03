@@ -173,19 +173,19 @@ export default function AdminInventoryPage() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4">
-            <div className="text-2xl font-bold text-white">{stats.totalItems}</div>
+            <div className="text-2xl font-bold text-white">{stats.totalItems || 0}</div>
             <div className="text-sm text-blue-100">Total Items</div>
           </div>
           <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-4">
-            <div className="text-2xl font-bold text-white">{stats.lowStockItems}</div>
+            <div className="text-2xl font-bold text-white">{stats.lowStockItems || 0}</div>
             <div className="text-sm text-orange-100">Low Stock</div>
           </div>
           <div className="bg-gradient-to-br from-red-500 to-rose-600 rounded-xl p-4">
-            <div className="text-2xl font-bold text-white">{stats.expiredItems}</div>
+            <div className="text-2xl font-bold text-white">{stats.expiredItems || 0}</div>
             <div className="text-sm text-red-100">Expired</div>
           </div>
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4">
-            <div className="text-2xl font-bold text-white">₹{stats.totalValue.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-white">₹{(stats.totalValue || 0).toLocaleString()}</div>
             <div className="text-sm text-green-100">Total Value</div>
           </div>
         </div>

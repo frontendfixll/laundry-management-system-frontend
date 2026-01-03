@@ -83,7 +83,7 @@ export function useAdminTickets(filters?: {
       }
       
       const response = await api.get(`/admin/support/tickets?${params}`)
-      setTickets(response.data.data || [])
+      setTickets(response.data.data?.tickets || response.data.tickets || response.data.data || [])
       
       const backendPagination = response.data.pagination || {}
       setPagination({
