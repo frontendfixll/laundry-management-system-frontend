@@ -1,0 +1,418 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "services": "Servicios",
+    "pricing": "Precios",
+    "help": "Ayuda",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "bookNow": "Reservar Ahora",
+    "dashboard": "Panel",
+    "myOrders": "Mis Pedidos",
+    "addresses": "Direcciones",
+    "logout": "Cerrar Sesión"
+  },
+  "hero": {
+    "badge": "Servicio de Lavandería #1 de India",
+    "title": "Servicio de Lavandería de Calidad en Tu Ciudad",
+    "subtitle": "Cuidamos la limpieza de tu ropa. Servicios de lavandería premium con recogida y entrega gratis.",
+    "schedulePickup": "Programar Recogida",
+    "exploreServices": "Explorar Servicios",
+    "happyCustomers": "Clientes Felices",
+    "turnaround": "Tiempo de Entrega",
+    "rating": "Calificación"
+  },
+  "process": {
+    "title": "Así es Como Trabajamos",
+    "subtitle": "Nuestro Proceso",
+    "step1": {
+      "title": "Recogemos Tu Ropa",
+      "desc": "Programa una recogida y nuestro equipo llega a tu puerta."
+    },
+    "step2": {
+      "title": "Limpieza Experta",
+      "desc": "Tu ropa se limpia con detergentes premium y tecnología avanzada."
+    },
+    "step3": {
+      "title": "Entrega Rápida",
+      "desc": "Ropa fresca y limpia entregada en 24-48 horas."
+    }
+  },
+  "services": {
+    "title": "Servicios que Ofrecemos",
+    "subtitle": "Servicios",
+    "washFold": "Lavar y Doblar",
+    "washFoldDesc": "Cuidado diario de ropa con detergentes premium",
+    "dryCleaning": "Limpieza en Seco",
+    "dryCleaningDesc": "Cuidado premium para prendas delicadas",
+    "steamPress": "Planchado a Vapor",
+    "steamPressDesc": "Planchado profesional con acabado perfecto",
+    "express": "Servicio Express",
+    "expressDesc": "Entrega el mismo día para necesidades urgentes",
+    "premiumCare": "Cuidado Premium",
+    "premiumCareDesc": "Tratamiento especial para artículos de lujo",
+    "qualityCare": "Cuidado de Calidad",
+    "qualityCareDesc": "Manejo experto",
+    "hero": {
+      "title": "Servicios de Limpieza Premium",
+      "subtitle": "Servicios profesionales de lavandería y limpieza en seco a tu puerta. Cuidado de calidad para todas tus prendas.",
+      "schedulePickup": "Programar Recogida Gratis",
+      "whatsapp": "Chat en Whatsapp"
+    },
+    "howWeWork": {
+      "badge": "Simple y Fácil",
+      "title": "Cómo Trabajamos",
+      "subtitle": "¡Hacer tu lavandería nunca ha sido tan fácil. Solo 4 simples pasos!",
+      "step1": {
+        "title": "Programar Recogida",
+        "subtitle": "Reserva en segundos",
+        "desc": "Usa nuestra app o sitio web para programar una recogida a tu hora conveniente."
+      },
+      "step2": {
+        "title": "Recogemos",
+        "subtitle": "Recogida a domicilio",
+        "desc": "Nuestro repartidor capacitado llega a tu puerta para recoger tu ropa."
+      },
+      "step3": {
+        "title": "Limpieza Experta",
+        "subtitle": "Cuidado premium",
+        "desc": "Tu ropa se limpia con detergentes ecológicos premium por expertos capacitados."
+      },
+      "step4": {
+        "title": "Entrega",
+        "subtitle": "Fresca y doblada",
+        "desc": "Tu ropa fresca y limpia se entrega a tu puerta justo a tiempo."
+      }
+    },
+    "ourServices": {
+      "badge": "Lo Que Ofrecemos",
+      "title": "Nuestros Servicios",
+      "subtitle": "Desde lavandería diaria hasta limpieza en seco premium, ofrecemos soluciones completas de cuidado de prendas."
+    },
+    "whyChoose": {
+      "title": "¿Por Qué Elegir LaundryPro?",
+      "freePickup": "Recogida y Entrega Gratis",
+      "freePickupDesc": "Servicio a domicilio sin costo extra",
+      "fastDelivery": "Entrega en 24-48 Horas",
+      "fastDeliveryDesc": "Tiempo de respuesta rápido",
+      "quality": "Calidad Garantizada",
+      "qualityDesc": "Cuidado premium para tu ropa",
+      "support": "Soporte 24/7",
+      "supportDesc": "Siempre aquí para ayudarte"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "¿Tienes preguntas sobre nuestros servicios? Tenemos respuestas."
+    },
+    "cta": {
+      "title": "¿Listo para Empezar?",
+      "subtitle": "Programa tu primera recogida hoy y experimenta la comodidad del servicio de lavandería profesional.",
+      "bookNow": "Reservar Ahora",
+      "callUs": "Llámanos"
+    }
+  },
+  "testimonials": {
+    "title": "Lo Que Dicen Nuestros Clientes",
+    "subtitle": "Testimonios"
+  },
+  "stats": {
+    "title": "Logros de la Empresa",
+    "subtitle": "Datos Curiosos",
+    "customers": "Clientes Felices",
+    "cities": "Ciudades Cubiertas",
+    "satisfaction": "Tasa de Satisfacción"
+  },
+  "about": {
+    "title": "Servicios de Lavandería Premium en los que Puedes Confiar",
+    "subtitle": "Sobre la Empresa",
+    "desc1": "En LaundryPro, ofrecemos una experiencia de lavandería perfecta adaptada a tu estilo de vida.",
+    "desc2": "Con más de 10 años de experiencia, hemos atendido a más de 50,000 clientes felices.",
+    "feature1": "Recogida y Entrega Gratis",
+    "feature2": "Entrega en 24-48 Horas",
+    "feature3": "Productos Ecológicos",
+    "feature4": "100% Satisfacción",
+    "yearsExp": "Años de Experiencia",
+    "learnMore": "Conoce Más Sobre Nosotros",
+    "quickPickup": "Recogida y entrega rápida",
+    "noExtraCharges": "Sin cargos adicionales"
+  },
+  "whyChoose": {
+    "household": "Servicio de Lavandería Doméstica",
+    "corporate": "Servicio de Lavandería Corporativa",
+    "allItems": "Todos los Artículos de Damas y Caballeros",
+    "dryCleanWashFold": "Limpieza en Seco, Lavar y Doblar"
+  },
+  "coverage": {
+    "title": "Servimos en Toda India",
+    "subtitle": "Cobertura",
+    "desc": "Disponible en más de 20 ciudades."
+  },
+  "cta": {
+    "title": "Llámanos para Servicio Premium",
+    "desc": "Entregamos la mejor experiencia de lavandería a tu puerta",
+    "callNow": "Llamar Ahora",
+    "whatsapp": "WhatsApp",
+    "referFriend": "Refiere a un Amigo y Obtén"
+  },
+  "footer": {
+    "desc": "Servicios de lavandería premium confiados por miles.",
+    "services": "Servicios",
+    "quickLinks": "Enlaces Rápidos",
+    "contact": "Contáctanos",
+    "copyright": "© 2024 LaundryPro. Todos los derechos reservados."
+  },
+  "theme": {
+    "title": "Tema",
+    "language": "Idioma",
+    "selectTemplate": "Seleccionar Plantilla"
+  },
+  "map": {
+    "title": "Encuéntranos",
+    "subtitle": "Nuestra Ubicación",
+    "visitUs": "Visítanos",
+    "address": "256/A, Green Road, NYC-9034"
+  },
+  "pricing": {
+    "hero": {
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Servicios de lavandería de calidad a precios accesibles. Sin cargos ocultos.",
+      "whatsapp": "Chat en WhatsApp"
+    },
+    "table": {
+      "title": "Nuestros Precios",
+      "subtitle": "Precios transparentes para todos nuestros servicios. Selecciona una categoría para ver precios detallados.",
+      "garment": "Prenda",
+      "washFold": "Lavar y Doblar",
+      "washIron": "Lavar y Planchar",
+      "dryClean": "Limpieza en Seco",
+      "steamPress": "Planchado a Vapor",
+      "noItems": "No hay artículos disponibles para esta categoría",
+      "bookNow": "Reservar Servicio Ahora"
+    },
+    "disclaimer": "* Los precios pueden variar según el tipo de tela y condición. Precio final confirmado después de inspección.",
+    "categories": {
+      "men": "Hombres",
+      "women": "Mujeres",
+      "kids": "Niños",
+      "household": "Hogar",
+      "institutional": "Institucional",
+      "others": "Otros"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "¿Tienes preguntas? Tenemos respuestas."
+    },
+    "cta": {
+      "title": "¿Listo para Empezar?",
+      "subtitle": "Programa tu primera recogida hoy y experimenta la comodidad del servicio de lavandería profesional.",
+      "bookNow": "Reservar Ahora",
+      "getStarted": "Comenzar",
+      "callUs": "Llámanos"
+    }
+  },
+  "help": {
+    "hero": {
+      "badge": "Soporte 24/7",
+      "title": "¿Cómo Podemos Ayudarte?",
+      "subtitle": "Encuentra respuestas, rastrea pedidos o contacta a nuestro equipo de soporte."
+    },
+    "stats": {
+      "customers": "Clientes",
+      "support": "Soporte",
+      "resolution": "Resolución"
+    },
+    "quickHelp": {
+      "trackOrder": "Rastrear Pedido",
+      "trackOrderDesc": "Verifica el estado en tiempo real de tu lavandería",
+      "raiseTicket": "Crear Ticket",
+      "raiseTicketDesc": "Reporta un problema u obtén ayuda",
+      "requestRefund": "Solicitar Reembolso",
+      "requestRefundDesc": "Inicia reembolso para cualquier pedido",
+      "liveSupport": "Soporte en Vivo",
+      "liveSupportDesc": "Chatea con nuestro equipo de soporte",
+      "getStarted": "Comenzar"
+    },
+    "contact": {
+      "badge": "Contáctanos",
+      "title": "¿Aún Necesitas Ayuda?",
+      "subtitle": "Nuestro equipo de soporte siempre está listo para asistirte. Elige tu forma preferida de contactarnos.",
+      "callUs": "Llámanos",
+      "callUsDesc": "Disponible 24/7 para consultas urgentes",
+      "emailUs": "Escríbenos",
+      "emailUsDesc": "Respondemos en 2 horas",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Soporte rápido por chat",
+      "chatNow": "Chatear Ahora"
+    },
+    "faq": {
+      "badge": "Preguntas Frecuentes",
+      "title": "Encuentra Respuestas Rápidas",
+      "subtitle": "Navega por nuestras preguntas más frecuentes para encontrar la información que necesitas.",
+      "general": "General",
+      "orders": "Pedidos",
+      "payment": "Pago",
+      "services": "Servicios"
+    },
+    "footer": {
+      "copyright": "© 2024 LaundryPro. Todos los derechos reservados."
+    }
+  },
+  "original": {
+    "hero": {
+      "welcomeBack": "Bienvenido de nuevo",
+      "easyPayment": "Opciones de Pago Fáciles",
+      "dedicatedSupport": "Soporte al Cliente Dedicado",
+      "premiumQuality": "Cuidado de Calidad Premium",
+      "certifiedPros": "Profesionales Certificados",
+      "fiveStarService": "Servicio 5 Estrellas"
+    },
+    "services": {
+      "washIron": "Lavar y Planchar",
+      "washIronDesc": "Prendas limpias, crujientes y sin arrugas.",
+      "premiumLaundry": "Lavandería Premium",
+      "premiumLaundryDesc": "Cuidado suave para telas especiales.",
+      "starching": "Almidonado",
+      "starchingDesc": "Rigidez perfecta y duradera para la ropa.",
+      "premiumSteamPress": "Planchado a Vapor Premium",
+      "premiumSteamPressDesc": "Servicio de planchado extra fino y cuidadoso.",
+      "premiumDryClean": "Limpieza en Seco Premium",
+      "premiumDryCleanDesc": "Cuidado de primera para artículos de lujo.",
+      "sectionTitle": "Servicio Premium de Lavandería y Limpieza en Seco en India",
+      "sectionSubtitle": "¡Limpieza de Calidad con Grandes Ahorros!",
+      "sectionDesc": "En LaundryPro, cuidamos todas tus necesidades de ropa — desde ropa de casa hasta ropa formal de oficina."
+    },
+    "steps": {
+      "orderOnline": "Pedir en Línea",
+      "orderOnlineDesc": "Haz tu pedido de lavandería en clics."
+    },
+    "whyChoose": {
+      "title": "¿Por Qué Elegirnos?",
+      "affordablePricing": "Precios Accesibles",
+      "realTimeTracking": "Seguimiento en Tiempo Real"
+    },
+    "cta": {
+      "readyTitle": "¿Listo para Experimentar el Servicio de Lavandería Premium?",
+      "joinCustomers": "Únete a más de 50,000+ clientes satisfechos que confían en LaundryPro.",
+      "freePickup": "Recogida y entrega gratis",
+      "turnaround": "Entrega en 24-48 horas",
+      "satisfaction": "100% satisfacción garantizada",
+      "bookNewOrder": "Reservar Nuevo Pedido",
+      "chatWhatsApp": "Chat en WhatsApp"
+    },
+    "banner": {
+      "scheduleToday": "Programa hoy para",
+      "getOff": "Obtén 20% de descuento",
+      "scheduleFirstPickup": "Programa tu primera recogida"
+    },
+    "guarantee": {
+      "title": "La",
+      "titleHighlight": "Garantía LaundryPro.",
+      "desc": "Cada pedido está respaldado por nuestra garantía líder en la industria. Si no estás satisfecho con la limpieza de tu ropa, la volveremos a limpiar – sin cargo."
+    },
+    "testimonials": {
+      "subtitle": "Reseñas de Clientes"
+    },
+    "footer": {
+      "ironing": "Planchado",
+      "premiumServices": "Servicios Premium",
+      "company": "Empresa",
+      "contact": "Contacto"
+    },
+    "settings": {
+      "title": "Configuración",
+      "scheme": "Esquema",
+      "colorCustomizer": "Personalizador de Color",
+      "landingPage": "Página de Inicio"
+    }
+  },
+  "minimal": {
+    "hero": {
+      "badge": "Servicio de Lavandería #1",
+      "title": "Cuidado de ropa sin esfuerzo, diseñado para vidas ocupadas.",
+      "subtitle": "Recogida y entrega conveniente para ahorrarte tiempo. Limpieza de alta calidad para que te veas mejor."
+    },
+    "pricing": {
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Tiempo de entrega estándar de 2-3 días para todos los pedidos.",
+      "viewAll": "Ver lista completa de precios"
+    },
+    "whyLove": {
+      "title": "Por qué te encantará LaundryPro",
+      "freePickup": "Recogida y Entrega Gratis",
+      "freePickupDesc": "Vamos a ti. Programa un horario que te funcione, y nosotros nos encargamos del resto.",
+      "turnaround": "Entrega en 24-48 Horas",
+      "turnaroundDesc": "Recibe tu ropa fresca y limpia en solo 1-2 días.",
+      "quality": "Calidad Garantizada",
+      "qualityDesc": "¿No estás satisfecho? Volvemos a limpiar gratis o te devolvemos tu dinero.",
+      "eco": "Limpieza Ecológica",
+      "ecoDesc": "Usamos detergentes y procesos seguros para el medio ambiente."
+    },
+    "features": {
+      "feature1": {
+        "title": "Tu ropa limpia al alcance de tu mano",
+        "desc": "Programa una recogida simplemente usando nuestra app o sitio web. Rastrea tu pedido en tiempo real y recibe notificaciones cuando tu ropa esté lista."
+      },
+      "feature2": {
+        "title": "Lavandería y limpieza en seco sostenible",
+        "desc": "Con LaundryPro, ayudas al medio ambiente. Usamos detergentes ecológicos, ahorramos agua con máquinas de alta eficiencia y reducimos el uso de químicos."
+      },
+      "feature3": {
+        "title": "Servicio al cliente de clase mundial",
+        "desc": "Nuestro equipo de soporte dedicado está disponible 24/7 para ayudarte con cualquier pregunta. Tu satisfacción es nuestra prioridad."
+      },
+      "getOff": "Obtén ₹200 de descuento"
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "subtitle": "Empezar es fácil. Así es como funciona.",
+      "step1": {
+        "title": "Programa una Recogida",
+        "desc": "Elige un horario que te funcione. Ofrecemos ventanas de recogida flexibles."
+      },
+      "step2": {
+        "title": "Limpiamos Tu Ropa",
+        "desc": "Nuestros expertos limpian tus artículos con cuidado usando productos premium."
+      },
+      "step3": {
+        "title": "Entrega a Tu Puerta",
+        "desc": "Ropa fresca y limpia entregada según tu horario."
+      }
+    },
+    "testimonials": {
+      "title": "Lo que dicen nuestros clientes"
+    },
+    "guarantee": {
+      "title": "La Garantía LaundryPro",
+      "desc": "Respaldamos nuestro trabajo. Si no estás 100% satisfecho con nuestro servicio, volvemos a limpiar tus artículos gratis o te damos un reembolso completo.",
+      "satisfaction": "Satisfacción Garantizada",
+      "damage": "Protección contra Daños",
+      "onTime": "Entrega a Tiempo",
+      "customers": "50,000+ Clientes Felices"
+    },
+    "cta": {
+      "title": "¿Listo para simplificar tu lavandería?",
+      "subtitle": "¡Obtén 20% de descuento en tu primer pedido!",
+      "schedulePickup": "Programar Recogida Gratis",
+      "whatsapp": "WhatsApp"
+    },
+    "footer": {
+      "desc": "Servicios premium de lavandería y limpieza en seco, entregados a tu puerta.",
+      "services": "Servicios",
+      "company": "Empresa",
+      "contact": "Contacto",
+      "dryCleaning": "Limpieza en Seco",
+      "washFold": "Lavar y Doblar",
+      "steamPress": "Planchado a Vapor",
+      "expressService": "Servicio Express",
+      "pricing": "Precios",
+      "helpCenter": "Centro de Ayuda",
+      "aboutUs": "Sobre Nosotros",
+      "contactUs": "Contacto",
+      "cities": "20+ Ciudades en India",
+      "copyright": "© 2024 LaundryPro. Todos los derechos reservados.",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio"
+    },
+    "viewPricing": "Ver Precios"
+  }
+}

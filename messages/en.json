@@ -1,0 +1,418 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "pricing": "Pricing",
+    "help": "Help",
+    "login": "Login",
+    "signup": "Sign Up",
+    "bookNow": "Book Now",
+    "dashboard": "Dashboard",
+    "myOrders": "My Orders",
+    "addresses": "Addresses",
+    "logout": "Logout"
+  },
+  "hero": {
+    "badge": "India's #1 Laundry Service",
+    "title": "Quality Laundry Service in Your City",
+    "subtitle": "We take care of the cleanliness of your clothes. Premium laundry services with free pickup & delivery.",
+    "schedulePickup": "Schedule Pickup",
+    "exploreServices": "Explore Services",
+    "happyCustomers": "Happy Customers",
+    "turnaround": "Turnaround",
+    "rating": "Rating"
+  },
+  "process": {
+    "title": "This is How We Work",
+    "subtitle": "Our Process",
+    "step1": {
+      "title": "We Collect Your Clothes",
+      "desc": "Schedule a pickup and our team arrives at your doorstep to collect your laundry."
+    },
+    "step2": {
+      "title": "Expert Cleaning",
+      "desc": "Your clothes are cleaned with premium detergents and advanced technology."
+    },
+    "step3": {
+      "title": "Fast Delivery",
+      "desc": "Fresh, clean clothes delivered back to you within 24-48 hours."
+    }
+  },
+  "services": {
+    "title": "Services We Offer",
+    "subtitle": "Services",
+    "washFold": "Wash & Fold",
+    "washFoldDesc": "Everyday laundry care with premium detergents",
+    "dryCleaning": "Dry Cleaning",
+    "dryCleaningDesc": "Premium care for delicate and formal garments",
+    "steamPress": "Steam Press",
+    "steamPressDesc": "Professional ironing with perfect finish",
+    "express": "Express Service",
+    "expressDesc": "Same day delivery for urgent needs",
+    "premiumCare": "Premium Care",
+    "premiumCareDesc": "Special treatment for luxury designer items",
+    "qualityCare": "Quality Care",
+    "qualityCareDesc": "Expert handling",
+    "hero": {
+      "title": "Premium Cleaning Services",
+      "subtitle": "Professional laundry and dry cleaning services at your doorstep. Quality care for all your garments.",
+      "schedulePickup": "Schedule Free Pickup",
+      "whatsapp": "Chat on Whatsapp"
+    },
+    "howWeWork": {
+      "badge": "Simple & Easy",
+      "title": "How We Work",
+      "subtitle": "Getting your laundry done has never been easier. Just 4 simple steps!",
+      "step1": {
+        "title": "Schedule Pickup",
+        "subtitle": "Book in seconds",
+        "desc": "Use our app or website to schedule a pickup at your convenient time."
+      },
+      "step2": {
+        "title": "We Collect",
+        "subtitle": "Doorstep pickup",
+        "desc": "Our trained delivery partner arrives at your doorstep to collect your laundry."
+      },
+      "step3": {
+        "title": "Expert Cleaning",
+        "subtitle": "Premium care",
+        "desc": "Your clothes are cleaned with premium eco-friendly detergents by trained experts."
+      },
+      "step4": {
+        "title": "Delivery",
+        "subtitle": "Fresh & folded",
+        "desc": "Your fresh, clean clothes are delivered back to your doorstep right on time."
+      }
+    },
+    "ourServices": {
+      "badge": "What We Offer",
+      "title": "Our Services",
+      "subtitle": "From everyday laundry to premium dry cleaning, we offer comprehensive garment care solutions."
+    },
+    "whyChoose": {
+      "title": "Why Choose LaundryPro?",
+      "freePickup": "Free Pickup & Delivery",
+      "freePickupDesc": "Doorstep service at no extra cost",
+      "fastDelivery": "24-48 Hour Delivery",
+      "fastDeliveryDesc": "Quick turnaround time",
+      "quality": "Quality Assured",
+      "qualityDesc": "Premium care for your clothes",
+      "support": "24/7 Support",
+      "supportDesc": "Always here to help you"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Got questions about our services? We have got answers."
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "subtitle": "Schedule your first pickup today and experience the convenience of professional laundry service.",
+      "bookNow": "Book Now",
+      "callUs": "Call Us"
+    }
+  },
+  "testimonials": {
+    "title": "What Our Customers Say",
+    "subtitle": "Testimonials"
+  },
+  "stats": {
+    "title": "Company Achievement",
+    "subtitle": "Fun Facts",
+    "customers": "Happy Customers",
+    "cities": "Cities Covered",
+    "satisfaction": "Satisfaction Rate"
+  },
+  "about": {
+    "title": "Premium Laundry Services You Can Trust",
+    "subtitle": "About Company",
+    "desc1": "At LaundryPro, we offer a seamless laundry and dry cleaning experience tailored to your busy lifestyle.",
+    "desc2": "With over 10 years of experience, we have served more than 50,000 happy customers across 20+ cities.",
+    "feature1": "Free Pickup & Delivery",
+    "feature2": "24-48 Hour Turnaround",
+    "feature3": "Eco-Friendly Products",
+    "feature4": "100% Satisfaction",
+    "yearsExp": "Years Experience",
+    "learnMore": "Learn More About Us",
+    "quickPickup": "Quick pickup & delivery",
+    "noExtraCharges": "No extra charges"
+  },
+  "whyChoose": {
+    "household": "Household Laundry Service",
+    "corporate": "Corporate Laundry Service",
+    "allItems": "All Ladies and Gents Items",
+    "dryCleanWashFold": "Dry Cleaning Wash and Fold"
+  },
+  "coverage": {
+    "title": "We Serve Across India",
+    "subtitle": "Coverage",
+    "desc": "Available in 20+ cities including Mumbai, Delhi, Bangalore, Chennai, Hyderabad, Pune, and more."
+  },
+  "cta": {
+    "title": "Call Us for Premium Service",
+    "desc": "We deliver the best laundry experience right to your doorstep",
+    "callNow": "Call Now",
+    "whatsapp": "WhatsApp Us",
+    "referFriend": "Refer a Friend & Get"
+  },
+  "footer": {
+    "desc": "Premium laundry services trusted by thousands across India.",
+    "services": "Services",
+    "quickLinks": "Quick Links",
+    "contact": "Get in Touch",
+    "copyright": "© 2024 LaundryPro. All rights reserved."
+  },
+  "theme": {
+    "title": "Theme",
+    "language": "Language",
+    "selectTemplate": "Select Template"
+  },
+  "map": {
+    "title": "Find Us",
+    "subtitle": "Our Location",
+    "visitUs": "Visit Us",
+    "address": "256/A, Green Road, NYC-9034"
+  },
+  "pricing": {
+    "hero": {
+      "title": "Simple & Transparent Pricing",
+      "subtitle": "Quality laundry services at affordable prices. No hidden charges.",
+      "whatsapp": "Chat on WhatsApp"
+    },
+    "table": {
+      "title": "Our Pricing",
+      "subtitle": "Transparent pricing for all our services. Select a category to view detailed pricing.",
+      "garment": "Garment",
+      "washFold": "Wash & Fold",
+      "washIron": "Wash & Iron",
+      "dryClean": "Dry Clean",
+      "steamPress": "Steam Press",
+      "noItems": "No items available for this category",
+      "bookNow": "Book Service Now"
+    },
+    "disclaimer": "* Prices may vary based on fabric type and condition. Final price confirmed after inspection.",
+    "categories": {
+      "men": "Men",
+      "women": "Women",
+      "kids": "Kids",
+      "household": "Household",
+      "institutional": "Institutional",
+      "others": "Others"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Got questions? We've got answers."
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "subtitle": "Schedule your first pickup today and experience the convenience of professional laundry service.",
+      "bookNow": "Book Now",
+      "getStarted": "Get Started",
+      "callUs": "Call Us"
+    }
+  },
+  "help": {
+    "hero": {
+      "badge": "24/7 Support",
+      "title": "How Can We Help?",
+      "subtitle": "Find answers, track orders, or contact our support team."
+    },
+    "stats": {
+      "customers": "Customers",
+      "support": "Support",
+      "resolution": "Resolution"
+    },
+    "quickHelp": {
+      "trackOrder": "Track Order",
+      "trackOrderDesc": "Check real-time status of your laundry",
+      "raiseTicket": "Raise Ticket",
+      "raiseTicketDesc": "Report an issue or get help",
+      "requestRefund": "Request Refund",
+      "requestRefundDesc": "Initiate refund for any order",
+      "liveSupport": "Live Support",
+      "liveSupportDesc": "Chat with our support team",
+      "getStarted": "Get Started"
+    },
+    "contact": {
+      "badge": "Get In Touch",
+      "title": "Still Need Help?",
+      "subtitle": "Our support team is always ready to assist you. Choose your preferred way to reach us.",
+      "callUs": "Call Us",
+      "callUsDesc": "Available 24/7 for urgent queries",
+      "emailUs": "Email Us",
+      "emailUsDesc": "We reply within 2 hours",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Quick chat support",
+      "chatNow": "Chat Now"
+    },
+    "faq": {
+      "badge": "Frequently Asked Questions",
+      "title": "Find Quick Answers",
+      "subtitle": "Browse through our most commonly asked questions to find the information you need.",
+      "general": "General",
+      "orders": "Orders",
+      "payment": "Payment",
+      "services": "Services"
+    },
+    "footer": {
+      "copyright": "© 2024 LaundryPro. All rights reserved."
+    }
+  },
+  "original": {
+    "hero": {
+      "welcomeBack": "Welcome back",
+      "easyPayment": "Easy Payment Options",
+      "dedicatedSupport": "Dedicated Customer Support",
+      "premiumQuality": "Premium Quality Care",
+      "certifiedPros": "Certified Professionals",
+      "fiveStarService": "5-Star Rated Service"
+    },
+    "services": {
+      "washIron": "Wash & Iron",
+      "washIronDesc": "Clean, crisp, wrinkle-free garments.",
+      "premiumLaundry": "Premium Laundry",
+      "premiumLaundryDesc": "Gentle care for special fabrics.",
+      "starching": "Starching",
+      "starchingDesc": "Perfect, lasting stiffness for clothes.",
+      "premiumSteamPress": "Premium Steam Press",
+      "premiumSteamPressDesc": "Extra-fine, careful press service.",
+      "premiumDryClean": "Premium Dry Clean",
+      "premiumDryCleanDesc": "Top-tier care for luxury items.",
+      "sectionTitle": "Premium Laundry And Dry Clean Service in India",
+      "sectionSubtitle": "Quality Cleaning with Great Savings!",
+      "sectionDesc": "At LaundryPro, we take care of all your clothing needs — from everyday home wear to formal office attire."
+    },
+    "steps": {
+      "orderOnline": "Order Online",
+      "orderOnlineDesc": "Place your laundry request in clicks."
+    },
+    "whyChoose": {
+      "title": "Why Choose Us?",
+      "affordablePricing": "Affordable Pricing",
+      "realTimeTracking": "Real-Time Order Tracking"
+    },
+    "cta": {
+      "readyTitle": "Ready to Experience Premium Laundry Service?",
+      "joinCustomers": "Join over 50,000+ satisfied customers who trust LaundryPro.",
+      "freePickup": "Free pickup & delivery",
+      "turnaround": "24-48 hours turnaround",
+      "satisfaction": "100% satisfaction guaranteed",
+      "bookNewOrder": "Book New Order",
+      "chatWhatsApp": "Chat on WhatsApp"
+    },
+    "banner": {
+      "scheduleToday": "Schedule today to",
+      "getOff": "Get 20% off",
+      "scheduleFirstPickup": "Schedule your first pickup"
+    },
+    "guarantee": {
+      "title": "The LaundryPro",
+      "titleHighlight": "Guarantee.",
+      "desc": "Every order is backed by our industry-leading guarantee. If you're not satisfied with the cleaning of your clothes, we will re-clean them – free of charge."
+    },
+    "testimonials": {
+      "subtitle": "Customer Reviews"
+    },
+    "footer": {
+      "ironing": "Ironing",
+      "premiumServices": "Premium Services",
+      "company": "Company",
+      "contact": "Contact"
+    },
+    "settings": {
+      "title": "Settings",
+      "scheme": "Scheme",
+      "colorCustomizer": "Color Customizer",
+      "landingPage": "Landing Page"
+    }
+  },
+  "minimal": {
+    "hero": {
+      "badge": "#1 Rated Laundry Service",
+      "title": "Effortless laundry care, designed for busy lives.",
+      "subtitle": "Convenient pickup and delivery to save you time. High-quality cleaning to keep you looking your best."
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Standard 2-3 day turnaround for all orders.",
+      "viewAll": "View full price list"
+    },
+    "whyLove": {
+      "title": "Why you'll love LaundryPro",
+      "freePickup": "Free Pickup & Delivery",
+      "freePickupDesc": "We come to you. Schedule a time that works, and we handle the rest.",
+      "turnaround": "24-48 Hour Turnaround",
+      "turnaroundDesc": "Get your clothes back fresh and clean in just 1-2 days.",
+      "quality": "Quality Guaranteed",
+      "qualityDesc": "Not satisfied? We'll re-clean for free or refund your money.",
+      "eco": "Eco-Friendly Cleaning",
+      "ecoDesc": "We use environmentally safe detergents and processes."
+    },
+    "features": {
+      "feature1": {
+        "title": "Your clean clothes at your fingertips",
+        "desc": "Schedule a pickup by simply using our app or website. Track your order in real-time and get notified when your clothes are ready."
+      },
+      "feature2": {
+        "title": "Sustainable laundry and dry cleaning",
+        "desc": "With LaundryPro, you help the environment. We use eco-friendly detergents, save water with high-efficiency machines, and reduce chemical usage."
+      },
+      "feature3": {
+        "title": "World-class customer service",
+        "desc": "Our dedicated support team is available 24/7 to help you with any questions. Your satisfaction is our top priority."
+      },
+      "getOff": "Get ₹200 off"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "subtitle": "Getting started is easy. Here's how it works.",
+      "step1": {
+        "title": "Schedule a Pickup",
+        "desc": "Choose a time that works for you. We offer flexible pickup windows."
+      },
+      "step2": {
+        "title": "We Clean Your Clothes",
+        "desc": "Our experts clean your items with care using premium products."
+      },
+      "step3": {
+        "title": "Delivery to Your Door",
+        "desc": "Fresh, clean clothes delivered back to you on your schedule."
+      }
+    },
+    "testimonials": {
+      "title": "What our customers say"
+    },
+    "guarantee": {
+      "title": "The LaundryPro Guarantee",
+      "desc": "We stand behind our work. If you're not 100% satisfied with our service, we'll re-clean your items for free or give you a full refund.",
+      "satisfaction": "Satisfaction Guaranteed",
+      "damage": "Damage Protection",
+      "onTime": "On-Time Delivery",
+      "customers": "50,000+ Happy Customers"
+    },
+    "cta": {
+      "title": "Ready to simplify your laundry?",
+      "subtitle": "Get 20% off your first order!",
+      "schedulePickup": "Schedule Free Pickup",
+      "whatsapp": "WhatsApp Us"
+    },
+    "footer": {
+      "desc": "Premium laundry and dry cleaning services, delivered to your door.",
+      "services": "Services",
+      "company": "Company",
+      "contact": "Contact",
+      "dryCleaning": "Dry Cleaning",
+      "washFold": "Wash & Fold",
+      "steamPress": "Steam Press",
+      "expressService": "Express Service",
+      "pricing": "Pricing",
+      "helpCenter": "Help Center",
+      "aboutUs": "About Us",
+      "contactUs": "Contact",
+      "cities": "20+ Cities across India",
+      "copyright": "© 2024 LaundryPro. All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "viewPricing": "View Pricing"
+  }
+}
