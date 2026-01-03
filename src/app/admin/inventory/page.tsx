@@ -74,7 +74,7 @@ export default function AdminInventoryPage() {
     try {
       setLoading(true)
       const token = getAuthToken()
-      const res = await fetch(`${API_URL}/center-admin/inventory`, {
+      const res = await fetch(`${API_URL}/admin/inventory`, {
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include'
       })
@@ -97,7 +97,7 @@ export default function AdminInventoryPage() {
     try {
       setSaving(true)
       const token = getAuthToken()
-      const res = await fetch(`${API_URL}/center-admin/inventory`, {
+      const res = await fetch(`${API_URL}/admin/inventory`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         credentials: 'include',
@@ -121,7 +121,7 @@ export default function AdminInventoryPage() {
     try {
       setSaving(true)
       const token = getAuthToken()
-      const res = await fetch(`${API_URL}/center-admin/inventory/${selectedItem._id}/stock`, {
+      const res = await fetch(`${API_URL}/admin/inventory/${selectedItem._id}/stock`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         credentials: 'include',
