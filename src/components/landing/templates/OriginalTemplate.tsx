@@ -777,7 +777,6 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isDarkTheme, setIsDarkTheme] = useState(false)
   const [scheme, setScheme] = useState<SchemeMode>('light')
-  const router = useRouter()
   const colors = colorClasses[themeColor]
 
   // Get computed theme colors based on scheme
