@@ -291,18 +291,9 @@ export default function LoginPage() {
                     type="radio"
                     name="demoAccount"
                     className="w-4 h-4 text-teal-600 focus:ring-teal-500"
-                    onChange={() => setFormData({ email: 'deepakthavrani2@gmail.com', password: 'password123' })}
+                    onChange={() => setFormData({ email: 'deepakthavrani72@gmail.com', password: 'password123' })}
                   />
                   <span className="text-sm text-gray-600">Admin</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <input
-                    type="radio"
-                    name="demoAccount"
-                    className="w-4 h-4 text-teal-600 focus:ring-teal-500"
-                    onChange={() => setFormData({ email: 'd4@gmail.com', password: 'password123' })}
-                  />
-                  <span className="text-sm text-gray-600">Center Admin</span>
                 </label>
               </div>
             </div>
