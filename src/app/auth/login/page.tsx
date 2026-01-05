@@ -291,7 +291,7 @@ export default function LoginPage() {
                     type="radio"
                     name="demoAccount"
                     className="w-4 h-4 text-teal-600 focus:ring-teal-500"
-                    onChange={() => setFormData({ email: 'admin@laundrypro.com', password: 'admin123' })}
+                    onChange={() => setFormData({ email: 'deepakthavrani2@gmail.com', password: 'password123' })}
                   />
                   <span className="text-sm text-gray-600">Admin</span>
                 </label>

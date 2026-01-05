@@ -1099,14 +1099,6 @@ export default function FreshSpinTemplate({ themeColor, isAuthenticated, onBookN
           </div>
         </div>
       </footer>
-
-      {/* Settings Panel - Hide on tenant pages */}
-      {!isTenantPage && (
-      <SettingsPanel 
-        currentLanguage={language}
-        onLanguageChange={onLanguageChange}
-      />
-      )}
     </div>
   )
 }

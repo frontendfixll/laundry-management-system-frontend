@@ -1292,19 +1292,6 @@ export default function LaundryMasterTemplate({ themeColor, isAuthenticated, onB
           </div>
         </div>
       </footer>
-
-      {/* Settings Panel */}
-      <SettingsPanel 
-        colors={colors} 
-        themeColor={themeColor}
-        currentLanguage={language}
-        currentScheme={scheme}
-        currentTemplate={currentTemplate}
-        onColorChange={onColorChange}
-        onLanguageChange={onLanguageChange}
-        onSchemeChange={handleSchemeChange}
-        onTemplateChange={onTemplateChange}
-      />
     </div>
   )
 }

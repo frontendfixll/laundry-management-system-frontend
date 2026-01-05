@@ -1090,18 +1090,6 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
           </div>
         </div>
       </footer>
-
-      {/* Settings Panel */}
-      <SettingsPanel 
-        themeColor={themeColor}
-        currentLanguage={language}
-        currentScheme={scheme}
-        currentTemplate={currentTemplate}
-        onColorChange={onColorChange}
-        onLanguageChange={onLanguageChange}
-        onSchemeChange={handleSchemeChange}
-        onTemplateChange={onTemplateChange}
-      />
     </div>
   )
 }
