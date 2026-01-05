@@ -112,6 +112,14 @@ export default function TemplateHeader() {
     }
   }
 
+  // Get login URL with tenant redirect if on tenant page
+  const getLoginUrl = () => {
+    if (isTenantPage && tenant?.slug) {
+      return `/auth/login?redirect=${encodeURIComponent(`/${tenant.slug}`)}`
+    }
+    return '/auth/login'
+  }
+
   // Dark mode toggle handler
   const toggleDarkMode = () => {
     const newMode = !isDarkMode
@@ -321,7 +329,7 @@ export default function TemplateHeader() {
                 </>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Link href="/auth/login">
+                  <Link href={getLoginUrl()}>
                     <Button variant="outline" className={`${colors.border} ${colors.text} h-8 text-sm`}>
                       {t('nav.login')}
                     </Button>
@@ -464,7 +472,7 @@ export default function TemplateHeader() {
                 </>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Link href="/auth/login">
+                  <Link href={getLoginUrl()}>
                     <Button variant="outline" className={`${colors.border} ${colors.text}`}>
                       {t('nav.login')}
                     </Button>
@@ -617,7 +625,7 @@ export default function TemplateHeader() {
                 </>
               ) : (
                 <>
-                  <Link href="/auth/login" className={`font-medium ${textMuted} transition-colors hover:opacity-80`}>
+                  <Link href={getLoginUrl()} className={`font-medium ${textMuted} transition-colors hover:opacity-80`}>
                     {t('nav.login')}
                   </Link>
                   <Button 
@@ -791,7 +799,7 @@ export default function TemplateHeader() {
                     <Moon className="w-5 h-5 text-gray-600" />
                   )}
                 </button>
-                <Link href="/auth/login">
+                <Link href={getLoginUrl()}>
                   <Button variant="outline" className={`${colors.border} ${colors.text} ${colors.lightBg}`}>{t('nav.login')}</Button>
                 </Link>
                 <Link href="/auth/register">
@@ -805,4 +813,5 @@ export default function TemplateHeader() {
     </nav>
   )
 }
+
 

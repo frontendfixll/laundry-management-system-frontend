@@ -774,6 +774,18 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
     }
     window.location.href = '/'
   }
+  
+  // Get login URL with tenant redirect if on tenant page
+  const getLoginUrl = () => {
+    if (isTenantPage) {
+      const pathParts = window.location.pathname.split('/')
+      if (pathParts.length > 1 && pathParts[1]) {
+        return `/auth/login?redirect=${encodeURIComponent(`/${pathParts[1]}`)}`
+      }
+    }
+    return '/auth/login'
+  }
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isDarkTheme, setIsDarkTheme] = useState(false)
   const [scheme, setScheme] = useState<SchemeMode>('light')
@@ -946,7 +958,7 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
                       <Moon className="w-5 h-5" style={{ color: theme.textSecondary }} />
                     )}
                   </button>
-                  <Link href="/auth/login"><Button variant="outline" style={{ borderColor: theme.accent, color: theme.accentText }}>{t('nav.login')}</Button></Link>
+                  <Link href={getLoginUrl()}><Button variant="outline" style={{ borderColor: theme.accent, color: theme.accentText }}>{t('nav.login')}</Button></Link>
                   <Button className="text-white" style={{ backgroundColor: theme.accent }} onClick={onBookNow}>{t('nav.bookNow')}</Button>
                 </div>
               )}
@@ -1110,4 +1122,5 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
     </div>
   )
 }
+
 

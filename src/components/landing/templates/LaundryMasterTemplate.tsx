@@ -657,6 +657,17 @@ export default function LaundryMasterTemplate({ themeColor, isAuthenticated, onB
     window.location.href = '/'
   }
   
+  // Get login URL with tenant redirect if on tenant page
+  const getLoginUrl = () => {
+    if (isTenantPage) {
+      const pathParts = window.location.pathname.split('/')
+      if (pathParts.length > 1 && pathParts[1]) {
+        return `/auth/login?redirect=${encodeURIComponent(`/${pathParts[1]}`)}`
+      }
+    }
+    return '/auth/login'
+  }
+  
   // Get computed theme colors based on scheme
   const theme = getThemeColors(themeColor, scheme)
 
@@ -803,7 +814,7 @@ export default function LaundryMasterTemplate({ themeColor, isAuthenticated, onB
                 </>
               ) : (
                 <div className="flex items-center gap-3">
-                  <Link href="/auth/login">
+                  <Link href={getLoginUrl()}>
                     <Button 
                       variant="outline" 
                       style={{ borderColor: theme.accent, color: theme.accentText }}
@@ -1310,4 +1321,5 @@ export default function LaundryMasterTemplate({ themeColor, isAuthenticated, onB
     </div>
   )
 }
+
 
