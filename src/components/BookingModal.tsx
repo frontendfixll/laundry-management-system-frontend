@@ -3,7 +3,7 @@
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 import { useState, useEffect, useCallback } from 'react'
-import { X, MapPin, Sparkles, Package, Calendar, Clock, ChevronRight, ChevronLeft, Loader2, Check, Minus, Plus, Phone, CreditCard, Truck, CheckCircle, Building2, Home } from 'lucide-react'
+import { X, MapPin, Sparkles, Package, Calendar, Clock, ChevronRight, ChevronLeft, Loader2, Check, Minus, Plus, Phone, CreditCard, Truck, CheckCircle, Building2, Home, Tag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
@@ -110,6 +110,12 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
   const needsPickupAddress = serviceType === 'full_service' || serviceType === 'home_pickup_self_pickup'
   const needsDeliveryAddress = serviceType === 'full_service' || serviceType === 'self_drop_home_delivery'
   const getServiceTypeDiscount = () => SERVICE_TYPES.find(s => s.id === serviceType)?.discount || 0
+  
+  // Coupon states
+  const [couponCode, setCouponCode] = useState('')
+  const [couponLoading, setCouponLoading] = useState(false)
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
+  const [couponError, setCouponError] = useState('')
   
   // Order states
   const [isExpress, setIsExpress] = useState(false)
@@ -293,6 +299,53 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
     }
   }
 
+  const validateCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code')
+      return
+    }
+    
+    setCouponLoading(true)
+    setCouponError('')
+    
+    try {
+      const orderValue = getTotalPrice() + (deliveryInfo?.deliveryCharge || 0)
+      const response = await fetch(`${API_URL}/customer/coupons/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          code: couponCode.toUpperCase(),
+          orderValue,
+          tenancyId
+        })
+      })
+      const data = await response.json()
+      
+      if (data.success) {
+        setAppliedCoupon(data.data)
+        setCouponError('')
+        toast.success(`Coupon applied! You save ₹${data.data.discount}`)
+      } else {
+        setCouponError(data.message || 'Invalid coupon code')
+        setAppliedCoupon(null)
+      }
+    } catch (error) {
+      setCouponError('Failed to validate coupon')
+      setAppliedCoupon(null)
+    } finally {
+      setCouponLoading(false)
+    }
+  }
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null)
+    setCouponCode('')
+    setCouponError('')
+  }
+
   const handleAddAddress = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -349,6 +402,8 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
       selectedBranchId: selectedBranch?._id,
       // Tenancy ID for tenant-specific orders
       tenancyId: tenancyId,
+      // Coupon code if applied
+      couponCode: appliedCoupon?.coupon?.code || undefined,
       deliveryDetails: deliveryInfo ? {
         distance: deliveryInfo.distance,
         deliveryCharge: deliveryInfo.deliveryCharge,
@@ -449,6 +504,10 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
     setCalculatedPricing(null)
     setDeliveryInfo(null)
     setServiceType('full_service')
+    // Reset coupon
+    setCouponCode('')
+    setAppliedCoupon(null)
+    setCouponError('')
   }
 
   const handleClose = () => {
@@ -1002,6 +1061,43 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
                     </div>
                   </div>
 
+                  {/* Coupon Code */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Have a Coupon?</label>
+                    {appliedCoupon ? (
+                      <div className="p-3 bg-green-50 border border-green-200 rounded-xl">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-green-600 font-bold">{appliedCoupon.coupon.code}</span>
+                            <span className="text-green-700 text-sm">- ₹{appliedCoupon.discount} off</span>
+                          </div>
+                          <button onClick={removeCoupon} className="text-red-500 hover:text-red-700 text-sm">
+                            Remove
+                          </button>
+                        </div>
+                        <p className="text-xs text-green-600 mt-1">{appliedCoupon.coupon.name}</p>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Enter coupon code"
+                          value={couponCode}
+                          onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError('') }}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 uppercase"
+                        />
+                        <button
+                          onClick={validateCoupon}
+                          disabled={couponLoading || !couponCode.trim()}
+                          className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {couponLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+                        </button>
+                      </div>
+                    )}
+                    {couponError && <p className="text-red-500 text-sm mt-1">{couponError}</p>}
+                  </div>
+
                   {/* Total */}
                   <div className="p-4 bg-teal-50 rounded-xl">
                     <div className="flex justify-between text-sm mb-1">
@@ -1016,10 +1112,18 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
                         </span>
                       </div>
                     )}
+                    {appliedCoupon && (
+                      <div className="flex justify-between text-sm mb-1 text-green-600">
+                        <span>Coupon Discount ({appliedCoupon.coupon.code})</span>
+                        <span>-₹{appliedCoupon.discount}</span>
+                      </div>
+                    )}
                     <hr className="my-2 border-teal-200" />
                     <div className="flex justify-between font-bold">
                       <span>Total</span>
-                      <span className="text-teal-600">₹{getTotalPrice() + (deliveryInfo?.deliveryCharge || 0)}</span>
+                      <span className="text-teal-600">
+                        ₹{Math.max(0, getTotalPrice() + (deliveryInfo?.deliveryCharge || 0) - (appliedCoupon?.discount || 0))}
+                      </span>
                     </div>
                   </div>
                 </div>

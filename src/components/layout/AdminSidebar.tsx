@@ -21,6 +21,7 @@ import {
   Ticket,
   Palette,
   QrCode,
+  Tag,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, createContext, useContext } from 'react'
@@ -34,6 +35,7 @@ const navigation = [
   { name: 'Customers', href: '/admin/customers', icon: Users, permission: { module: 'customers', action: 'view' } },
   { name: 'Inventory', href: '/admin/inventory', icon: Package, permission: { module: 'inventory', action: 'view' } },
   { name: 'Services', href: '/admin/services', icon: Sparkles, permission: { module: 'services', action: 'view' } },
+  { name: 'Coupons', href: '/admin/coupons', icon: Tag, permission: { module: 'coupons', action: 'view' } },
   { name: 'Logistics', href: '/admin/logistics', icon: Truck, permission: { module: 'logistics', action: 'view' } },
   { name: 'Support Tickets', href: '/admin/tickets', icon: Ticket, permission: { module: 'tickets', action: 'view' } },
   { name: 'Refunds', href: '/admin/refunds', icon: RefreshCw, permission: { module: 'orders', action: 'cancel' } },
@@ -59,7 +61,7 @@ const hasPermission = (user: any, permission: { module: string; action: string }
   }
   
   const hasIt = user.permissions[permission.module]?.[permission.action] === true
-  console.log(`🔐 Permission check: ${permission.module}.${permission.action} = ${hasIt}`)
+  console.log(`🔐 Permission check: ${permission.module}.${permission.action} = ${hasIt}`, user.permissions)
   return hasIt
 }
 
