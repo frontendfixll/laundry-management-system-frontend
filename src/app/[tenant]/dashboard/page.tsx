@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { 
   ShoppingBag, Clock, CheckCircle, Truck, Plus, MapPin, Calendar, ArrowRight, 
-  Package, Sparkles, User, HelpCircle, Star, Gift, ChevronRight, BarChart3, 
+  Package, Sparkles, User, HelpCircle, Star, Gift, ChevronRight, ChevronLeft, BarChart3, 
   TrendingUp, ArrowLeft, Home, LogOut, Menu, X, Wallet
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -190,6 +190,21 @@ export default function TenantDashboard() {
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0, pending: 0, cancelled: 0 })
   const [greeting, setGreeting] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  // Load sidebar collapsed state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('tenant-sidebar-collapsed')
+    if (saved) {
+      setSidebarCollapsed(JSON.parse(saved))
+    }
+  }, [])
+
+  const toggleSidebarCollapse = () => {
+    const newValue = !sidebarCollapsed
+    setSidebarCollapsed(newValue)
+    localStorage.setItem('tenant-sidebar-collapsed', JSON.stringify(newValue))
+  }
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -315,45 +330,74 @@ export default function TenantDashboard() {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 transform transition-transform duration-300 lg:transform-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transform transition-all duration-300 lg:transform-none ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} ${sidebarCollapsed ? 'w-20' : 'w-72'}`}>
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="p-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <Link href={`/${tenant}`} className="flex items-center gap-3">
-                {tenantInfo?.branding?.logo?.url ? (
-                  <img src={tenantInfo.branding.logo.url} alt={tenantInfo.name} className="w-10 h-10 rounded-xl object-contain" />
-                ) : (
-                  <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <Sparkles className="w-5 h-5 text-white" />
+              {!sidebarCollapsed && (
+                <Link href={`/${tenant}`} className="flex items-center gap-3">
+                  {tenantInfo?.branding?.logo?.url ? (
+                    <img src={tenantInfo.branding.logo.url} alt={tenantInfo.name} className="w-10 h-10 rounded-xl object-contain" />
+                  ) : (
+                    <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="font-bold text-gray-800">{tenantInfo?.name || 'Dashboard'}</h1>
+                    <p className="text-xs text-gray-500">Customer Portal</p>
                   </div>
-                )}
-                <div>
-                  <h1 className="font-bold text-gray-800">{tenantInfo?.name || 'Dashboard'}</h1>
-                  <p className="text-xs text-gray-500">Customer Portal</p>
-                </div>
-              </Link>
+                </Link>
+              )}
+              {sidebarCollapsed && (
+                <Link href={`/${tenant}`} className="mx-auto">
+                  {tenantInfo?.branding?.logo?.url ? (
+                    <img src={tenantInfo.branding.logo.url} alt={tenantInfo.name} className="w-10 h-10 rounded-xl object-contain" />
+                  ) : (
+                    <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                  )}
+                </Link>
+              )}
               <button className="lg:hidden p-2 hover:bg-gray-100 rounded-lg" onClick={() => setSidebarOpen(false)}>
                 <X className="w-5 h-5 text-gray-500" />
+              </button>
+              <button 
+                className="hidden lg:flex p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={toggleSidebarCollapse}
+                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              >
+                {sidebarCollapsed ? <ChevronRight className="w-5 h-5 text-gray-500" /> : <ChevronLeft className="w-5 h-5 text-gray-500" />}
               </button>
             </div>
           </div>
 
           {/* User Info */}
-          <div className="p-4 border-b border-gray-100">
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl">
+          {!sidebarCollapsed && (
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl">
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-semibold">{user?.name?.charAt(0).toUpperCase()}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-800 truncate">{user?.name}</p>
+                  <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          {sidebarCollapsed && (
+            <div className="p-2 border-b border-gray-100 flex justify-center">
               <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-semibold">{user?.name?.charAt(0).toUpperCase()}</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
-              </div>
             </div>
-          </div>
+          )}
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          <nav className={`flex-1 ${sidebarCollapsed ? 'p-2' : 'p-4'} space-y-1 overflow-y-auto`}>
             {sidebarNavigation.map((item) => {
               const href = `/${tenant}/${item.href}`
               const isActive = item.current
@@ -361,29 +405,38 @@ export default function TenantDashboard() {
                 <Link
                   key={item.name}
                   href={href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  title={sidebarCollapsed ? item.name : undefined}
+                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 rounded-xl transition-all ${
                     isActive 
                       ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30' 
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-gray-400'}`} />
-                  <span className="font-medium">{item.name}</span>
+                  <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`} />
+                  {!sidebarCollapsed && <span className="font-medium">{item.name}</span>}
                 </Link>
               )
             })}
           </nav>
 
           {/* Sidebar Footer */}
-          <div className="p-4 border-t border-gray-100 space-y-2">
-            <Link href={`/${tenant}`} className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-all">
-              <ArrowLeft className="w-5 h-5 text-gray-400" />
-              <span className="font-medium">Back to Store</span>
+          <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'} border-t border-gray-100 space-y-2`}>
+            <Link 
+              href={`/${tenant}`} 
+              title={sidebarCollapsed ? 'Back to Store' : undefined}
+              className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-all`}
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              {!sidebarCollapsed && <span className="font-medium">Back to Store</span>}
             </Link>
-            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all">
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
+            <button 
+              onClick={handleLogout} 
+              title={sidebarCollapsed ? 'Logout' : undefined}
+              className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all`}
+            >
+              <LogOut className="w-5 h-5 flex-shrink-0" />
+              {!sidebarCollapsed && <span className="font-medium">Logout</span>}
             </button>
           </div>
         </div>
