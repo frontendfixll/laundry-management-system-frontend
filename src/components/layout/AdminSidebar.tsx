@@ -16,12 +16,20 @@ import {
   Package,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Sparkles,
   LogOut,
   Ticket,
   Palette,
   QrCode,
   Tag,
+  Percent,
+  Gift,
+  Star,
+  Users2,
+  Target,
+  MapPin,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useState, useEffect, createContext, useContext } from 'react'
@@ -36,7 +44,20 @@ const navigation = [
   { name: 'Customers', href: '/admin/customers', icon: Users, permission: { module: 'customers', action: 'view' } },
   { name: 'Inventory', href: '/admin/inventory', icon: Package, permission: { module: 'inventory', action: 'view' } },
   { name: 'Services', href: '/admin/services', icon: Sparkles, permission: { module: 'services', action: 'view' } },
-  { name: 'Coupons', href: '/admin/coupons', icon: Tag, permission: { module: 'coupons', action: 'view' } },
+  { name: 'Branches', href: '/admin/branches', icon: MapPin, permission: { module: 'settings', action: 'view' } },
+  { name: 'Campaigns', href: '/admin/campaigns', icon: Target, permission: { module: 'coupons', action: 'view' } },
+  { 
+    name: 'Programs', 
+    icon: Gift, 
+    permission: { module: 'coupons', action: 'view' },
+    isExpandable: true,
+    subItems: [
+      { name: 'Coupons', href: '/admin/coupons', icon: Tag, permission: { module: 'coupons', action: 'view' } },
+      { name: 'Discounts', href: '/admin/discounts', icon: Percent, permission: { module: 'coupons', action: 'view' } },
+      { name: 'Referrals', href: '/admin/referrals', icon: Users2, permission: { module: 'coupons', action: 'view' } },
+      { name: 'Loyalty', href: '/admin/loyalty', icon: Star, permission: { module: 'coupons', action: 'view' } },
+    ]
+  },
   { name: 'Logistics', href: '/admin/logistics', icon: Truck, permission: { module: 'logistics', action: 'view' } },
   { name: 'Support Tickets', href: '/admin/tickets', icon: Ticket, permission: { module: 'tickets', action: 'view' } },
   { name: 'Refunds', href: '/admin/refunds', icon: RefreshCw, permission: { module: 'orders', action: 'cancel' } },
@@ -72,6 +93,8 @@ interface SidebarContextType {
   setIsCollapsed: (value: boolean) => void
   mobileOpen: boolean
   setMobileOpen: (value: boolean) => void
+  expandedItems: string[]
+  toggleExpanded: (itemName: string) => void
 }
 
 const SidebarContext = createContext<SidebarContextType>({
@@ -79,6 +102,8 @@ const SidebarContext = createContext<SidebarContextType>({
   setIsCollapsed: () => {},
   mobileOpen: false,
   setMobileOpen: () => {},
+  expandedItems: [],
+  toggleExpanded: () => {},
 })
 
 export const useAdminSidebar = () => useContext(SidebarContext)
@@ -90,11 +115,17 @@ export function AdminSidebarProvider({
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [expandedItems, setExpandedItems] = useState<string[]>(['Programs']) // Programs expanded by default
 
   useEffect(() => {
     const saved = localStorage.getItem('admin-sidebar-collapsed')
     if (saved) {
       setIsCollapsed(JSON.parse(saved))
+    }
+    
+    const savedExpanded = localStorage.getItem('admin-sidebar-expanded')
+    if (savedExpanded) {
+      setExpandedItems(JSON.parse(savedExpanded))
     }
   }, [])
 
@@ -103,9 +134,25 @@ export function AdminSidebarProvider({
     localStorage.setItem('admin-sidebar-collapsed', JSON.stringify(value))
   }
 
+  const toggleExpanded = (itemName: string) => {
+    const newExpanded = expandedItems.includes(itemName)
+      ? expandedItems.filter(item => item !== itemName)
+      : [...expandedItems, itemName]
+    
+    setExpandedItems(newExpanded)
+    localStorage.setItem('admin-sidebar-expanded', JSON.stringify(newExpanded))
+  }
+
   return (
     <SidebarContext.Provider
-      value={{ isCollapsed, setIsCollapsed: handleSetCollapsed, mobileOpen, setMobileOpen }}
+      value={{ 
+        isCollapsed, 
+        setIsCollapsed: handleSetCollapsed, 
+        mobileOpen, 
+        setMobileOpen,
+        expandedItems,
+        toggleExpanded
+      }}
     >
       {children}
     </SidebarContext.Provider>
@@ -114,7 +161,7 @@ export function AdminSidebarProvider({
 
 export function AdminSidebar() {
   const pathname = usePathname()
-  const { isCollapsed, setIsCollapsed } = useAdminSidebar()
+  const { isCollapsed, setIsCollapsed, expandedItems, toggleExpanded } = useAdminSidebar()
   const { user, logout } = useAuthStore()
   const { metrics, loading: metricsLoading } = useAdminDashboard()
 
@@ -125,6 +172,123 @@ export function AdminSidebar() {
   const handleLogout = () => {
     logout()
     window.location.href = '/'
+  }
+
+  // Check if any sub-item is active
+  const isParentActive = (item: any) => {
+    if (item.href) {
+      return pathname === item.href || pathname.startsWith(item.href + '/')
+    }
+    if (item.subItems) {
+      return item.subItems.some((subItem: any) => 
+        pathname === subItem.href || pathname.startsWith(subItem.href + '/')
+      )
+    }
+    return false
+  }
+
+  const renderNavItem = (item: any) => {
+    const isActive = isParentActive(item)
+    const Icon = item.icon
+    const isExpanded = expandedItems.includes(item.name)
+
+    if (item.isExpandable && item.subItems) {
+      return (
+        <div key={item.name}>
+          {/* Parent Item */}
+          <button
+            onClick={() => toggleExpanded(item.name)}
+            className={cn(
+              'group flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-all',
+              isActive
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+                : 'text-gray-700 hover:bg-blue-50'
+            )}
+          >
+            <Icon
+              className={cn(
+                'flex-shrink-0 w-5 h-5',
+                isCollapsed ? 'mx-auto' : 'mr-3',
+                isActive
+                  ? 'text-white'
+                  : 'text-gray-400 group-hover:text-blue-500'
+              )}
+            />
+            {!isCollapsed && (
+              <>
+                <span className="truncate flex-1 text-left">{item.name}</span>
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4 ml-2" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                )}
+              </>
+            )}
+          </button>
+
+          {/* Sub Items */}
+          {!isCollapsed && isExpanded && (
+            <div className="ml-6 mt-1 space-y-1">
+              {item.subItems
+                .filter((subItem: any) => hasPermission(user, subItem.permission))
+                .map((subItem: any) => {
+                const isSubActive = pathname === subItem.href || pathname.startsWith(subItem.href + '/')
+                const SubIcon = subItem.icon
+
+                return (
+                  <Link
+                    key={subItem.name}
+                    href={subItem.href}
+                    className={cn(
+                      'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
+                      isSubActive
+                        ? 'bg-blue-100 text-blue-700 border-l-2 border-blue-500'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    )}
+                  >
+                    <SubIcon
+                      className={cn(
+                        'flex-shrink-0 w-4 h-4 mr-3',
+                        isSubActive
+                          ? 'text-blue-500'
+                          : 'text-gray-400 group-hover:text-gray-500'
+                      )}
+                    />
+                    <span className="truncate">{subItem.name}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    // Regular navigation item
+    return (
+      <Link
+        key={item.name}
+        href={item.href}
+        title={isCollapsed ? item.name : undefined}
+        className={cn(
+          'group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all',
+          isActive
+            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
+            : 'text-gray-700 hover:bg-blue-50'
+        )}
+      >
+        <Icon
+          className={cn(
+            'flex-shrink-0 w-5 h-5',
+            isCollapsed ? 'mx-auto' : 'mr-3',
+            isActive
+              ? 'text-white'
+              : 'text-gray-400 group-hover:text-blue-500'
+          )}
+        />
+        {!isCollapsed && <span className="truncate">{item.name}</span>}
+      </Link>
+    )
   }
 
   return (
@@ -183,35 +347,7 @@ export function AdminSidebar() {
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
         {navigation
           .filter(item => hasPermission(user, item.permission))
-          .map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-          const Icon = item.icon
-
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              title={isCollapsed ? item.name : undefined}
-              className={cn(
-                'group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all',
-                isActive
-                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30'
-                  : 'text-gray-700 hover:bg-blue-50'
-              )}
-            >
-              <Icon
-                className={cn(
-                  'flex-shrink-0 w-5 h-5',
-                  isCollapsed ? 'mx-auto' : 'mr-3',
-                  isActive
-                    ? 'text-white'
-                    : 'text-gray-400 group-hover:text-blue-500'
-                )}
-              />
-              {!isCollapsed && <span className="truncate">{item.name}</span>}
-            </Link>
-          )
-        })}
+          .map(renderNavItem)}
       </nav>
 
       {/* Quick Stats - Only show when expanded */}
