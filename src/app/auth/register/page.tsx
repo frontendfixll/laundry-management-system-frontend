@@ -150,9 +150,10 @@ function OriginalRegisterForm({ referralCode }: { referralCode: string | null })
       return
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/
+    // Password validation - require uppercase, lowercase, and number (special char optional)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/
     if (!passwordRegex.test(formData.password)) {
-      toast.error('Password must contain uppercase, lowercase, number, and special character')
+      toast.error('Password must contain at least one uppercase, one lowercase, and one number')
       return
     }
 
