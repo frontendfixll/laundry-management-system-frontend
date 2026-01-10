@@ -24,6 +24,12 @@ export default function FreshSpinRegisterForm({ referralCode }: { referralCode?:
       toast.error('Password must be at least 8 characters')
       return
     }
+    // Password validation - require uppercase, lowercase, number, and special character
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/
+    if (!passwordRegex.test(formData.password)) {
+      toast.error('Password must contain uppercase, lowercase, number, and special character')
+      return
+    }
     setIsLoading(true)
     try {
       const response = await authAPI.register({ 

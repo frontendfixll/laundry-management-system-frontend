@@ -42,11 +42,16 @@ function RegisterContent() {
       const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
       
       // Extract subdomain (e.g., "dgsfg" from "dgsfg.example.com")
+      // Skip Vercel preview URLs (*.vercel.app) as they're not real tenant subdomains
       let subdomain: string | null = null
       if (!isLocalhost) {
         const parts = hostname.split('.')
-        // If we have more than 2 parts (subdomain.domain.tld), first part is subdomain
-        if (parts.length > 2) {
+        const isVercelUrl = hostname.endsWith('.vercel.app')
+        const isRenderUrl = hostname.endsWith('.onrender.com')
+        
+        // Only extract subdomain for real custom domains (not deployment platforms)
+        // For custom domains: subdomain.yourdomain.com has 3+ parts
+        if (parts.length > 2 && !isVercelUrl && !isRenderUrl) {
           subdomain = parts[0]
         }
       }
@@ -150,10 +155,10 @@ function OriginalRegisterForm({ referralCode }: { referralCode: string | null })
       return
     }
 
-    // Password validation - require uppercase, lowercase, and number (special char optional)
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/
+    // Password validation - require uppercase, lowercase, number, and special character
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/
     if (!passwordRegex.test(formData.password)) {
-      toast.error('Password must contain at least one uppercase, one lowercase, and one number')
+      toast.error('Password must contain at least one uppercase, one lowercase, one number, and one special character (!@#$%^&*)')
       return
     }
 

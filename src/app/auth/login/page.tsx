@@ -21,11 +21,16 @@ export default function LoginPage() {
       const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
       
       // Extract subdomain (e.g., "dgsfg" from "dgsfg.example.com")
+      // Skip Vercel preview URLs (*.vercel.app) as they're not real tenant subdomains
       let subdomain: string | null = null
       if (!isLocalhost) {
         const parts = hostname.split('.')
-        // If we have more than 2 parts (subdomain.domain.tld), first part is subdomain
-        if (parts.length > 2) {
+        const isVercelUrl = hostname.endsWith('.vercel.app')
+        const isRenderUrl = hostname.endsWith('.onrender.com')
+        
+        // Only extract subdomain for real custom domains (not deployment platforms)
+        // For custom domains: subdomain.yourdomain.com has 3+ parts
+        if (parts.length > 2 && !isVercelUrl && !isRenderUrl) {
           subdomain = parts[0]
         }
       }
