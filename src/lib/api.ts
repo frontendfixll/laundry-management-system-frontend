@@ -93,6 +93,8 @@ export const authAPI = {
     password: string
     confirmPassword: string
     role?: string
+    referralCode?: string
+    tenancySlug?: string
   }) => api.post('/auth/register', userData),
   
   verifyEmail: (token: string) => api.post('/auth/verify-email', { token }),

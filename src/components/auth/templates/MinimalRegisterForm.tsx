@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { authAPI } from '@/lib/api'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowLeft, Zap, Shield, Clock, Truck, Star } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowLeft, Zap, Shield, Clock, Truck, Star, Gift } from 'lucide-react'
 
-export default function MinimalRegisterForm() {
+export default function MinimalRegisterForm({ referralCode }: { referralCode?: string | null }) {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -26,7 +26,17 @@ export default function MinimalRegisterForm() {
     }
     setIsLoading(true)
     try {
-      await authAPI.register({ name: formData.name, email: formData.email, phone: formData.phone, password: formData.password, confirmPassword: formData.confirmPassword })
+      const response = await authAPI.register({ 
+        name: formData.name, 
+        email: formData.email, 
+        phone: formData.phone, 
+        password: formData.password, 
+        confirmPassword: formData.confirmPassword,
+        referralCode: referralCode || undefined
+      })
+      if (response.data?.referralApplied) {
+        toast.success('🎁 Referral bonus will be applied on your first order!')
+      }
       toast.success('Registration successful! Please check your email.')
       router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (error: any) {

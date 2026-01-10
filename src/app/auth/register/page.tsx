@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { authAPI } from '@/lib/api'
 import toast from 'react-hot-toast'
-import { Eye, EyeOff, Mail, Lock, User, Phone, Sparkles, ArrowLeft, CheckCircle, Shield, Truck, Clock, Star } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, User, Phone, Sparkles, ArrowLeft, CheckCircle, Shield, Truck, Clock, Star, Gift } from 'lucide-react'
 import MinimalRegisterForm from '@/components/auth/templates/MinimalRegisterForm'
 import FreshSpinRegisterForm from '@/components/auth/templates/FreshSpinRegisterForm'
 import LaundryMasterRegisterForm from '@/components/auth/templates/LaundryMasterRegisterForm'
@@ -14,11 +14,28 @@ import { getCurrentTemplate } from '@/utils/templateUtils'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
-export default function RegisterPage() {
+// Loading component
+function RegisterLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
+    </div>
+  )
+}
+
+// Main register content
+function RegisterContent() {
   const [template, setTemplate] = useState<string>('original')
   const [isLoadingTemplate, setIsLoadingTemplate] = useState(true)
+  const searchParams = useSearchParams()
+  const referralCode = searchParams.get('ref')
 
   useEffect(() => {
+    // Store referral code in sessionStorage for other templates
+    if (referralCode) {
+      sessionStorage.setItem('referralCode', referralCode)
+    }
+    
     const detectTemplate = async () => {
       // Check if we're on a tenant subdomain
       const hostname = window.location.hostname
@@ -83,22 +100,31 @@ export default function RegisterPage() {
 
   // Use template-specific register forms for templates 2, 3, and 4
   if (template === 'minimal') {
-    return <MinimalRegisterForm />
+    return <MinimalRegisterForm referralCode={referralCode} />
   }
 
   if (template === 'freshspin') {
-    return <FreshSpinRegisterForm />
+    return <FreshSpinRegisterForm referralCode={referralCode} />
   }
 
   if (template === 'starter') {
-    return <LaundryMasterRegisterForm />
+    return <LaundryMasterRegisterForm referralCode={referralCode} />
   }
 
   // Original template (template 1) - keep existing design
-  return <OriginalRegisterForm />
+  return <OriginalRegisterForm referralCode={referralCode} />
 }
 
-function OriginalRegisterForm() {
+// Export with Suspense wrapper
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<RegisterLoading />}>
+      <RegisterContent />
+    </Suspense>
+  )
+}
+
+function OriginalRegisterForm({ referralCode }: { referralCode: string | null }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -133,14 +159,19 @@ function OriginalRegisterForm() {
     setIsLoading(true)
 
     try {
-      await authAPI.register({
+      const response = await authAPI.register({
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
+        referralCode: referralCode || undefined,
       })
 
+      if (response.data?.referralApplied) {
+        toast.success(`🎁 Referral bonus will be applied on your first order!`)
+      }
+      
       toast.success('Registration successful! Please check your email to verify your account.')
       router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (error: any) {
@@ -267,6 +298,21 @@ function OriginalRegisterForm() {
 
             {/* Register Form Card */}
             <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+              {/* Referral Banner */}
+              {referralCode && (
+                <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Gift className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-green-800">Referral Code Applied!</p>
+                      <p className="text-sm text-green-600">You'll get a bonus on your first order 🎁</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="hidden lg:block mb-6">
                 <h2 className="text-2xl font-bold text-gray-800" style={{ fontFamily: 'Poppins, sans-serif' }}>Create Account</h2>
                 <p className="text-gray-600 mt-1" style={{ fontSize: '15px' }}>Join thousands of satisfied customers</p>
