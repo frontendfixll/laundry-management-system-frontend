@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, MapPin, Phone, Clock, Users } from 'lucide-react'
+import { X, MapPin, Phone, Clock, Users, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,6 +20,28 @@ const getAuthToken = () => {
   }
   // Also check for direct token storage
   return localStorage.getItem('token')
+}
+
+// Geocode address using free Nominatim API
+const geocodeAddress = async (address: string): Promise<{lat: number, lng: number} | null> => {
+  try {
+    const encodedAddress = encodeURIComponent(address)
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`,
+      { headers: { 'User-Agent': 'LaundryPro-Admin/1.0' } }
+    )
+    const data = await response.json()
+    if (data && data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lng: parseFloat(data[0].lon)
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Geocoding error:', error)
+    return null
+  }
 }
 
 interface CreateBranchModalProps {
@@ -43,6 +65,10 @@ interface BranchFormData {
     phone: string
     email: string
     whatsapp: string
+  }
+  coordinates: {
+    latitude: number | string
+    longitude: number | string
   }
   capacity: {
     maxOrdersPerDay: number
@@ -71,6 +97,7 @@ const WORKING_DAYS = [
 export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchModalProps) {
   const [loading, setLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
+  const [geocoding, setGeocoding] = useState(false)
   
   const initialFormData: BranchFormData = {
     name: '',
@@ -87,6 +114,10 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
       phone: '',
       email: '',
       whatsapp: ''
+    },
+    coordinates: {
+      latitude: '',
+      longitude: ''
     },
     capacity: {
       maxOrdersPerDay: 100,
@@ -143,6 +174,70 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
     }))
   }
 
+  // Auto-geocode when pincode or city changes
+  const handleAutoGeocode = async () => {
+    const { addressLine1, city, state, pincode } = formData.address
+    
+    if (!pincode || pincode.length < 6) {
+      return // Need valid pincode
+    }
+    
+    // Build address string for geocoding
+    const addressParts = [addressLine1, city, state, pincode, 'India'].filter(Boolean)
+    const fullAddress = addressParts.join(', ')
+    
+    setGeocoding(true)
+    try {
+      const coords = await geocodeAddress(fullAddress)
+      if (coords) {
+        setFormData(prev => ({
+          ...prev,
+          coordinates: {
+            latitude: coords.lat,
+            longitude: coords.lng
+          }
+        }))
+        toast.success('📍 Coordinates auto-filled from address!', {
+          duration: 3000,
+          position: 'top-right',
+        })
+      } else {
+        // Try with just pincode and city
+        const simpleAddress = `${pincode}, ${city || ''}, India`
+        const simpleCoords = await geocodeAddress(simpleAddress)
+        if (simpleCoords) {
+          setFormData(prev => ({
+            ...prev,
+            coordinates: {
+              latitude: simpleCoords.lat,
+              longitude: simpleCoords.lng
+            }
+          }))
+          toast.success('📍 Coordinates auto-filled from pincode!', {
+            duration: 3000,
+            position: 'top-right',
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Auto-geocode error:', error)
+    } finally {
+      setGeocoding(false)
+    }
+  }
+
+  // Handle pincode change with auto-geocode
+  const handlePincodeChange = (value: string) => {
+    handleInputChange('address', 'pincode', value)
+    
+    // Auto-geocode when pincode is complete (6 digits)
+    if (value.length === 6) {
+      setTimeout(() => {
+        handleAutoGeocode()
+      }, 500) // Small delay to let state update
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -154,13 +249,28 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
     
     setLoading(true)
 
+    // Prepare data with proper coordinate format
+    const submitData = {
+      ...formData,
+      coordinates: {
+        latitude: formData.coordinates.latitude ? parseFloat(String(formData.coordinates.latitude)) : undefined,
+        longitude: formData.coordinates.longitude ? parseFloat(String(formData.coordinates.longitude)) : undefined
+      }
+    }
+
+    // Remove coordinates if not provided
+    if (!submitData.coordinates.latitude || !submitData.coordinates.longitude) {
+      delete (submitData as any).coordinates
+    }
+
     // Debug: Log the exact form data being submitted
     console.log('🔍 Form Data being submitted:')
-    console.log('Name:', formData.name)
-    console.log('Code:', formData.code)
-    console.log('Address:', formData.address)
-    console.log('Contact:', formData.contact)
-    console.log('Full formData:', JSON.stringify(formData, null, 2))
+    console.log('Name:', submitData.name)
+    console.log('Code:', submitData.code)
+    console.log('Address:', submitData.address)
+    console.log('Contact:', submitData.contact)
+    console.log('Coordinates:', submitData.coordinates)
+    console.log('Full submitData:', JSON.stringify(submitData, null, 2))
 
     try {
       const token = getAuthToken()
@@ -172,7 +282,7 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       })
 
       console.log('Response status:', response.status)
@@ -180,6 +290,29 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
       if (response.ok) {
         const result = await response.json()
         console.log('✅ Success result:', result)
+        
+        // If coordinates are provided and branch was created, update coordinates separately
+        const branchId = result.data?.branch?._id || result.data?._id
+        if (branchId && submitData.coordinates?.latitude && submitData.coordinates?.longitude) {
+          try {
+            await fetch(`${API_URL}/admin/branches/${branchId}/coordinates`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                latitude: submitData.coordinates.latitude,
+                longitude: submitData.coordinates.longitude,
+                serviceableRadius: submitData.serviceableRadius || 20
+              })
+            })
+            console.log('✅ Coordinates saved successfully')
+          } catch (coordError) {
+            console.warn('Could not save coordinates:', coordError)
+          }
+        }
+        
         toast.success('Branch created successfully!', {
           duration: 4000,
           position: 'top-right',
@@ -448,12 +581,12 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
                     <Input
                       id="pincode"
                       value={formData.address.pincode}
-                      onChange={(e) => handleInputChange('address', 'pincode', e.target.value)}
+                      onChange={(e) => handlePincodeChange(e.target.value)}
                       placeholder="400001"
                       maxLength={6}
                       required
                     />
-                    <p className="text-xs text-gray-500 mt-1">Exactly 6 digits required</p>
+                    <p className="text-xs text-gray-500 mt-1">6 digits - auto-fills GPS coordinates</p>
                   </div>
                   <div>
                     <Label htmlFor="landmark">Landmark</Label>
@@ -477,6 +610,62 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
                     min="1"
                     max="100"
                   />
+                </div>
+
+                {/* GPS Coordinates - Auto-filled */}
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-base font-medium flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      GPS Coordinates
+                      {geocoding && <Loader2 className="h-4 w-4 animate-spin text-blue-500" />}
+                    </Label>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleAutoGeocode}
+                      disabled={geocoding || !formData.address.pincode}
+                    >
+                      {geocoding ? 'Finding...' : '🔄 Auto-detect'}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Auto-filled from pincode. You can also enter manually from Google Maps.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="latitude">Latitude</Label>
+                      <Input
+                        id="latitude"
+                        type="number"
+                        step="any"
+                        value={formData.coordinates.latitude}
+                        onChange={(e) => handleInputChange('coordinates', 'latitude', e.target.value)}
+                        placeholder="26.9124"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="longitude">Longitude</Label>
+                      <Input
+                        id="longitude"
+                        type="number"
+                        step="any"
+                        value={formData.coordinates.longitude}
+                        onChange={(e) => handleInputChange('coordinates', 'longitude', e.target.value)}
+                        placeholder="75.7873"
+                      />
+                    </div>
+                  </div>
+                  {formData.coordinates.latitude && formData.coordinates.longitude ? (
+                    <p className="text-sm text-green-600 mt-2">
+                      ✓ Coordinates: {formData.coordinates.latitude}, {formData.coordinates.longitude}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-amber-600 mt-2">
+                      ⚠️ Enter pincode to auto-fill coordinates
+                    </p>
+                  )}
                 </div>
               </div>
             )}
@@ -609,6 +798,16 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
                     <p className="text-sm text-gray-600">
                       {formData.address.addressLine1}, {formData.address.city}, {formData.address.state} - {formData.address.pincode}
                     </p>
+                    {formData.coordinates.latitude && formData.coordinates.longitude && (
+                      <p className="text-sm text-green-600 mt-1">
+                        📍 GPS: {formData.coordinates.latitude}, {formData.coordinates.longitude}
+                      </p>
+                    )}
+                    {(!formData.coordinates.latitude || !formData.coordinates.longitude) && (
+                      <p className="text-sm text-amber-600 mt-1">
+                        ⚠️ No GPS coordinates - distance calculation won't work
+                      </p>
+                    )}
                   </div>
                   
                   <div>
@@ -618,6 +817,9 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
                     </p>
                     <p className="text-sm text-gray-600">
                       Max: {formData.capacity.maxOrdersPerDay} orders/day, {formData.capacity.maxWeightPerDay}kg/day
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Service Radius: {formData.serviceableRadius} km
                     </p>
                   </div>
                 </div>

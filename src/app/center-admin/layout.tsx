@@ -97,7 +97,7 @@ export default function CenterAdminLayout({
         <main className={`flex-1 p-4 lg:p-6 overflow-x-auto transition-all duration-300 ${
           sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
         }`}>
-          <div className="max-w-full">
+          <div className="max-w-screen-2xl mx-auto">
             {children}
           </div>
         </main>

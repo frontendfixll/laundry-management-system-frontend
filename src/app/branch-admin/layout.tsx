@@ -1,23 +1,23 @@
 'use client'
 
 import {
-  AdminSidebar,
-  AdminSidebarProvider,
-  useAdminSidebar,
-} from '@/components/layout/AdminSidebar'
-import AdminHeader from '@/components/layout/AdminHeader'
+  BranchAdminSidebar,
+  BranchAdminSidebarProvider,
+  useBranchAdminSidebar,
+} from '@/components/layout/BranchAdminSidebar'
+import BranchAdminHeader from '@/components/layout/BranchAdminHeader'
 import { useAuthStore } from '@/store/authStore'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 
-function AdminLayoutContent({ children }: { children: React.ReactNode }) {
-  const { isCollapsed, setMobileOpen } = useAdminSidebar()
+function BranchAdminLayoutContent({ children }: { children: React.ReactNode }) {
+  const { isCollapsed, setMobileOpen } = useBranchAdminSidebar()
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <AdminSidebar />
+      <BranchAdminSidebar />
 
       {/* Main Content */}
       <div
@@ -27,9 +27,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         )}
       >
         {/* Header - Fixed */}
-        <AdminHeader onMenuClick={() => setMobileOpen(true)} sidebarCollapsed={isCollapsed} />
+        <BranchAdminHeader onMenuClick={() => setMobileOpen(true)} sidebarCollapsed={isCollapsed} />
 
-        {/* Page Content - Add padding for fixed header (h-16 = 64px) */}
+        {/* Page Content */}
         <main className="p-4 lg:p-6 mt-16">
           <div className="max-w-screen-2xl mx-auto">{children}</div>
         </main>
@@ -38,7 +38,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function AdminLayout({
+export default function BranchAdminLayout({
   children,
 }: {
   children: React.ReactNode
@@ -54,7 +54,7 @@ export default function AdminLayout({
         return
       }
 
-      if (user.role !== 'admin') {
+      if (user.role !== 'branch_admin') {
         router.push('/auth/login')
         return
       }
@@ -69,16 +69,16 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Admin Panel...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Branch Admin Panel...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <AdminSidebarProvider>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
-    </AdminSidebarProvider>
+    <BranchAdminSidebarProvider>
+      <BranchAdminLayoutContent>{children}</BranchAdminLayoutContent>
+    </BranchAdminSidebarProvider>
   )
 }

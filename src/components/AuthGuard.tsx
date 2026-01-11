@@ -33,14 +33,18 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
       const roleRoutes = {
         customer: '/customer/dashboard',
         admin: '/admin/dashboard',
+        branch_admin: '/branch-admin/dashboard',
         staff: '/staff/dashboard',
         superadmin: '/superadmin/dashboard',
       }
       
       // Backward compatibility: map old roles to admin
       let effectiveRole = user.role
-      if (user.role === 'center_admin' || user.role === 'branch_manager') {
+      if (user.role === 'center_admin') {
         effectiveRole = 'admin'
+      }
+      if (user.role === 'branch_manager') {
+        effectiveRole = 'branch_admin'
       }
       
       const redirectPath = roleRoutes[effectiveRole as keyof typeof roleRoutes]

@@ -72,7 +72,7 @@ export default function CustomerLayout({
         
         {/* Page Content - Top padding for fixed header (h-16 = 64px, so pt-20 = 80px gives breathing room) */}
         <main className="pt-20 px-4 pb-4 lg:px-8 lg:pb-8">
-          {children}
+          <div className="max-w-screen-2xl mx-auto">{children}</div>
         </main>
       </div>
     </div>

@@ -90,6 +90,7 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
   const { isAuthenticated, user, token } = useAuthStore()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [servicesLoading, setServicesLoading] = useState(false) // Separate loading for services (doesn't affect branch selection UI)
   const [submitting, setSubmitting] = useState(false)
   
   // Tenant branding state - use prop if provided, otherwise fetch
@@ -325,14 +326,14 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
 
   const fetchServices = async (branchId: string) => {
     try {
-      setLoading(true)
+      setServicesLoading(true) // Use separate loading state - doesn't affect branch selection UI
       const response = await fetch(`${API_URL}/branches/${branchId}/services/enabled`)
       const data = await response.json()
       if (data.success) setServices(data.data.services || [])
     } catch (error) {
       console.error('Failed to fetch services:', error)
     } finally {
-      setLoading(false)
+      setServicesLoading(false)
     }
   }
 
@@ -855,23 +856,36 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {branches.map((branch) => (
-                        <div key={branch._id} onClick={() => setSelectedBranch(branch)}
-                          className="p-3 border-2 rounded-xl cursor-pointer transition-all border-gray-200 hover:border-gray-300"
-                          style={selectedBranch?._id === branch._id ? { ...getThemeStyles().primaryBorder, ...getThemeStyles().primaryBgLight } : {}}>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <p className="font-medium text-gray-800">{branch.name}</p>
-                              <p className="text-sm text-gray-500">{branch.address?.city || branch.address?.addressLine1 || 'Location available'}</p>
-                            </div>
-                            {selectedBranch?._id === branch._id && (
-                              <div className="w-6 h-6 rounded-full flex items-center justify-center" style={getThemeStyles().primaryBg}>
+                      {branches.map((branch) => {
+                        const isSelected = selectedBranch?._id === branch._id
+                        return (
+                          <div 
+                            key={branch._id} 
+                            onClick={() => setSelectedBranch(branch)}
+                            className={`p-3 border-2 rounded-xl cursor-pointer transition-colors duration-150 ${
+                              isSelected 
+                                ? 'border-current bg-current/10' 
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            }`}
+                            style={isSelected ? { borderColor: brandingColors.primaryColor, backgroundColor: getColorWithOpacity(brandingColors.primaryColor, 0.1) } : {}}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium text-gray-800">{branch.name}</p>
+                                <p className="text-sm text-gray-500">{branch.address?.city || branch.address?.addressLine1 || 'Location available'}</p>
+                              </div>
+                              <div 
+                                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 ${
+                                  isSelected ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
+                                }`}
+                                style={{ backgroundColor: brandingColors.primaryColor }}
+                              >
                                 <Check className="w-4 h-4 text-white" />
                               </div>
-                            )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                 </div>
@@ -940,7 +954,7 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
                   </h3>
                   <p className="text-sm text-gray-500">Choose a laundry service</p>
                   
-                  {loading ? (
+                  {servicesLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin" style={getThemeStyles().primary} />
                     </div>

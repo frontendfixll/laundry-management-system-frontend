@@ -567,6 +567,8 @@ function HeroCarousel({ isAuthenticated, user, onBookNow, colors, t, theme }: { 
 // Testimonials Carousel
 function TestimonialsCarousel({ colors, theme }: { colors: any; theme: ThemeColors }) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [slidesPerView, setSlidesPerView] = useState(1)
+  
   const testimonials = [
     { id: 1, name: 'Divya K.', review: 'I gave them my silk saree and was honestly worried. But they handled it with such care. Impressive service!', rating: 5 },
     { id: 2, name: 'Rajat T.', review: 'Very smooth process — booked on the app, got a confirmation instantly, and pickup arrived right on time.', rating: 5 },
@@ -577,39 +579,72 @@ function TestimonialsCarousel({ colors, theme }: { colors: any; theme: ThemeColo
     { id: 7, name: 'Sneha P.', review: 'Quality exceeded my expectations. My formal suits look professionally cleaned.', rating: 5 },
     { id: 8, name: 'Vikram J.', review: 'Fast, reliable, and affordable. Been using for 6 months now, never disappointed.', rating: 5 },
   ]
-  const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials]
-  const nextSlide = () => setCurrentIndex(prev => prev + 1)
-  const prevSlide = () => setCurrentIndex(prev => prev - 1)
+
+  // Detect screen size for slides per view
   useEffect(() => {
-    if (currentIndex >= testimonials.length) setTimeout(() => setCurrentIndex(0), 500)
-    if (currentIndex < 0) setTimeout(() => setCurrentIndex(testimonials.length - 1), 500)
-  }, [currentIndex, testimonials.length])
+    const updateSlidesPerView = () => {
+      if (window.innerWidth >= 1024) setSlidesPerView(4)
+      else if (window.innerWidth >= 640) setSlidesPerView(2)
+      else setSlidesPerView(1)
+    }
+    updateSlidesPerView()
+    window.addEventListener('resize', updateSlidesPerView)
+    return () => window.removeEventListener('resize', updateSlidesPerView)
+  }, [])
+
+  const nextSlide = () => setCurrentIndex(prev => (prev + 1) % testimonials.length)
+  const prevSlide = () => setCurrentIndex(prev => (prev - 1 + testimonials.length) % testimonials.length)
+
+  // Auto slide
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 4000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const slideWidth = 100 / slidesPerView
 
   return (
     <div className="relative">
-      <button onClick={prevSlide} className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full border-2 ${colors.border} bg-white flex items-center justify-center ${colors.hoverText}`}>
-        <ChevronLeft className={`w-5 h-5 ${colors.text}`} />
+      <button onClick={prevSlide} className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 sm:-translate-x-4 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${colors.border} bg-white flex items-center justify-center ${colors.hoverText} shadow-md`}>
+        <ChevronLeft className={`w-4 h-4 sm:w-5 sm:h-5 ${colors.text}`} />
       </button>
-      <button onClick={nextSlide} className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full border-2 ${colors.border} bg-white flex items-center justify-center ${colors.hoverText}`}>
-        <ChevronRight className={`w-5 h-5 ${colors.text}`} />
+      <button onClick={nextSlide} className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 sm:translate-x-4 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${colors.border} bg-white flex items-center justify-center ${colors.hoverText} shadow-md`}>
+        <ChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 ${colors.text}`} />
       </button>
-      <div className="overflow-hidden mx-8">
-        <div className="flex transition-transform duration-500" style={{ transform: `translateX(-${(currentIndex + testimonials.length) * 25}%)` }}>
-          {extendedTestimonials.map((testimonial, index) => (
-            <div key={`${testimonial.id}-${index}`} className="flex-shrink-0 w-1/4 px-2">
-              <div className="bg-white rounded-xl p-6 text-center h-full">
-                <div className={`w-14 h-14 ${colors.primary} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                  <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+      <div className="overflow-hidden mx-6 sm:mx-8">
+        <div 
+          className="flex transition-transform duration-500 ease-in-out" 
+          style={{ transform: `translateX(-${currentIndex * slideWidth}%)` }}
+        >
+          {testimonials.map((testimonial) => (
+            <div 
+              key={testimonial.id} 
+              className="flex-shrink-0 px-2"
+              style={{ width: `${slideWidth}%` }}
+            >
+              <div className="bg-white rounded-xl p-4 sm:p-6 text-center h-full shadow-sm border border-gray-100">
+                <div className={`w-10 h-10 sm:w-14 sm:h-14 ${colors.primary} rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4`}>
+                  <svg className="w-5 h-5 sm:w-7 sm:h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                   </svg>
                 </div>
-                <div className="flex justify-center mb-4">{[...Array(testimonial.rating)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />)}</div>
-                <p className="text-gray-700 text-base mb-4 leading-relaxed">{testimonial.review}</p>
-                <p className="font-bold text-gray-800 text-lg">{testimonial.name}</p>
+                <div className="flex justify-center mb-3 sm:mb-4">{[...Array(testimonial.rating)].map((_, i) => <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-yellow-400" />)}</div>
+                <p className="text-gray-700 text-sm sm:text-base mb-3 sm:mb-4 leading-relaxed line-clamp-4">{testimonial.review}</p>
+                <p className="font-bold text-gray-800 text-sm sm:text-lg">{testimonial.name}</p>
               </div>
             </div>
           ))}
         </div>
+      </div>
+      {/* Dots indicator for mobile */}
+      <div className="flex justify-center gap-2 mt-4 sm:hidden">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-2 h-2 rounded-full transition-all ${currentIndex === index ? `${colors.primary} w-4` : 'bg-gray-300'}`}
+          />
+        ))}
       </div>
     </div>
   )
@@ -897,6 +932,37 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
             </div>
+
+            {/* Mobile Menu Dropdown */}
+            {mobileMenuOpen && (
+              <div 
+                className="absolute top-full left-0 right-0 md:hidden shadow-lg border-t"
+                style={{ 
+                  backgroundColor: isDarkTheme ? '#1f2937' : theme.cardBg,
+                  borderColor: isDarkTheme ? '#374151' : theme.border
+                }}
+              >
+                <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
+                  <Link href={getTenantUrl('/')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.home')}</Link>
+                  <Link href={getTenantUrl('/services')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.services')}</Link>
+                  <Link href={getTenantUrl('/pricing')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.pricing')}</Link>
+                  <Link href={getTenantUrl('/help')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.help')}</Link>
+                  <hr style={{ borderColor: isDarkTheme ? '#374151' : theme.border }} />
+                  {isAuthenticated ? (
+                    <>
+                      <Link href={getTenantUrl('/dashboard')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.dashboard')}</Link>
+                      <Link href={getTenantUrl('/orders')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.myOrders')}</Link>
+                      <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="py-2 font-medium text-left text-red-500">{t('nav.logout')}</button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href={getLoginUrl()} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.login')}</Link>
+                      <Button className="text-white w-full" style={{ backgroundColor: theme.accent }} onClick={() => { onBookNow(); setMobileMenuOpen(false); }}>{t('nav.bookNow')}</Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
             <div className="hidden md:flex items-center space-x-8">
               <Link href={getTenantUrl('/')} className="hover:opacity-80 transition-opacity" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.home')}</Link>
               <Link href={getTenantUrl('/services')} className="hover:opacity-80 transition-opacity" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.services')}</Link>

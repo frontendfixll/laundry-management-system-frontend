@@ -33,11 +33,12 @@ export default function FreshSpinLoginForm() {
         const routes: Record<string, string> = {
           superadmin: '/superadmin/dashboard',
           admin: '/admin/dashboard',
+          branch_admin: '/branch-admin/dashboard',
           center_admin: '/center-admin/dashboard',
           branch_manager: '/branch-manager/dashboard',
           customer: '/customer/dashboard'
         }
-        router.push(routes[user.role] || '/customer/dashboard')
+        router.push(routes[user.role] || '/')
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed')

@@ -60,14 +60,15 @@ export default function BaseLoginForm({
         return
       }
 
-      const roleRoutes = {
+      const roleRoutes: Record<string, string> = {
         customer: '/',
         admin: '/admin/dashboard',
+        branch_admin: '/branch-admin/dashboard',
         center_admin: '/center-admin/dashboard',
         superadmin: '/superadmin/dashboard',
       }
 
-      const redirectPath = roleRoutes[user.role as keyof typeof roleRoutes] || '/'
+      const redirectPath = roleRoutes[user.role] || '/'
       setTimeout(() => {
         router.push(redirectPath)
       }, 100)

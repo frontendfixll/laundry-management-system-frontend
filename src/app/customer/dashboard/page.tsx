@@ -197,7 +197,7 @@ export default function CustomerDashboard() {
           { label: 'Completed', value: stats.completed, icon: CheckCircle, gradient: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/25' },
           { label: 'Pending', value: stats.pending, icon: Truck, gradient: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/25' },
         ].map((stat, i) => (
-          <div key={i} className={`group relative overflow-hidden bg-gradient-to-br ${stat.gradient} rounded-2xl p-5 text-white shadow-xl ${stat.shadow} hover:scale-[1.02] transition-all`}>
+          <div key={i} className={`group relative overflow-hidden bg-gradient-to-br ${stat.gradient} rounded-2xl p-4 xl:p-5 text-white shadow-xl ${stat.shadow} hover:scale-[1.02] transition-all`}>
             <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-500" />
             <div className="relative z-10">
               <div className="w-11 h-11 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"><stat.icon className="w-5 h-5" /></div>
@@ -209,7 +209,7 @@ export default function CustomerDashboard() {
       </div>
 
       {orders.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-6">
           <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <div><h3 className="font-bold text-gray-800">Order Distribution</h3><p className="text-sm text-gray-500">By status</p></div>

@@ -342,7 +342,7 @@ export default function PricingPage() {
         
         <div className="absolute inset-0 bg-gray-900/70"></div>
         
-        <div className="relative container mx-auto px-4 text-center">
+        <div className="relative container mx-auto px-4 text-center max-w-screen-2xl">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             {t('pricing.hero.title')}
           </h1>
@@ -358,18 +358,20 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Table Section */}
-      <section className="py-16 container mx-auto px-4">
+      <section className="py-16">
+        <div className="container mx-auto px-4 max-w-screen-2xl">
         <PricingTable isAuthenticated={isAuthenticated} theme={theme} t={t} />
         
         {/* Disclaimer */}
         <p className="text-center text-lg font-medium mt-8" style={{ color: theme.textSecondary }}>
           {t('pricing.disclaimer')}
         </p>
+        </div>
       </section>
 
       {/* FAQ Section */}
       <section className="py-16 transition-colors duration-300" style={{ backgroundColor: theme.sectionBg }}>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-screen-2xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('pricing.faq.title')}</h2>
             <p className="max-w-2xl mx-auto" style={{ color: theme.textSecondary }}>
@@ -397,7 +399,7 @@ export default function PricingPage() {
         className="py-16 transition-colors duration-300"
         style={{ background: `linear-gradient(to right, ${theme.accent}, ${theme.accentSecondary})` }}
       >
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4 text-center max-w-screen-2xl">
           <h2 className="text-3xl font-bold text-white mb-4">{t('pricing.cta.title')}</h2>
           <p className="text-white/80 mb-8 max-w-xl mx-auto">
             {t('pricing.cta.subtitle')}

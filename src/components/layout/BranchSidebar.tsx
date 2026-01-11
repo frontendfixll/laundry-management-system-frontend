@@ -32,9 +32,11 @@ const navigation = [
 interface BranchSidebarProps {
   collapsed?: boolean
   onCollapsedChange?: (collapsed: boolean) => void
+  mobileOpen?: boolean
+  onMobileClose?: () => void
 }
 
-export function BranchSidebar({ collapsed: externalCollapsed, onCollapsedChange }: BranchSidebarProps) {
+export function BranchSidebar({ collapsed: externalCollapsed, onCollapsedChange, mobileOpen, onMobileClose }: BranchSidebarProps) {
   const pathname = usePathname()
   const [internalCollapsed, setInternalCollapsed] = useState(false)
   const { user } = useAuthStore()
@@ -62,11 +64,96 @@ export function BranchSidebar({ collapsed: externalCollapsed, onCollapsedChange 
   // Filter navigation based on permissions
   const visibleNavigation = navigation.filter(item => hasModuleAccess(item.module))
 
+  const handleNavClick = () => {
+    if (onMobileClose) onMobileClose()
+  }
+
   return (
-    <div className={cn(
-      "hidden lg:flex lg:flex-shrink-0 lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 transition-all duration-300",
-      collapsed ? "lg:w-16" : "lg:w-64"
-    )}>
+    <>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-transform duration-300 flex flex-col w-64 lg:hidden",
+        mobileOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Header */}
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+              <Leaf className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-semibold text-gray-800">Center Admin</span>
+          </div>
+          <button
+            onClick={onMobileClose}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+          {visibleNavigation.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                onClick={handleNavClick}
+                className={cn(
+                  'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
+                  isActive
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                )}
+              >
+                <item.icon
+                  className={cn(
+                    'h-5 w-5 flex-shrink-0 mr-3',
+                    isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'
+                  )}
+                />
+                <span className="truncate">{item.name}</span>
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Branch Stats */}
+        <div className="px-4 py-4 border-t border-gray-200">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-gray-800 mb-2">Today&apos;s Status</h3>
+            <div className="space-y-2 text-xs text-gray-600">
+              <div className="flex justify-between">
+                <span>Pending Orders</span>
+                <span className="font-medium text-orange-600">12</span>
+              </div>
+              <div className="flex justify-between">
+                <span>In Progress</span>
+                <span className="font-medium text-blue-600">8</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Completed</span>
+                <span className="font-medium text-green-600">24</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div className={cn(
+        "hidden lg:flex lg:flex-shrink-0 lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 transition-all duration-300",
+        collapsed ? "lg:w-16" : "lg:w-64"
+      )}>
       <div className={cn(
         "flex flex-col bg-white border-r border-gray-200 pt-16 pb-4 overflow-y-auto transition-all duration-300",
         collapsed ? "w-16" : "w-64"
@@ -101,6 +188,7 @@ export function BranchSidebar({ collapsed: externalCollapsed, onCollapsedChange 
                 <Link
                   key={item.name}
                   href={item.href}
+                  onClick={handleNavClick}
                   className={cn(
                     'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
                     isActive
@@ -151,6 +239,6 @@ export function BranchSidebar({ collapsed: externalCollapsed, onCollapsedChange 
           )}
         </div>
       </div>
-    </div>
+    </>
   )
 }

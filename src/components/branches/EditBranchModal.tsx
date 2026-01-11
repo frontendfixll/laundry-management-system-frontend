@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, MapPin, Phone, Clock, Users } from 'lucide-react'
+import { X, MapPin, Phone, Clock, Users, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,6 +21,28 @@ const getAuthToken = () => {
   return localStorage.getItem('token')
 }
 
+// Geocode address using free Nominatim API
+const geocodeAddress = async (address: string): Promise<{lat: number, lng: number} | null> => {
+  try {
+    const encodedAddress = encodeURIComponent(address)
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`,
+      { headers: { 'User-Agent': 'LaundryPro-Admin/1.0' } }
+    )
+    const data = await response.json()
+    if (data && data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lng: parseFloat(data[0].lon)
+      }
+    }
+    return null
+  } catch (error) {
+    console.error('Geocoding error:', error)
+    return null
+  }
+}
+
 interface Branch {
   _id: string
   name: string
@@ -37,6 +59,10 @@ interface Branch {
     phone: string
     email?: string
     whatsapp?: string
+  }
+  coordinates?: {
+    latitude: number
+    longitude: number
   }
   capacity?: {
     maxOrdersPerDay: number
@@ -73,6 +99,7 @@ const WORKING_DAYS = [
 
 export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBranchModalProps) {
   const [loading, setLoading] = useState(false)
+  const [geocoding, setGeocoding] = useState(false)
   const [formData, setFormData] = useState<Branch>(branch)
 
   useEffect(() => {
@@ -84,7 +111,7 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
       setFormData(prev => ({
         ...prev,
         [section]: {
-          ...prev[section as keyof Branch],
+          ...(prev[section as keyof Branch] as object || {}),
           [field]: value
         }
       }))
@@ -93,6 +120,53 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
         ...prev,
         [field]: value
       }))
+    }
+  }
+
+  // Auto-geocode from address
+  const handleAutoGeocode = async () => {
+    const { addressLine1, city, state, pincode } = formData.address
+    
+    if (!pincode || pincode.length < 6) {
+      toast.error('Please enter a valid 6-digit pincode first')
+      return
+    }
+    
+    const addressParts = [addressLine1, city, state, pincode, 'India'].filter(Boolean)
+    const fullAddress = addressParts.join(', ')
+    
+    setGeocoding(true)
+    try {
+      const coords = await geocodeAddress(fullAddress)
+      if (coords) {
+        setFormData(prev => ({
+          ...prev,
+          coordinates: {
+            latitude: coords.lat,
+            longitude: coords.lng
+          }
+        }))
+        toast.success('📍 Coordinates auto-filled!', { duration: 3000 })
+      } else {
+        // Try with just pincode
+        const simpleCoords = await geocodeAddress(`${pincode}, ${city || ''}, India`)
+        if (simpleCoords) {
+          setFormData(prev => ({
+            ...prev,
+            coordinates: {
+              latitude: simpleCoords.lat,
+              longitude: simpleCoords.lng
+            }
+          }))
+          toast.success('📍 Coordinates auto-filled from pincode!', { duration: 3000 })
+        } else {
+          toast.error('Could not find coordinates. Please enter manually.')
+        }
+      }
+    } catch (error) {
+      toast.error('Geocoding failed. Please enter coordinates manually.')
+    } finally {
+      setGeocoding(false)
     }
   }
 
@@ -114,6 +188,8 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
 
     try {
       const token = getAuthToken()
+      
+      // First update branch basic info
       const response = await fetch(`${API_URL}/admin/branches-management/${branch._id}`, {
         method: 'PUT',
         headers: {
@@ -124,6 +200,26 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
       })
 
       if (response.ok) {
+        // If coordinates are provided, update them separately
+        if (formData.coordinates?.latitude && formData.coordinates?.longitude) {
+          try {
+            await fetch(`${API_URL}/admin/branches/${branch._id}/coordinates`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                latitude: formData.coordinates.latitude,
+                longitude: formData.coordinates.longitude,
+                serviceableRadius: formData.serviceableRadius || 20
+              })
+            })
+          } catch (coordError) {
+            console.warn('Could not update coordinates:', coordError)
+          }
+        }
+        
         toast.success('Branch updated successfully!', {
           duration: 4000,
           position: 'top-right',
@@ -339,6 +435,62 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
                     min="1"
                     max="100"
                   />
+                </div>
+
+                {/* GPS Coordinates */}
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-base font-medium flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      GPS Coordinates
+                      {geocoding && <Loader2 className="h-4 w-4 animate-spin text-blue-500" />}
+                    </Label>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleAutoGeocode}
+                      disabled={geocoding}
+                    >
+                      {geocoding ? 'Finding...' : '🔄 Auto-detect from Pincode'}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Click "Auto-detect" to fill coordinates from pincode, or enter manually.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="latitude">Latitude</Label>
+                      <Input
+                        id="latitude"
+                        type="number"
+                        step="any"
+                        value={formData.coordinates?.latitude || ''}
+                        onChange={(e) => handleInputChange('coordinates', 'latitude', parseFloat(e.target.value) || '')}
+                        placeholder="26.9124"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="longitude">Longitude</Label>
+                      <Input
+                        id="longitude"
+                        type="number"
+                        step="any"
+                        value={formData.coordinates?.longitude || ''}
+                        onChange={(e) => handleInputChange('coordinates', 'longitude', parseFloat(e.target.value) || '')}
+                        placeholder="75.7873"
+                      />
+                    </div>
+                  </div>
+                  {formData.coordinates?.latitude && formData.coordinates?.longitude ? (
+                    <p className="text-sm text-green-600 mt-2">
+                      ✓ Coordinates set: {formData.coordinates.latitude}, {formData.coordinates.longitude}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-amber-600 mt-2">
+                      ⚠️ No coordinates - distance calculation won't work in mobile app
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

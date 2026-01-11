@@ -74,7 +74,7 @@ function HowWeWorkSection({ isModalOpen, theme, t }: { isModalOpen?: boolean; th
   if (!isDesktop) {
     return (
       <section className="py-12 sm:py-16 transition-colors duration-300" style={{ backgroundColor: theme.sectionBg }}>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-screen-2xl">
           <div className="text-center mb-10">
             <p className="font-semibold mb-2" style={{ color: theme.accent }}>{t('services.howWeWork.badge')}</p>
             <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: theme.textPrimary }}>{t('services.howWeWork.title')}</h2>
@@ -123,7 +123,7 @@ function HowWeWorkSection({ isModalOpen, theme, t }: { isModalOpen?: boolean; th
   // Desktop Layout - Grid layout
   return (
     <section ref={sectionRef} className="py-16 relative transition-colors duration-300" style={{ backgroundColor: theme.sectionBg }}>
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 max-w-screen-2xl">
         <div className="text-center mb-16">
           <p className="font-semibold mb-2" style={{ color: theme.accent }}>{t('services.howWeWork.badge')}</p>
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('services.howWeWork.title')}</h2>
@@ -274,7 +274,7 @@ export default function ServicesPage() {
           <source src="/images/pricing.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-gray-900/40"></div>
-        <div className="relative container mx-auto px-4 h-full flex items-center">
+        <div className="relative container mx-auto px-4 h-full flex items-center max-w-screen-2xl">
           <div className="max-w-xl">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{t('services.hero.title').split(' ').slice(0, 2).join(' ')}<br />{t('services.hero.title').split(' ').slice(2).join(' ')}</h1>
             <p className="text-lg text-gray-200 mb-8">{t('services.hero.subtitle')}</p>
@@ -295,7 +295,7 @@ export default function ServicesPage() {
       <HowWeWorkSection isModalOpen={showBookingModal} theme={theme} t={t} />
 
       <section className="py-16 transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-screen-2xl">
           <div className="text-center mb-12">
             <p className="font-semibold mb-2" style={{ color: theme.accent }}>{t('services.ourServices.badge')}</p>
             <h2 className="text-3xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('services.ourServices.title')}</h2>
@@ -346,7 +346,7 @@ export default function ServicesPage() {
       </section>
 
       <section className="py-16 transition-colors duration-300" style={{ backgroundColor: theme.sectionBg }}>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-screen-2xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('services.whyChoose.title')}</h2>
           </div>
@@ -384,7 +384,7 @@ export default function ServicesPage() {
       </section>
 
       <section className="py-16 transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-screen-2xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('services.faq.title')}</h2>
             <p className="max-w-2xl mx-auto" style={{ color: theme.textSecondary }}>{t('services.faq.subtitle')}</p>
@@ -401,7 +401,7 @@ export default function ServicesPage() {
         className="py-16 transition-colors duration-300"
         style={{ background: `linear-gradient(to right, ${theme.accent}, ${theme.accentSecondary})` }}
       >
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-4 text-center max-w-screen-2xl">
           <h2 className="text-3xl font-bold text-white mb-4">{t('services.cta.title')}</h2>
           <p className="text-white/80 mb-8 max-w-xl mx-auto">{t('services.cta.subtitle')}</p>
           <div className="flex flex-wrap justify-center gap-4">

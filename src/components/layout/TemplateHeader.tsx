@@ -382,6 +382,33 @@ export default function TemplateHeader() {
           </div>
         </div>
       </header>
+
+      {/* FreshSpin Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className={`md:hidden fixed top-[60px] left-0 right-0 z-40 ${headerBg} border-b ${headerBorder} shadow-lg`}>
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex flex-col gap-3">
+              <Link href={getLink('/')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.home')}</Link>
+              <Link href={getLink('/services')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.services')}</Link>
+              <Link href={getLink('/pricing')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.pricing')}</Link>
+              <Link href={getLink('/help')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.help')}</Link>
+              <hr className={isDarkMode ? 'border-gray-700' : ''} />
+              {isAuthenticated ? (
+                <>
+                  <Link href={getDashboardUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.dashboard')}</Link>
+                  <button onClick={() => { handleBookNow(); setMobileMenuOpen(false); }} className="text-white py-2 px-4 rounded-full font-medium text-center" style={{ backgroundColor: colors.accent }}>{t('nav.bookNow')}</button>
+                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-red-500 font-medium py-2 text-left">{t('nav.logout')}</button>
+                </>
+              ) : (
+                <>
+                  <Link href={getLoginUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.login')}</Link>
+                  <button onClick={() => { handleBookNow(); setMobileMenuOpen(false); }} className="text-white py-2 px-4 rounded-full font-medium text-center" style={{ backgroundColor: colors.accent }}>{t('nav.bookNow')}</button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     )
   }
@@ -521,6 +548,31 @@ export default function TemplateHeader() {
               </button>
             </div>
           </div>
+
+          {/* Starter Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className={`lg:hidden mt-4 pb-4 rounded-xl shadow-lg p-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className="flex flex-col gap-3">
+                <Link href={getLink('/')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.home')}</Link>
+                <Link href={getLink('/services')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.services')}</Link>
+                <Link href={getLink('/pricing')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.pricing')}</Link>
+                <Link href={getLink('/help')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.help')}</Link>
+                <hr className={isDarkMode ? 'border-gray-700' : ''} />
+                {isAuthenticated ? (
+                  <>
+                    <Link href={getDashboardUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.dashboard')}</Link>
+                    <button onClick={() => { handleBookNow(); setMobileMenuOpen(false); }} className={`${colors.primary} text-white py-2 px-4 rounded-md font-medium text-center`}>{t('hero.schedulePickup')}</button>
+                    <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-red-500 font-medium py-2 text-left">{t('nav.logout')}</button>
+                  </>
+                ) : (
+                  <>
+                    <Link href={getLoginUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.login')}</Link>
+                    <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)} className={`${colors.primary} text-white py-2 px-4 rounded-md font-medium text-center`}>{t('nav.signup')}</Link>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </header>
     )
@@ -823,6 +875,30 @@ export default function TemplateHeader() {
             )}
           </div>
         </div>
+
+        {/* Default Template Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className={`md:hidden mt-4 pb-4 rounded-xl shadow-lg p-4 mx-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="flex flex-col gap-3">
+              <Link href={getLink('/')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.home')}</Link>
+              <Link href={getLink('/services')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.services')}</Link>
+              <Link href={getLink('/pricing')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.pricing')}</Link>
+              <Link href={getLink('/help')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.help')}</Link>
+              <hr className={isDarkMode ? 'border-gray-700' : ''} />
+              {isAuthenticated ? (
+                <>
+                  <Link href={getDashboardUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.dashboard')}</Link>
+                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-red-500 font-medium py-2 text-left">{t('nav.logout')}</button>
+                </>
+              ) : (
+                <>
+                  <Link href={getLoginUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.login')}</Link>
+                  <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)} className={`${colors.primary} text-white py-2 px-4 rounded-lg font-medium text-center block`}>{t('nav.signup')}</Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   )

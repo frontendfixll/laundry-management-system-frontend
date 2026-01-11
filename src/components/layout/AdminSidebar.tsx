@@ -45,7 +45,8 @@ const navigation = [
   { name: 'Customers', href: '/admin/customers', icon: Users, permission: { module: 'customers', action: 'view' } },
   { name: 'Inventory', href: '/admin/inventory', icon: Package, permission: { module: 'inventory', action: 'view' } },
   { name: 'Services', href: '/admin/services', icon: Sparkles, permission: { module: 'services', action: 'view' } },
-  { name: 'Branches', href: '/admin/branches', icon: MapPin, permission: { module: 'settings', action: 'view' } },
+  { name: 'Branches', href: '/admin/branches', icon: MapPin, permission: null },
+  { name: 'Branch Admins', href: '/admin/branch-admins', icon: Users, permission: null },
   { 
     name: 'Programs', 
     icon: Gift, 
@@ -163,7 +164,7 @@ export function AdminSidebarProvider({
 
 export function AdminSidebar() {
   const pathname = usePathname()
-  const { isCollapsed, setIsCollapsed, expandedItems, toggleExpanded } = useAdminSidebar()
+  const { isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen, expandedItems, toggleExpanded } = useAdminSidebar()
   const { user, logout } = useAuthStore()
   const { metrics, loading: metricsLoading } = useAdminDashboard()
 
@@ -174,6 +175,10 @@ export function AdminSidebar() {
   const handleLogout = () => {
     logout()
     window.location.href = '/'
+  }
+
+  const closeMobile = () => {
+    setMobileOpen(false)
   }
 
   // Check if any sub-item is active
@@ -189,10 +194,11 @@ export function AdminSidebar() {
     return false
   }
 
-  const renderNavItem = (item: any) => {
+  const renderNavItem = (item: any, isMobile = false) => {
     const isActive = isParentActive(item)
     const Icon = item.icon
     const isExpanded = expandedItems.includes(item.name)
+    const showText = isMobile || !isCollapsed
 
     if (item.isExpandable && item.subItems) {
       return (
@@ -210,13 +216,13 @@ export function AdminSidebar() {
             <Icon
               className={cn(
                 'flex-shrink-0 w-5 h-5',
-                isCollapsed ? 'mx-auto' : 'mr-3',
+                showText ? 'mr-3' : 'mx-auto',
                 isActive
                   ? 'text-white'
                   : 'text-gray-400 group-hover:text-blue-500'
               )}
             />
-            {!isCollapsed && (
+            {showText && (
               <>
                 <span className="truncate flex-1 text-left">{item.name}</span>
                 {isExpanded ? (
@@ -229,7 +235,7 @@ export function AdminSidebar() {
           </button>
 
           {/* Sub Items */}
-          {!isCollapsed && isExpanded && (
+          {showText && isExpanded && (
             <div className="ml-6 mt-1 space-y-1">
               {item.subItems
                 .filter((subItem: any) => hasPermission(user, subItem.permission))
@@ -241,6 +247,7 @@ export function AdminSidebar() {
                   <Link
                     key={subItem.name}
                     href={subItem.href}
+                    onClick={closeMobile}
                     className={cn(
                       'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
                       isSubActive
@@ -271,7 +278,8 @@ export function AdminSidebar() {
       <Link
         key={item.name}
         href={item.href}
-        title={isCollapsed ? item.name : undefined}
+        onClick={closeMobile}
+        title={!showText ? item.name : undefined}
         className={cn(
           'group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all',
           isActive
@@ -282,28 +290,24 @@ export function AdminSidebar() {
         <Icon
           className={cn(
             'flex-shrink-0 w-5 h-5',
-            isCollapsed ? 'mx-auto' : 'mr-3',
+            showText ? 'mr-3' : 'mx-auto',
             isActive
               ? 'text-white'
               : 'text-gray-400 group-hover:text-blue-500'
           )}
         />
-        {!isCollapsed && <span className="truncate">{item.name}</span>}
+        {showText && <span className="truncate">{item.name}</span>}
       </Link>
     )
   }
 
-  return (
-    <div
-      className={cn(
-        'fixed inset-y-0 left-0 z-50 bg-white shadow-xl transition-all duration-300 flex-col hidden lg:flex',
-        isCollapsed ? 'w-16' : 'w-64'
-      )}
-    >
+  // Sidebar content component to avoid duplication
+  const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
+    <>
       {/* Header */}
       <div className="flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-gray-200">
-        {!isCollapsed && (
-          <Link href="/admin/dashboard" className="flex items-center space-x-3">
+        {(isMobile || !isCollapsed) && (
+          <Link href="/admin/dashboard" className="flex items-center space-x-3" onClick={closeMobile}>
             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
@@ -313,21 +317,30 @@ export function AdminSidebar() {
           </Link>
         )}
 
-        <button
-          onClick={toggleCollapse}
-          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-          title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="w-5 h-5 text-gray-500" />
-          ) : (
+        {isMobile ? (
+          <button
+            onClick={closeMobile}
+            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          >
             <ChevronLeft className="w-5 h-5 text-gray-500" />
-          )}
-        </button>
+          </button>
+        ) : (
+          <button
+            onClick={toggleCollapse}
+            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-5 h-5 text-gray-500" />
+            ) : (
+              <ChevronLeft className="w-5 h-5 text-gray-500" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* User Info */}
-      {!isCollapsed && user && (
+      {(isMobile || !isCollapsed) && user && (
         <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
@@ -349,11 +362,11 @@ export function AdminSidebar() {
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
         {navigation
           .filter(item => hasPermission(user, item.permission))
-          .map(renderNavItem)}
+          .map(item => renderNavItem(item, isMobile))}
       </nav>
 
       {/* Quick Stats - Only show when expanded */}
-      {!isCollapsed && (
+      {(isMobile || !isCollapsed) && (
         <div className="flex-shrink-0 px-4 pb-4">
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-800 mb-2">
@@ -361,14 +374,6 @@ export function AdminSidebar() {
             </h3>
             {metricsLoading ? (
               <div className="space-y-2 text-xs text-gray-400">
-                <div className="flex justify-between">
-                  <span>Loading...</span>
-                  <div className="w-6 h-3 bg-gray-200 rounded animate-pulse"></div>
-                </div>
-                <div className="flex justify-between">
-                  <span>Loading...</span>
-                  <div className="w-6 h-3 bg-gray-200 rounded animate-pulse"></div>
-                </div>
                 <div className="flex justify-between">
                   <span>Loading...</span>
                   <div className="w-6 h-3 bg-gray-200 rounded animate-pulse"></div>
@@ -401,7 +406,7 @@ export function AdminSidebar() {
       )}
 
       {/* Version Info */}
-      {!isCollapsed && (
+      {(isMobile || !isCollapsed) && (
         <div className="flex-shrink-0 px-4 py-2 border-t border-gray-200">
           <div className="text-xs text-gray-400 text-center">
             v2.0.0
@@ -415,18 +420,50 @@ export function AdminSidebar() {
           onClick={handleLogout}
           className={cn(
             'group flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors',
-            isCollapsed ? 'justify-center' : ''
+            (isMobile || !isCollapsed) ? '' : 'justify-center'
           )}
         >
           <LogOut
             className={cn(
               'flex-shrink-0 w-5 h-5 text-gray-400 group-hover:text-red-500',
-              isCollapsed ? '' : 'mr-3'
+              (isMobile || !isCollapsed) ? 'mr-3' : ''
             )}
           />
-          {!isCollapsed && 'Sign Out'}
+          {(isMobile || !isCollapsed) && 'Sign Out'}
         </button>
       </div>
-    </div>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile Overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={closeMobile}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <div
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 bg-white shadow-xl transition-transform duration-300 flex flex-col w-64 lg:hidden',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <SidebarContent isMobile={true} />
+      </div>
+
+      {/* Desktop Sidebar */}
+      <div
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 bg-white shadow-xl transition-all duration-300 flex-col hidden lg:flex',
+          isCollapsed ? 'w-16' : 'w-64'
+        )}
+      >
+        <SidebarContent isMobile={false} />
+      </div>
+    </>
   )
 }

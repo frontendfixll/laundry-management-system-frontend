@@ -20,7 +20,7 @@ interface Notification {
   }
 }
 
-export function BranchNavbar() {
+export function BranchNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -143,7 +143,7 @@ export function BranchNavbar() {
           {/* Left side */}
           <div className="flex items-center">
             <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={onMenuClick}
               className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
               <Menu className="h-6 w-6" />
