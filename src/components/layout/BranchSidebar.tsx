@@ -239,6 +239,7 @@ export function BranchSidebar({ collapsed: externalCollapsed, onCollapsedChange,
           )}
         </div>
       </div>
+      </div>
     </>
   )
 }
