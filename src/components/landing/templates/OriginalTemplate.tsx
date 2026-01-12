@@ -580,12 +580,14 @@ function TestimonialsCarousel({ colors, theme }: { colors: any; theme: ThemeColo
     { id: 8, name: 'Vikram J.', review: 'Fast, reliable, and affordable. Been using for 6 months now, never disappointed.', rating: 5 },
   ]
 
-  // Detect screen size for slides per view
+  // Detect screen size for slides per view - more cards on larger screens
   useEffect(() => {
     const updateSlidesPerView = () => {
-      if (window.innerWidth >= 1024) setSlidesPerView(4)
-      else if (window.innerWidth >= 640) setSlidesPerView(2)
-      else setSlidesPerView(1)
+      if (window.innerWidth >= 1536) setSlidesPerView(5)      // 2xl screens
+      else if (window.innerWidth >= 1280) setSlidesPerView(4) // xl screens
+      else if (window.innerWidth >= 1024) setSlidesPerView(4) // lg screens
+      else if (window.innerWidth >= 640) setSlidesPerView(2)  // sm screens
+      else setSlidesPerView(1)                                 // mobile
     }
     updateSlidesPerView()
     window.addEventListener('resize', updateSlidesPerView)
@@ -604,7 +606,7 @@ function TestimonialsCarousel({ colors, theme }: { colors: any; theme: ThemeColo
   const slideWidth = 100 / slidesPerView
 
   return (
-    <div className="relative">
+    <div className="relative max-w-screen-2xl mx-auto">
       <button onClick={prevSlide} className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 sm:-translate-x-4 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${colors.border} bg-white flex items-center justify-center ${colors.hoverText} shadow-md`}>
         <ChevronLeft className={`w-4 h-4 sm:w-5 sm:h-5 ${colors.text}`} />
       </button>
@@ -619,7 +621,7 @@ function TestimonialsCarousel({ colors, theme }: { colors: any; theme: ThemeColo
           {testimonials.map((testimonial) => (
             <div 
               key={testimonial.id} 
-              className="flex-shrink-0 px-2"
+              className="flex-shrink-0 px-2 2xl:px-3"
               style={{ width: `${slideWidth}%` }}
             >
               <div className="bg-white rounded-xl p-4 sm:p-6 text-center h-full shadow-sm border border-gray-100">
@@ -725,9 +727,9 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible, colors, themeC
     <div ref={sectionRef} className="relative" style={{ minHeight: isPinned ? '200vh' : 'auto' }}>
       <section className={`py-16 min-h-[100vh] flex items-center justify-center overflow-hidden transition-colors duration-300 ${isPinned ? 'sticky top-0' : ''}`}
         style={{ zIndex: isPinned ? 10 : 1, backgroundColor: `rgb(${bgR}, ${bgG}, ${bgB})` }}>
-        <div className="w-full flex justify-center">
-          <div className="transition-all duration-300 ease-out relative"
-            style={{ width: `${bannerWidth}%`, padding: `${bannerPaddingY}px 24px`, borderRadius: `${topRadius}px ${topRadius}px 20px 20px`, backgroundColor: `rgb(${colorR}, ${colorG}, ${colorB})`, textAlign: scrollProgress < 0.5 ? 'left' : 'center' }}>
+        <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-center">
+          <div className="transition-all duration-300 ease-out relative w-full"
+            style={{ maxWidth: `${Math.min(bannerWidth, 100)}%`, padding: `${bannerPaddingY}px 24px`, borderRadius: `${topRadius}px ${topRadius}px 20px 20px`, backgroundColor: `rgb(${colorR}, ${colorG}, ${colorB})`, textAlign: scrollProgress < 0.5 ? 'left' : 'center' }}>
             <p className="font-bold tracking-[0.2em] uppercase text-gray-600 transition-all" style={{ fontSize: `${10 + scrollProgress * 6}px`, marginBottom: `${8 + scrollProgress * 16}px` }}>Schedule today to</p>
             <h2 className="leading-tight transition-all" style={{ fontSize: `${22 + scrollProgress * 44}px`, marginBottom: `${16 + scrollProgress * 16}px` }}>
               <span className="font-extrabold text-gray-900">Get 20% off </span>
@@ -745,25 +747,27 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible, colors, themeC
       </section>
       {showGallery && (
         <section className="bg-gray-900 py-8 overflow-hidden transition-all duration-500" style={{ opacity: galleryOpacity }}>
-          <div className="mb-4 overflow-hidden">
-            <div className="flex gap-4" style={{ width: 'max-content', transform: `translateX(-${imageRowOffset % 1000}px)` }}>
-              {[...topRowImages, ...topRowImages, ...topRowImages].map((img, index) => (
-                <div key={`top-${index}`} className="w-72 h-48 flex-shrink-0 rounded-xl overflow-hidden">
-                  <img src={img} alt={`Laundry ${index + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
-                </div>
-              ))}
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-4 overflow-hidden rounded-xl">
+              <div className="flex gap-4" style={{ width: 'max-content', transform: `translateX(-${imageRowOffset % 1000}px)` }}>
+                {[...topRowImages, ...topRowImages, ...topRowImages].map((img, index) => (
+                  <div key={`top-${index}`} className="w-64 h-44 2xl:w-72 2xl:h-48 flex-shrink-0 rounded-xl overflow-hidden">
+                    <img src={img} alt={`Laundry ${index + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-xl">
+              <div className="flex gap-4" style={{ width: 'max-content', transform: `translateX(-${1000 - (imageRowOffset % 1000)}px)` }}>
+                {[...bottomRowImages, ...bottomRowImages, ...bottomRowImages].map((img, index) => (
+                  <div key={`bottom-${index}`} className="w-64 h-44 2xl:w-72 2xl:h-48 flex-shrink-0 rounded-xl overflow-hidden">
+                    <img src={img} alt={`Laundry ${index + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="overflow-hidden">
-            <div className="flex gap-4" style={{ width: 'max-content', transform: `translateX(-${1000 - (imageRowOffset % 1000)}px)` }}>
-              {[...bottomRowImages, ...bottomRowImages, ...bottomRowImages].map((img, index) => (
-                <div key={`bottom-${index}`} className="w-72 h-48 flex-shrink-0 rounded-xl overflow-hidden">
-                  <img src={img} alt={`Laundry ${index + 1}`} className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="container mx-auto px-4 py-16">
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div><h2 className="text-4xl md:text-5xl font-bold text-white leading-tight">The LaundryPro<br /><span className={accentLightTextClass}>Guarantee.</span></h2></div>
               <div>
@@ -898,7 +902,7 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
           borderColor: isDarkTheme ? '#374151' : theme.border
         }}
       >
-        <div className="container mx-auto px-4 py-4">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.accent }}><Sparkles className="w-6 h-6 text-white" /></div>
@@ -942,7 +946,7 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
                   borderColor: isDarkTheme ? '#374151' : theme.border
                 }}
               >
-                <div className="container mx-auto px-4 py-4 flex flex-col gap-3">
+                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-3">
                   <Link href={getTenantUrl('/')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.home')}</Link>
                   <Link href={getTenantUrl('/services')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.services')}</Link>
                   <Link href={getTenantUrl('/pricing')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.pricing')}</Link>
@@ -1060,14 +1064,14 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
 
       {/* Hero Section */}
       <section className="relative pt-20 pb-0 overflow-hidden transition-colors duration-300" style={{ backgroundColor: theme.heroBg }}>
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <HeroCarousel isAuthenticated={isAuthenticated} user={user} onBookNow={onBookNow} colors={colors} t={t} theme={theme} />
         </div>
       </section>
 
       {/* How It Works */}
       <section className="py-20 transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
-        <div className="container mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <p className="font-semibold mb-2" style={{ color: theme.accentText }}>{t('process.subtitle')}</p>
             <h2 className="text-4xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('process.title')}</h2>
@@ -1131,7 +1135,7 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
 
       {/* Services Grid */}
       <section id="services" className="py-20 transition-colors duration-300" style={{ backgroundColor: theme.sectionBg }}>
-        <div className="container mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <p className="font-semibold mb-2" style={{ color: theme.accentText }}>{t('original.services.sectionTitle')}</p>
             <h2 className="text-4xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('original.services.sectionSubtitle')}</h2>
@@ -1155,7 +1159,7 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
 
       {/* Testimonials */}
       <section className="py-20 transition-colors duration-300" style={{ backgroundColor: theme.sectionBgAlt }}>
-        <div className="container mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="font-semibold mb-2" style={{ color: theme.accentText }}>{t('original.testimonials.subtitle')}</p>
             <h2 className="text-3xl font-bold" style={{ color: theme.textPrimary }}>{t('testimonials.title')}</h2>
@@ -1166,8 +1170,8 @@ export default function OriginalTemplate({ themeColor, isAuthenticated, user, on
 
       {/* Footer */}
       <footer className="py-12 transition-colors duration-300" style={{ backgroundColor: theme.footerBg }}>
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.accent }}><Sparkles className="w-5 h-5 text-white" /></div>
