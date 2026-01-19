@@ -273,7 +273,7 @@ export default function CustomerDashboard() {
         {[
           { href: '/customer/addresses', icon: MapPin, label: 'Addresses', desc: 'Manage locations', gradient: 'from-teal-500 to-cyan-500' },
           { href: '/customer/profile', icon: User, label: 'Profile', desc: 'Account settings', gradient: 'from-purple-500 to-violet-500' },
-          { href: '/pricing', icon: Star, label: 'Pricing', desc: 'View rates', gradient: 'from-amber-500 to-orange-500' },
+          { href: '/customer/upgrade', icon: TrendingUp, label: 'Upgrade Plan', desc: 'Get more features', gradient: 'from-green-500 to-emerald-500' },
           { href: '/customer/support', icon: HelpCircle, label: 'Support', desc: 'Get help', gradient: 'from-blue-500 to-indigo-500' },
         ].map((item, i) => (
           <Link key={i} href={item.href}>
