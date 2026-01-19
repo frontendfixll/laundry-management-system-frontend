@@ -105,7 +105,56 @@ export const useRealTimeNotifications = () => {
   const [unreadCount, setUnreadCount] = useState(0)
   const [isConnected, setIsConnected] = useState(false)
   const socketRef = useRef<Socket | null>(null)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const lastPollRef = useRef<string>(new Date().toISOString())
   const [showNotificationPanel, setShowNotificationPanel] = useState(false)
+
+  // Polling fallback for serverless environments
+  const startPolling = () => {
+    if (pollingIntervalRef.current) return
+
+    console.log('🔄 Starting notification polling (serverless fallback)')
+    
+    pollingIntervalRef.current = setInterval(async () => {
+      try {
+        const token = getAuthToken()
+        if (!token) return
+
+        const response = await fetch(`${API_URL}/notifications/poll?since=${lastPollRef.current}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include'
+        })
+        
+        const data = await response.json()
+        
+        if (data.success && data.data.hasNew) {
+          console.log('📬 New notifications via polling:', data.data.notifications.length)
+          
+          // Add new notifications
+          data.data.notifications.forEach((notification: Notification) => {
+            setNotifications(prev => [notification, ...prev])
+            showToastNotification(notification)
+          })
+          
+          // Update unread count
+          setUnreadCount(data.data.unreadCount)
+          
+          // Update last poll timestamp
+          lastPollRef.current = data.data.timestamp
+        }
+      } catch (error) {
+        console.error('Polling error:', error)
+      }
+    }, 10000) // Poll every 10 seconds
+  }
+
+  const stopPolling = () => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current)
+      pollingIntervalRef.current = null
+      console.log('⏹️ Stopped notification polling')
+    }
+  }
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -115,7 +164,9 @@ export const useRealTimeNotifications = () => {
     // Create socket connection
     const socket = io(API_URL.replace('/api', ''), {
       auth: { token },
-      transports: ['websocket', 'polling']
+      transports: ['websocket', 'polling'],
+      timeout: 10000,
+      forceNew: true
     })
 
     socketRef.current = socket
@@ -128,6 +179,17 @@ export const useRealTimeNotifications = () => {
     socket.on('disconnect', () => {
       console.log('❌ Disconnected from notification server')
       setIsConnected(false)
+    })
+
+    socket.on('connect_error', (error) => {
+      console.log('❌ WebSocket connection error:', error.message)
+      setIsConnected(false)
+      
+      // Start polling fallback if WebSocket fails
+      if (!pollingIntervalRef.current) {
+        console.log('🔄 Starting polling fallback for notifications')
+        startPolling()
+      }
     })
 
     // Listen for new notifications
@@ -170,16 +232,31 @@ export const useRealTimeNotifications = () => {
       }, 3000)
     })
 
+    // Cleanup on unmount
     return () => {
       socket.disconnect()
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+        pollingIntervalRef.current = null
+      }
     }
   }, [])
 
-  // Fetch initial notifications
+  // Fetch initial notifications and start fallback if needed
   useEffect(() => {
     fetchNotifications()
     fetchUnreadCount()
-  }, [])
+    
+    // Start polling fallback after 5 seconds if WebSocket hasn't connected
+    const fallbackTimer = setTimeout(() => {
+      if (!isConnected && !pollingIntervalRef.current) {
+        console.log('🔄 WebSocket not connected, starting polling fallback')
+        startPolling()
+      }
+    }, 5000)
+    
+    return () => clearTimeout(fallbackTimer)
+  }, [isConnected])
 
   const fetchNotifications = async () => {
     try {
