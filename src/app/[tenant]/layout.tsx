@@ -1,8 +1,10 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { TenantProvider } from '@/contexts/TenantContext'
 import { useEffect, useState } from 'react'
+import { useAuthStore } from '@/store/authStore'
+import { usePreviewStore } from '@/store/previewStore'
 
 interface TenantBranding {
   name: string
@@ -31,10 +33,35 @@ interface TenantBranding {
 
 export default function TenantLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
+  const router = useRouter()
   const tenant = params.tenant as string
+  const { user } = useAuthStore()
+  const { isAdminPreviewMode } = usePreviewStore()
   const [tenantData, setTenantData] = useState<TenantBranding | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Redirect admins away from tenant pages (except in preview mode)
+  useEffect(() => {
+    if (user && ['admin', 'center_admin', 'branch_admin', 'branch_manager'].includes(user.role)) {
+      // Allow access in preview mode
+      if (!isAdminPreviewMode) {
+        const adminDashboardRoutes: Record<string, string> = {
+          admin: '/admin/dashboard',
+          center_admin: '/center-admin/dashboard',
+          branch_admin: '/branch-admin/dashboard',
+          branch_manager: '/center-admin/dashboard'
+        }
+        
+        const adminDashboard = adminDashboardRoutes[user.role]
+        if (adminDashboard) {
+          console.log(`🔄 Admin ${user.role} accessing tenant page, redirecting to: ${adminDashboard}`)
+          router.replace(adminDashboard)
+          return
+        }
+      }
+    }
+  }, [user, router, isAdminPreviewMode])
 
   useEffect(() => {
     const fetchTenantBranding = async () => {

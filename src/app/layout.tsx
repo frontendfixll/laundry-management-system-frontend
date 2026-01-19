@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Poppins, Roboto } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
+import { RoleBasedNavigation } from '@/components/RoleBasedNavigation'
+import { AdminPreviewBanner } from '@/components/AdminPreviewBanner'
 
 const poppins = Poppins({ 
   subsets: ['latin'],
@@ -29,7 +31,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poppins.variable} ${roboto.variable} font-roboto`}>
         <Providers>
-          {children}
+          <RoleBasedNavigation>
+            <AdminPreviewBanner />
+            {children}
+          </RoleBasedNavigation>
         </Providers>
       </body>
     </html>

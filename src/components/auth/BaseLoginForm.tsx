@@ -50,34 +50,26 @@ export default function BaseLoginForm({
       setAuth(user, token)
       toast.success('Login successful!')
 
-      // Role-based redirect logic
+      // Strict role-based redirect logic - no exceptions
       const roleRoutes: Record<string, string> = {
-        customer: '/',
+        customer: '/customer/dashboard',
         admin: '/admin/dashboard',
         branch_admin: '/branch-admin/dashboard',
         center_admin: '/center-admin/dashboard',
+        branch_manager: '/center-admin/dashboard',
+        staff: '/staff/dashboard',
         superadmin: '/superadmin/dashboard',
       }
 
-      // If user is NOT a customer, always redirect to their role-specific dashboard
-      // (ignore redirect URL for non-customer roles)
-      if (user.role !== 'customer') {
-        const redirectPath = roleRoutes[user.role] || '/admin/dashboard'
-        console.log(`Non-customer role (${user.role}) - redirecting to:`, redirectPath)
-        setTimeout(() => {
-          router.push(redirectPath)
-        }, 100)
-        return
-      }
-
-      // For customers, handle redirect URL if present
-      if (redirectUrl) {
-        const decodedUrl = decodeURIComponent(redirectUrl)
-        console.log('Customer redirecting to:', decodedUrl)
-        setTimeout(() => {
-          router.push(decodedUrl)
-        }, 100)
-        return
+      // Always redirect to role-specific dashboard (ignore redirect URL for non-customers)
+      const redirectPath = roleRoutes[user.role] || '/auth/login'
+      
+      console.log(`🔄 Login successful - redirecting ${user.role} to: ${redirectPath}`)
+      
+      setTimeout(() => {
+        router.push(redirectPath)
+      }, 100)
+      return
       }
 
       // Default customer redirect

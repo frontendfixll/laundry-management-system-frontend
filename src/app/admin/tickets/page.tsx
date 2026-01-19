@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { 
   Ticket, 
@@ -51,7 +52,7 @@ const categoryOptions = [
   { value: 'other', label: 'Other' }
 ]
 
-export default function AdminTicketsPage() {
+function AdminTicketsPage() {
   const [filters, setFilters] = useState({
     page: 1,
     limit: ITEMS_PER_PAGE,
@@ -474,3 +475,8 @@ export default function AdminTicketsPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminTicketsPage, {
+  module: 'tickets',
+  action: 'view',
+  feature: 'tickets'
+})

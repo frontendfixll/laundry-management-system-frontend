@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { useAuthStore } from '@/store/authStore'
 import CreateAdminCampaignModal from '@/components/campaigns/CreateAdminCampaignModal'
 import {
@@ -87,7 +88,7 @@ const CAMPAIGN_STATUSES = [
   { value: 'CANCELLED', label: 'Cancelled', color: 'bg-red-100 text-red-800' }
 ]
 
-export default function AdminCampaignsPage() {
+function AdminCampaignsPage() {
   const { token } = useAuthStore()
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
@@ -574,3 +575,8 @@ export default function AdminCampaignsPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminCampaignsPage, {
+  module: 'coupons',
+  action: 'view',
+  feature: 'campaigns'
+})

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { useAuthStore } from '@/store/authStore'
 import {
   Star,
@@ -59,7 +60,7 @@ const PROGRAM_TYPES = [
   { value: 'cashback', label: 'Cashback', icon: CreditCard, description: 'Percentage back as credit' }
 ]
 
-export default function LoyaltyPage() {
+function LoyaltyPage() {
   const { token } = useAuthStore()
   const [programs, setPrograms] = useState<LoyaltyProgram[]>([])
   const [stats, setStats] = useState<LoyaltyStats>({
@@ -638,3 +639,8 @@ export default function LoyaltyPage() {
     </div>
   )
 }
+export default withRouteGuard(LoyaltyPage, {
+  module: 'coupons',
+  action: 'view',
+  feature: 'loyalty_points'
+})

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { SmartQuickActions } from '@/components/SmartQuickActions'
 import { useAdminDashboard } from '@/hooks/useAdmin'
 import { useAdminAnalytics } from '@/hooks/useAnalytics'
 import {
@@ -533,52 +534,10 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Quick Actions & Alerts */}
+        {/* Smart Quick Actions & Alerts */}
         <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-            <div className="space-y-3">
-              <Link
-                href="/admin/orders"
-                className="flex items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:from-blue-100 hover:to-indigo-100 transition-all duration-200 group"
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
-                  <ShoppingBag className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">Manage Orders</div>
-                  <div className="text-xs text-gray-500">Assign & track orders</div>
-                </div>
-              </Link>
-
-              <Link
-                href="/admin/customers"
-                className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-200 group"
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform">
-                  <Users className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">Customer Management</div>
-                  <div className="text-xs text-gray-500">View & manage customers</div>
-                </div>
-              </Link>
-
-              <Link
-                href="/admin/branches"
-                className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all duration-200 group"
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mr-4 shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform">
-                  <Building2 className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">Branch Operations</div>
-                  <div className="text-xs text-gray-500">Monitor branches</div>
-                </div>
-              </Link>
-            </div>
-          </div>
+          {/* Smart Quick Actions */}
+          <SmartQuickActions maxActions={6} showAnalytics={canViewReports} />
 
           {/* Alerts */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

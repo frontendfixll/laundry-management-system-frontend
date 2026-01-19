@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { withRouteGuard } from '@/components/withRouteGuard';
 import { 
   QrCode, Search, Package, User, MapPin, Clock, IndianRupee, 
   CheckCircle, AlertCircle, RefreshCw, History, Truck, 
@@ -124,7 +125,7 @@ const ORDER_STATUSES = [
 
 const ITEM_STATUSES = ['pending', 'in_progress', 'completed', 'quality_check', 'ready'];
 
-export default function AdminScannerPage() {
+function AdminScannerPage() {
   const [manualCode, setManualCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -567,3 +568,8 @@ export default function AdminScannerPage() {
     </div>
   );
 }
+export default withRouteGuard(AdminScannerPage, {
+  module: 'orders',
+  action: 'view',
+  feature: 'orders'
+})

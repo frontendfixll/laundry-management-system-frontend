@@ -17,21 +17,25 @@ export default function DashboardRedirect() {
       return
     }
 
-    // Redirect based on user role
-    switch (user.role) {
-      case 'admin':
-        router.push('/admin/dashboard')
-        break
-      case 'center_admin':
-      case 'branch_manager':
-        router.push('/center-admin/dashboard')
-        break
-      case 'customer':
-        router.push('/customer/dashboard')
-        break
-      default:
-        // If role is unknown, try customer dashboard
-        router.push('/customer/dashboard')
+    // Strict role-based redirect - each role goes to their specific dashboard
+    const roleRoutes: Record<string, string> = {
+      admin: '/admin/dashboard',
+      center_admin: '/center-admin/dashboard',
+      branch_admin: '/branch-admin/dashboard',
+      branch_manager: '/center-admin/dashboard', // Map to center-admin
+      staff: '/staff/dashboard',
+      customer: '/customer/dashboard',
+      superadmin: '/superadmin/dashboard'
+    }
+
+    const redirectPath = roleRoutes[user.role]
+    
+    if (redirectPath) {
+      console.log(`🔄 Redirecting ${user.role} to: ${redirectPath}`)
+      router.replace(redirectPath)
+    } else {
+      console.warn('Unknown role:', user.role, 'redirecting to login')
+      router.push('/auth/login')
     }
   }, [user, _hasHydrated, router])
 
@@ -40,7 +44,7 @@ export default function DashboardRedirect() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Redirecting to dashboard...</p>
+        <p className="text-gray-600">Redirecting to your dashboard...</p>
       </div>
     </div>
   )

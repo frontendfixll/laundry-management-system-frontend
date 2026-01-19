@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { usePermissions } from '@/hooks/usePermissions'
 import { 
@@ -50,7 +51,7 @@ interface PaymentStats {
   monthlyRevenue: number
 }
 
-export default function AdminPaymentsPage() {
+function AdminPaymentsPage() {
   const { hasPermission } = usePermissions('financial')
   const canExport = hasPermission('reports', 'export')
   const [payments, setPayments] = useState<Payment[]>([])
@@ -478,3 +479,8 @@ export default function AdminPaymentsPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminPaymentsPage, {
+  module: 'performance',
+  action: 'view',
+  feature: 'payments'
+})

@@ -4,6 +4,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { usePermissions } from '@/hooks/usePermissions'
 import { Truck, Search, MapPin, Phone, User, Package, CheckCircle, Eye, AlertCircle, Star, Clock, TrendingUp, X, Plus, Edit, Trash2, Power } from 'lucide-react'
@@ -35,7 +36,7 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   return data
 }
 
-export default function AdminLogisticsPage() {
+function AdminLogisticsPage() {
   const { canCreate, canUpdate, canDelete } = usePermissions('logistics')
   const [partners, setPartners] = useState<LogisticsPartner[]>([])
   const [loading, setLoading] = useState(true)
@@ -170,3 +171,8 @@ export default function AdminLogisticsPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminLogisticsPage, {
+  module: 'logistics',
+  action: 'view',
+  feature: 'logistics'
+})

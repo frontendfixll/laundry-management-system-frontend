@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { 
   BarChart3, 
   TrendingUp,
@@ -261,7 +262,7 @@ interface AnalyticsData {
   recentOrders: any[]
 }
 
-export default function AdminAnalyticsPage() {
+function AdminAnalyticsPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -665,3 +666,8 @@ export default function AdminAnalyticsPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminAnalyticsPage, {
+  module: 'performance',
+  action: 'view',
+  feature: 'advanced_analytics'
+})

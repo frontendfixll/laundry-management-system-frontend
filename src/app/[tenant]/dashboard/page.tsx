@@ -188,6 +188,25 @@ export default function TenantDashboard() {
   const tenant = params.tenant as string
   const { user, token, isAuthenticated, logout } = useAuthStore()
   
+  // Redirect admins to their proper dashboard
+  useEffect(() => {
+    if (user && ['admin', 'center_admin', 'branch_admin', 'branch_manager'].includes(user.role)) {
+      const adminDashboardRoutes: Record<string, string> = {
+        admin: '/admin/dashboard',
+        center_admin: '/center-admin/dashboard',
+        branch_admin: '/branch-admin/dashboard',
+        branch_manager: '/center-admin/dashboard'
+      }
+      
+      const adminDashboard = adminDashboardRoutes[user.role]
+      if (adminDashboard) {
+        console.log(`🔄 Admin ${user.role} accessing tenant dashboard, redirecting to: ${adminDashboard}`)
+        router.replace(adminDashboard)
+        return
+      }
+    }
+  }, [user, router])
+  
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

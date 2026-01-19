@@ -23,6 +23,12 @@ export type FeatureKey =
   | 'reviews'
   | 'refunds'
   | 'payments'
+  | 'advanced_analytics'
+  | 'settings'
+  | 'loyalty_points'
+  | 'referral_program'
+  | 'wallet'
+  | 'custom_branding'
   // Programs
   | 'campaigns'
   | 'coupons'

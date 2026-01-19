@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Plus, Search, MapPin, Users, Activity, Settings, Trash2, Edit, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -54,7 +55,7 @@ interface Branch {
   utilizationRate: number
 }
 
-export default function BranchesPage() {
+function BranchesPage() {
   const [branches, setBranches] = useState<Branch[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -700,3 +701,9 @@ export default function BranchesPage() {
     </div>
   )
 }
+
+export default withRouteGuard(BranchesPage, {
+  module: 'branches',
+  action: 'view',
+  feature: 'branches'
+})

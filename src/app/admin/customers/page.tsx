@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { RouteGuard } from '@/components/RouteGuard'
 import { usePermissions } from '@/hooks/usePermissions'
 import { 
   Users, 
@@ -107,6 +108,17 @@ interface CustomerDetails extends Customer {
 }
 
 export default function AdminCustomersPage() {
+  return (
+    <RouteGuard 
+      requiredPermission={{ module: 'customers', action: 'view' }}
+      requiredFeature="customers"
+    >
+      <AdminCustomersContent />
+    </RouteGuard>
+  )
+}
+
+function AdminCustomersContent() {
   const { canUpdate, hasPermission } = usePermissions('customers')
   const canExportReports = hasPermission('reports', 'export')
   const router = useRouter()

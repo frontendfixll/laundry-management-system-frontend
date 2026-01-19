@@ -16,9 +16,11 @@ import {
   Save,
   Package,
   ChevronDown,
-  Check
+  Check,
+  Eye
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import toast from 'react-hot-toast'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
@@ -114,7 +116,7 @@ const INVENTORY_ITEMS = [
   }
 ]
 
-export default function AdminInventoryPage() {
+function AdminInventoryPage() {
   const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [stats, setStats] = useState<InventoryStats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -122,6 +124,7 @@ export default function AdminInventoryPage() {
   const [filter, setFilter] = useState('all')
   const [showAddModal, setShowAddModal] = useState(false)
   const [showStockModal, setShowStockModal] = useState(false)
+  const [showRequestModal, setShowRequestModal] = useState(false)
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null)
   const [saving, setSaving] = useState(false)
   
@@ -134,6 +137,17 @@ export default function AdminInventoryPage() {
     itemName: '', currentStock: 0, minThreshold: 10, maxCapacity: 100, unit: 'units', unitCost: 0, supplier: ''
   })
   const [stockUpdate, setStockUpdate] = useState({ quantity: 0, action: 'add' as 'add' | 'consume', reason: '' })
+  
+  // Request item state
+  const [requestItem, setRequestItem] = useState({
+    itemName: '',
+    category: '',
+    description: '',
+    estimatedQuantity: '',
+    unit: 'units',
+    urgency: 'normal' as 'low' | 'normal' | 'high',
+    justification: ''
+  })
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -291,6 +305,47 @@ export default function AdminInventoryPage() {
     finally { setSaving(false) }
   }
 
+  const handleRequestItem = async () => {
+    if (!requestItem.itemName || !requestItem.description) {
+      toast.error('Please fill in item name and description')
+      return
+    }
+    
+    try {
+      setSaving(true)
+      const token = getAuthToken()
+      const response = await fetch(`${API_URL}/admin/inventory/request`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestItem)
+      })
+      
+      const data = await response.json()
+      if (data.success) {
+        toast.success('Item request sent to SuperAdmin successfully!')
+        setShowRequestModal(false)
+        setRequestItem({
+          itemName: '',
+          category: '',
+          description: '',
+          estimatedQuantity: '',
+          unit: 'units',
+          urgency: 'normal',
+          justification: ''
+        })
+      } else {
+        toast.error(data.message || 'Failed to send request')
+      }
+    } catch (error) {
+      toast.error('Failed to send request')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const filteredInventory = inventory.filter(item => {
     const matchesSearch = item.itemName.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = filter === 'all' || (filter === 'low' && item.isLowStock) || (filter === 'expired' && item.isExpired)
@@ -316,6 +371,14 @@ export default function AdminInventoryPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={fetchInventory}><RefreshCw className="w-4 h-4 mr-2" />Refresh</Button>
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.href = '/admin/inventory/requests'}
+            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            View Requests
+          </Button>
           <Button onClick={() => setShowAddModal(true)} className="bg-blue-500 hover:bg-blue-600"><Plus className="w-4 h-4 mr-2" />Add Item</Button>
         </div>
       </div>
@@ -342,16 +405,35 @@ export default function AdminInventoryPage() {
       )}
 
       <div className="bg-white rounded-xl shadow-sm border p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-            <input type="text" placeholder="Search items..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-3 py-2 border rounded-lg" />
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <div className="w-full sm:w-80 relative">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="Search items..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+            />
           </div>
-          <select value={filter} onChange={(e) => setFilter(e.target.value)} className="px-4 py-2 border rounded-lg">
+          <select 
+            value={filter} 
+            onChange={(e) => setFilter(e.target.value)} 
+            className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <option value="all">All Items</option>
             <option value="low">Low Stock</option>
             <option value="expired">Expired</option>
           </select>
+          
+          {/* Request New Item Button */}
+          <Button
+            onClick={() => setShowRequestModal(true)}
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Request Item
+          </Button>
         </div>
       </div>
 
@@ -464,15 +546,15 @@ export default function AdminInventoryPage() {
                 {showDropdown && (
                   <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-2xl max-h-72 overflow-hidden">
                     {/* Search Input */}
-                    <div className="p-3 border-b border-gray-200 sticky top-0 bg-white">
+                    <div className="p-2 border-b border-gray-200 sticky top-0 bg-white">
                       <div className="relative">
-                        <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
                         <input
                           type="text"
                           placeholder="Search items..."
                           value={dropdownSearch}
                           onChange={(e) => setDropdownSearch(e.target.value)}
-                          className="w-full pl-10 pr-3 py-2.5 border-2 border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                           onClick={(e) => e.stopPropagation()}
                         />
                       </div>
@@ -922,6 +1004,154 @@ export default function AdminInventoryPage() {
         </div>,
         document.body
       )}
+
+      {/* Request Item Modal */}
+      {showRequestModal && createPortal(
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-800">Request New Item</h2>
+                <button onClick={() => setShowRequestModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Item Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Item Name *</label>
+                  <input
+                    type="text"
+                    value={requestItem.itemName}
+                    onChange={(e) => setRequestItem({...requestItem, itemName: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="e.g., Premium Detergent"
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <select
+                    value={requestItem.category}
+                    onChange={(e) => setRequestItem({...requestItem, category: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Cleaning Chemicals">Cleaning Chemicals</option>
+                    <option value="Dry Cleaning Chemicals">Dry Cleaning Chemicals</option>
+                    <option value="Packaging Materials">Packaging Materials</option>
+                    <option value="Equipment Supplies">Equipment Supplies</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                  <textarea
+                    value={requestItem.description}
+                    onChange={(e) => setRequestItem({...requestItem, description: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={3}
+                    placeholder="Describe the item, its purpose, and specifications..."
+                  />
+                </div>
+
+                {/* Estimated Quantity & Unit */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Est. Quantity</label>
+                    <input
+                      type="text"
+                      value={requestItem.estimatedQuantity}
+                      onChange={(e) => setRequestItem({...requestItem, estimatedQuantity: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., 50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+                    <select
+                      value={requestItem.unit}
+                      onChange={(e) => setRequestItem({...requestItem, unit: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="units">Units</option>
+                      <option value="kg">Kilograms</option>
+                      <option value="liters">Liters</option>
+                      <option value="boxes">Boxes</option>
+                      <option value="bottles">Bottles</option>
+                      <option value="pieces">Pieces</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Urgency */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Urgency Level</label>
+                  <select
+                    value={requestItem.urgency}
+                    onChange={(e) => setRequestItem({...requestItem, urgency: e.target.value as 'low' | 'normal' | 'high'})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="low">Low - Can wait 1-2 weeks</option>
+                    <option value="normal">Normal - Needed within a week</option>
+                    <option value="high">High - Urgent, needed ASAP</option>
+                  </select>
+                </div>
+
+                {/* Justification */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Justification</label>
+                  <textarea
+                    value={requestItem.justification}
+                    onChange={(e) => setRequestItem({...requestItem, justification: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                    placeholder="Why is this item needed? How will it improve operations?"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowRequestModal(false)}
+                  className="flex-1"
+                  disabled={saving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleRequestItem}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Send Request
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   )
 }
+export default withRouteGuard(AdminInventoryPage, {
+  module: 'inventory',
+  action: 'view',
+  feature: 'inventory'
+})

@@ -4,6 +4,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { 
   Settings, 
   User,
@@ -42,7 +43,7 @@ interface BranchCoordinateStatus {
   serviceableRadius?: number
 }
 
-export default function AdminSettingsPage() {
+function AdminSettingsPage() {
   const { user, token } = useAuthStore()
   const [activeTab, setActiveTab] = useState('profile')
   const [showPassword, setShowPassword] = useState(false)
@@ -666,3 +667,8 @@ export default function AdminSettingsPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminSettingsPage, {
+  module: 'settings',
+  action: 'view'
+  // No feature requirement for settings
+})

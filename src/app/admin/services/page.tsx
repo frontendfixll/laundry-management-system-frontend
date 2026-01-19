@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { usePermissions } from '@/hooks/usePermissions'
 import { 
@@ -128,7 +129,7 @@ const iconOptions = [
   'Shirt', 'Sparkles', 'Award', 'Zap', 'Star', 'Crown', 'Diamond', 'Flame', 'Scissors'
 ]
 
-export default function AdminServicesPage() {
+function AdminServicesPage() {
   const { canCreate, canUpdate, canDelete } = usePermissions('services')
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
@@ -1292,3 +1293,8 @@ export default function AdminServicesPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminServicesPage, {
+  module: 'services',
+  action: 'view',
+  feature: 'services'
+})

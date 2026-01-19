@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { usePermissions } from '@/hooks/usePermissions'
 import { 
@@ -36,7 +37,7 @@ const statusOptions = [
   { value: 'rejected', label: 'Rejected' }
 ]
 
-export default function AdminRefundsPage() {
+function AdminRefundsPage() {
   const { canRefund, hasPermission } = usePermissions('orders')
   const canApprove = hasPermission('financial', 'approve')
   const [filters, setFilters] = useState({
@@ -726,3 +727,8 @@ export default function AdminRefundsPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminRefundsPage, {
+  module: 'orders',
+  action: 'cancel',
+  feature: 'refunds'
+})

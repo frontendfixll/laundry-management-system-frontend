@@ -8,8 +8,11 @@ import {
 import AdminHeader from '@/components/layout/AdminHeader'
 import NotificationContainer from '@/components/NotificationContainer'
 import RefreshPrompt from '@/components/RefreshPrompt'
+import ModernToaster from '@/components/ModernToast'
+import ConnectionStatus from '@/components/ConnectionStatus'
 import { useAuthStore } from '@/store/authStore'
 import { useRefreshPromptStore } from '@/store/refreshPromptStore'
+import { useRealTimeNotifications } from '@/hooks/useRealTimeNotifications'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -19,6 +22,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed, setMobileOpen } = useAdminSidebar()
   const { setAuth, user, _hasHydrated } = useAuthStore() // Add _hasHydrated to check if store is ready
   const { showPrompt, setShowPrompt } = useRefreshPromptStore() // Add refresh prompt store
+  const { isConnected } = useRealTimeNotifications() // Get connection status
   
   // Enable real-time permission sync
   usePermissionSync({
@@ -76,6 +80,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           <div className="max-w-screen-2xl mx-auto">{children}</div>
         </main>
       </div>
+
+      {/* Real-time Connection Status */}
+      <ConnectionStatus isConnected={isConnected} />
+
+      {/* Modern Toast Notifications */}
+      <ModernToaster />
     </div>
   )
 }

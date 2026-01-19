@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { usePermissions } from '@/hooks/usePermissions'
 import { 
   Package, 
@@ -100,7 +101,7 @@ interface Order {
   }
 }
 
-export default function AdminOrdersPage() {
+function AdminOrdersPage() {
   const { canView, canUpdate, canAssign, canCancel, hasPermission } = usePermissions('orders')
   const canExportReports = hasPermission('reports', 'export')
   const router = useRouter()
@@ -1115,3 +1116,8 @@ export default function AdminOrdersPage() {
     </div>
   )
 }
+export default withRouteGuard(AdminOrdersPage, {
+  module: 'orders',
+  action: 'view',
+  feature: 'orders'
+})
