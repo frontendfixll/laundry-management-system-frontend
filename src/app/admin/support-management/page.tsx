@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import CreateSupportUserModal from '@/components/support/CreateSupportUserModal'
 import SupportUserDetailsModal from '@/components/support/SupportUserDetailsModal'
-import { toast } from '@/components/ui/toast'
+import { toast } from 'react-hot-toast'
 
 interface SupportUser {
   _id: string
