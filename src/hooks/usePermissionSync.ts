@@ -1,102 +1,151 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useAuthStore } from '@/store/authStore';
-import toast from 'react-hot-toast';
+'use client'
 
-export const usePermissionSync = () => {
-  const { refreshUserData, user } = useAuthStore();
-  const isRefreshingRef = useRef(false);
-  const lastRefreshTimeRef = useRef(0);
+import { useCallback, useEffect, useRef } from 'react'
+import { useAuthStore } from '@/store/authStore'
+import toast from 'react-hot-toast'
 
-  // Handle permission updates from WebSocket
-  const handlePermissionUpdate = useCallback(async (event: CustomEvent) => {
-    console.log('🔄 Handling permission update:', event.detail);
-    
-    // Prevent duplicate refreshes
-    const now = Date.now();
-    if (isRefreshingRef.current || (now - lastRefreshTimeRef.current) < 3000) {
-      console.log('⚠️ Permission refresh already in progress or too recent, skipping');
-      return;
-    }
-    
-    try {
-      isRefreshingRef.current = true;
-      lastRefreshTimeRef.current = now;
-      
-      // Refresh user data to get latest permissions
-      await refreshUserData();
-      
-      // Show success toast (only if not already showing)
-      const existingToasts = document.querySelectorAll('[data-toast-id*="permission"]');
-      if (existingToasts.length === 0) {
-        toast.success('Permissions updated successfully!', {
-          duration: 3000,
-          icon: '🔄',
-          id: 'permission-success'
-        });
-      }
-      
-      console.log('✅ Permissions refreshed successfully');
-    } catch (error) {
-      console.error('❌ Failed to refresh permissions:', error);
-      
-      // Show error toast (only if not already showing)
-      const existingErrorToasts = document.querySelectorAll('[data-toast-id*="permission-error"]');
-      if (existingErrorToasts.length === 0) {
-        toast.error('Failed to refresh permissions. Page will reload automatically.', {
-          duration: 3000,
-          id: 'permission-error'
-        });
-      }
-      
-      // Force page reload on error
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
-    } finally {
-      isRefreshingRef.current = false;
-    }
-  }, [refreshUserData]);
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
-  // Listen for permission update events
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+interface UsePermissionSyncOptions {
+  autoReload?: boolean
+  onPermissionsUpdated?: () => void
+  onRoleChanged?: (oldRole: string, newRole: string) => void
+}
 
-    // Listen for custom permission update events
-    window.addEventListener('permissionsUpdated', handlePermissionUpdate as EventListener);
+export const usePermissionSync = (options: UsePermissionSyncOptions = {}) => {
+  const { 
+    autoReload = false, 
+    onPermissionsUpdated, 
+    onRoleChanged 
+  } = options
+  
+  const { user, refreshUserData, updateUser } = useAuthStore()
+  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const lastSyncRef = useRef<string>(new Date().toISOString())
 
-    // Cleanup
-    return () => {
-      window.removeEventListener('permissionsUpdated', handlePermissionUpdate as EventListener);
-    };
-  }, [handlePermissionUpdate]);
-
-  // Manual permission refresh function
+  // Manual permission refresh
   const refreshPermissions = useCallback(async () => {
-    if (isRefreshingRef.current) {
-      console.log('⚠️ Permission refresh already in progress');
-      return false;
-    }
-    
     try {
-      console.log('🔄 Manually refreshing permissions...');
-      isRefreshingRef.current = true;
-      lastRefreshTimeRef.current = Date.now();
+      console.log('🔄 Manually refreshing permissions...')
+      await refreshUserData()
       
-      await refreshUserData();
-      toast.success('Permissions refreshed!');
-      return true;
+      // Call callback if provided
+      if (onPermissionsUpdated) {
+        onPermissionsUpdated()
+      }
+      
+      // Removed toast to prevent notification spam - unified system handles this
+      return true
     } catch (error) {
-      console.error('❌ Failed to refresh permissions:', error);
-      toast.error('Failed to refresh permissions');
-      return false;
-    } finally {
-      isRefreshingRef.current = false;
+      console.error('Failed to refresh permissions:', error)
+      // Keep error toast for actual failures
+      toast.error('Failed to refresh permissions', {
+        icon: '❌',
+        duration: 3000
+      })
+      return false
     }
-  }, [refreshUserData]);
+  }, [refreshUserData, onPermissionsUpdated])
+
+  // Check for permission updates (polling fallback)
+  const checkPermissionUpdates = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token || !user) return
+
+      const response = await fetch(`${API_URL}/auth/permission-status?since=${lastSyncRef.current}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        
+        if (data.success && data.data.hasUpdates) {
+          console.log('🔄 Permission updates detected via polling')
+          
+          if (autoReload) {
+            await refreshUserData()
+          } else {
+            // Call callback instead of auto-reloading
+            if (onPermissionsUpdated) {
+              onPermissionsUpdated()
+            }
+          }
+          
+          lastSyncRef.current = new Date().toISOString()
+        }
+      }
+    } catch (error) {
+      console.error('Permission check error:', error)
+    }
+  }, [user, refreshUserData, autoReload, onPermissionsUpdated])
+
+  // Start periodic permission checking (fallback for when WebSocket is not available)
+  const startPeriodicSync = useCallback((intervalMs: number = 30000) => {
+    if (syncIntervalRef.current) return
+
+    console.log('🔄 Starting periodic permission sync')
+    syncIntervalRef.current = setInterval(checkPermissionUpdates, intervalMs)
+  }, [checkPermissionUpdates])
+
+  // Stop periodic permission checking
+  const stopPeriodicSync = useCallback(() => {
+    if (syncIntervalRef.current) {
+      clearInterval(syncIntervalRef.current)
+      syncIntervalRef.current = null
+      console.log('⏹️ Stopped periodic permission sync')
+    }
+  }, [])
+
+  // Listen for custom permission update events - PREVENT PAGE RELOADS
+  useEffect(() => {
+    const handlePermissionUpdate = (event: CustomEvent) => {
+      console.log('🔄 Custom permission update event received:', event.detail)
+      
+      // IMPORTANT: Don't trigger page reload here
+      if (autoReload) {
+        refreshPermissions()
+      } else {
+        // Just call the callback, don't reload
+        if (onPermissionsUpdated) {
+          onPermissionsUpdated()
+        }
+      }
+    }
+
+    const handleRoleChange = (event: CustomEvent) => {
+      console.log('👤 Role change event received:', event.detail)
+      
+      if (onRoleChanged && event.detail.oldRole && event.detail.newRole) {
+        onRoleChanged(event.detail.oldRole, event.detail.newRole)
+      }
+    }
+
+    // Listen for permission and role change events
+    window.addEventListener('permissionsUpdated', handlePermissionUpdate as EventListener)
+    window.addEventListener('roleChanged', handleRoleChange as EventListener)
+    
+    return () => {
+      window.removeEventListener('permissionsUpdated', handlePermissionUpdate as EventListener)
+      window.removeEventListener('roleChanged', handleRoleChange as EventListener)
+    }
+  }, [refreshPermissions, autoReload, onPermissionsUpdated, onRoleChanged])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopPeriodicSync()
+    }
+  }, [stopPeriodicSync])
 
   return {
     refreshPermissions,
-    user,
-    isRefreshing: isRefreshingRef.current
-  };
-};
+    startPeriodicSync,
+    stopPeriodicSync,
+    checkPermissionUpdates
+  }
+}

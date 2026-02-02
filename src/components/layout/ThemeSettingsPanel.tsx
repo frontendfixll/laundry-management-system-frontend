@@ -47,7 +47,7 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
   const saveSettings = (newSettings: Partial<typeof defaultSettings>) => {
     const settings = { mode, color, sidebarColor, ...newSettings }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
-    
+
     // Dispatch custom event for other components to listen
     window.dispatchEvent(new CustomEvent('adminThemeChange', { detail: settings }))
   }
@@ -55,7 +55,7 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
   const handleModeChange = (newMode: ThemeMode) => {
     setMode(newMode)
     saveSettings({ mode: newMode })
-    
+
     // Apply dark mode to document
     if (newMode === 'dark') {
       document.documentElement.classList.add('dark')
@@ -101,7 +101,7 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
   return (
     <>
       {/* Backdrop */}
-      <div 
+      <div
         className={cn(
           'fixed inset-0 bg-black/20 z-50 transition-opacity duration-300',
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -110,7 +110,7 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
       />
 
       {/* Panel */}
-      <div 
+      <div
         className={cn(
           'fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto',
           isOpen ? 'translate-x-0' : 'translate-x-full'
@@ -119,7 +119,7 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h2 className="text-xl font-semibold text-gray-800">Settings</h2>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
@@ -136,8 +136,8 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
                 onClick={() => handleModeChange('auto')}
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all text-sm font-medium',
-                  mode === 'auto' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                  mode === 'auto'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600'
                     : 'border-gray-200 hover:border-gray-300 text-gray-600'
                 )}
               >
@@ -148,8 +148,8 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
                 onClick={() => handleModeChange('dark')}
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all text-sm font-medium',
-                  mode === 'dark' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                  mode === 'dark'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600'
                     : 'border-gray-200 hover:border-gray-300 text-gray-600'
                 )}
               >
@@ -160,8 +160,8 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
                 onClick={() => handleModeChange('light')}
                 className={cn(
                   'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 transition-all text-sm font-medium',
-                  mode === 'light' 
-                    ? 'border-blue-500 bg-blue-500 text-white' 
+                  mode === 'light'
+                    ? 'border-blue-500 bg-blue-500 text-white'
                     : 'border-gray-200 hover:border-gray-300 text-gray-600'
                 )}
               >
@@ -175,7 +175,7 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-gray-800">Color Customizer</h3>
-              <button 
+              <button
                 onClick={handleReset}
                 className="text-blue-500 hover:text-blue-600 transition-colors"
                 title="Reset to default"
@@ -190,12 +190,12 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
                   onClick={() => handleColorChange(option.id)}
                   className={cn(
                     'w-12 h-12 rounded-lg overflow-hidden border-2 transition-all',
-                    color === option.id 
-                      ? 'border-gray-800 scale-110 shadow-lg' 
+                    color === option.id
+                      ? 'border-gray-800 scale-110 shadow-lg'
                       : 'border-gray-200 hover:border-gray-300'
                   )}
                 >
-                  <div 
+                  <div
                     className="w-full h-full"
                     style={{
                       background: `linear-gradient(135deg, ${option.colors[0]} 50%, ${option.colors[1]} 50%)`
@@ -214,48 +214,54 @@ export default function ThemeSettingsPanel({ isOpen, onClose }: ThemeSettingsPan
                 onClick={() => handleSidebarColorChange('white')}
                 className={cn(
                   'flex-1 h-20 rounded-xl border-2 transition-all bg-white flex items-center justify-center',
-                  sidebarColor === 'white' 
-                    ? 'border-blue-500 shadow-lg' 
+                  sidebarColor === 'white'
+                    ? 'border-blue-500 shadow-lg'
                     : 'border-gray-200 hover:border-gray-300'
                 )}
               >
-                <div className="flex gap-1">
-                  <div className="w-1 h-8 bg-gray-300 rounded-full"></div>
-                  <div className="w-1 h-8 bg-gray-200 rounded-full"></div>
-                  <div className="w-1 h-8 bg-gray-300 rounded-full"></div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-10 rounded-sm bg-gray-200"></div>
+                  <div className="flex flex-col gap-1">
+                    <div className="w-10 h-2 rounded-sm bg-gray-50"></div>
+                    <div className="w-10 h-2 rounded-sm bg-gray-50"></div>
+                  </div>
                 </div>
               </button>
               <button
                 onClick={() => handleSidebarColorChange('dark')}
                 className={cn(
                   'flex-1 h-20 rounded-xl border-2 transition-all bg-gray-800 flex items-center justify-center',
-                  sidebarColor === 'dark' 
-                    ? 'border-blue-500 shadow-lg' 
+                  sidebarColor === 'dark'
+                    ? 'border-blue-500 shadow-lg'
                     : 'border-gray-200 hover:border-gray-300'
                 )}
               >
-                <div className="flex gap-1">
-                  <div className="w-1 h-8 bg-gray-600 rounded-full"></div>
-                  <div className="w-1 h-8 bg-gray-500 rounded-full"></div>
-                  <div className="w-1 h-8 bg-gray-600 rounded-full"></div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-10 rounded-sm bg-gray-600"></div>
+                  <div className="flex flex-col gap-1">
+                    <div className="w-10 h-2 rounded-sm bg-gray-700"></div>
+                    <div className="w-10 h-2 rounded-sm bg-gray-700"></div>
+                  </div>
                 </div>
               </button>
               <button
                 onClick={() => handleSidebarColorChange('color')}
                 className={cn(
                   'flex-1 h-20 rounded-xl border-2 transition-all flex items-center justify-center',
-                  sidebarColor === 'color' 
-                    ? 'border-blue-500 shadow-lg' 
+                  sidebarColor === 'color'
+                    ? 'border-blue-500 shadow-lg'
                     : 'border-gray-200 hover:border-gray-300'
                 )}
                 style={{
                   background: `linear-gradient(180deg, ${colorOptions.find(c => c.id === color)?.colors[0] || '#3b82f6'}, ${colorOptions.find(c => c.id === color)?.colors[1] || '#6366f1'})`
                 }}
               >
-                <div className="flex gap-1">
-                  <div className="w-1 h-8 bg-white/40 rounded-full"></div>
-                  <div className="w-1 h-8 bg-white/30 rounded-full"></div>
-                  <div className="w-1 h-8 bg-white/40 rounded-full"></div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-10 rounded-sm bg-white/40"></div>
+                  <div className="flex flex-col gap-1">
+                    <div className="w-10 h-2 rounded-sm bg-white/20"></div>
+                    <div className="w-10 h-2 rounded-sm bg-white/20"></div>
+                  </div>
                 </div>
               </button>
             </div>

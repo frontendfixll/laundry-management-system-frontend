@@ -1,0 +1,314 @@
+/* Sidebar Header Fix */
+
+/* Ensure sidebar header is properly positioned */
+.admin-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 50 !important;
+  width: 256px !important;
+  /* w-64 = 256px */
+}
+
+.admin-sidebar.sidebar-collapsed {
+  width: 64px !important;
+  /* w-16 = 64px */
+}
+
+/* Sidebar header styling */
+.sidebar-header {
+  height: 64px !important;
+  /* Match main header height */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 20px !important;
+  /* Increased padding for wider sidebar */
+  border-bottom: 1px solid #e5e7eb !important;
+  background-color: white !important;
+  flex-shrink: 0 !important;
+}
+
+/* Logo container in sidebar header */
+.sidebar-logo-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  /* Increased gap */
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.sidebar-logo-container .logo-icon {
+  width: 36px !important;
+  /* Slightly larger icon */
+  height: 36px !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar-logo-container .logo-text {
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.sidebar-logo-container .logo-text h1 {
+  font-size: 20px !important;
+  /* Larger font */
+  font-weight: 700 !important;
+  color: #111827 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.2 !important;
+}
+
+.sidebar-logo-container .logo-text p {
+  font-size: 13px !important;
+  /* Slightly larger */
+  color: #6b7280 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.2 !important;
+}
+
+/* Collapsed state logo */
+.sidebar-collapsed-logo {
+  display: none !important;
+}
+
+.sidebar-collapsed .sidebar-collapsed-logo {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.sidebar-collapsed .sidebar-logo-container {
+  display: none !important;
+}
+
+/* Header buttons */
+.sidebar-header-buttons {
+  display: flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+  gap: 8px !important;
+  /* Increased gap */
+}
+
+.sidebar-header-buttons button {
+  padding: 8px !important;
+  /* Increased padding */
+  border-radius: 10px !important;
+  transition: background-color 0.2s !important;
+  border: none !important;
+  background: transparent !important;
+  cursor: pointer !important;
+}
+
+.sidebar-header-buttons button:hover {
+  background-color: #f3f4f6 !important;
+}
+
+/* User info section */
+.sidebar-user-info {
+  padding: 20px !important;
+  /* Increased padding */
+  border-bottom: 1px solid #e5e7eb !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar-user-info .user-avatar {
+  width: 44px !important;
+  /* Larger avatar */
+  height: 44px !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar-user-info .user-details {
+  min-width: 0 !important;
+  flex: 1 !important;
+  margin-left: 16px !important;
+  /* Increased margin */
+}
+
+.sidebar-user-info .user-details p:first-child {
+  font-size: 15px !important;
+  /* Larger font */
+  font-weight: 600 !important;
+  color: #111827 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.3 !important;
+}
+
+.sidebar-user-info .user-details p:last-child {
+  font-size: 13px !important;
+  /* Larger font */
+  color: #6b7280 !important;
+  margin: 2px 0 0 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.3 !important;
+}
+
+/* Collapsed user avatar */
+.sidebar-collapsed-user {
+  display: none !important;
+  padding: 12px !important;
+  /* Increased padding */
+  border-bottom: 1px solid #e5e7eb !important;
+  flex-shrink: 0 !important;
+}
+
+.sidebar-collapsed .sidebar-collapsed-user {
+  display: block !important;
+}
+
+.sidebar-collapsed .sidebar-user-info {
+  display: none !important;
+}
+
+/* Navigation area */
+.sidebar-navigation {
+  flex: 1 !important;
+  padding: 20px 12px !important;
+  /* Increased padding */
+  overflow-y: auto !important;
+  min-height: 0 !important;
+}
+
+/* Navigation items */
+.sidebar-navigation a,
+.sidebar-navigation button {
+  padding: 12px 16px !important;
+  /* Increased padding */
+  margin-bottom: 4px !important;
+  border-radius: 12px !important;
+  /* More rounded */
+  font-size: 15px !important;
+  /* Larger font */
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.sidebar-navigation .lucide {
+  width: 20px !important;
+  /* Larger icons */
+  height: 20px !important;
+  margin-right: 12px !important;
+  /* Increased margin */
+}
+
+/* Version info */
+.sidebar-version {
+  padding: 12px 20px !important;
+  /* Increased padding */
+  border-top: 1px solid #e5e7eb !important;
+  flex-shrink: 0 !important;
+  text-align: center !important;
+}
+
+.sidebar-collapsed .sidebar-version {
+  display: none !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 256px !important;
+    /* Always full width on mobile - Match layout */
+  }
+
+  .sidebar-collapsed-logo,
+  .sidebar-collapsed-user {
+    display: none !important;
+  }
+
+  .sidebar-logo-container,
+  .sidebar-user-info {
+    display: flex !important;
+  }
+}
+
+/* Fix z-index conflicts */
+.admin-header {
+  z-index: 60 !important;
+}
+
+.admin-sidebar {
+  z-index: 50 !important;
+}
+
+/* Ensure proper layout */
+.admin-layout {
+  position: relative;
+  min-height: 100vh;
+}
+
+.admin-layout .admin-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 50 !important;
+}
+
+.admin-layout .admin-sidebar+div {
+  transition: margin-left 0.3s ease !important;
+  min-height: 100vh !important;
+}
+
+@media (min-width: 1024px) {
+  .admin-layout .admin-sidebar.sidebar-collapsed+div {
+    margin-left: 64px !important;
+  }
+
+  .admin-layout .admin-sidebar:not(.sidebar-collapsed)+div {
+    margin-left: 256px !important;
+    /* Match sidebar width */
+  }
+
+  /* Ensure header positioning matches */
+  .admin-header {
+    transition: left 0.3s ease !important;
+  }
+}
+
+/* Main Content Area Positioning */
+.main-content-area {
+  position: relative !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+}
+
+@media (min-width: 1024px) {
+  .main-content-area {
+    margin-left: 0 !important;
+    /* Reset any conflicting margins */
+  }
+}
+
+/* Ensure no conflicting positioning */
+.admin-layout>.main-content-area {
+  display: block !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix any potential overflow issues */
+.admin-layout {
+  overflow-x: hidden !important;
+}
+
+/* Ensure main content doesn't have conflicting positioning */
+.main-content-area main {
+  position: relative !important;
+  z-index: 1 !important;
+}

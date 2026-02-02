@@ -109,7 +109,7 @@ export default function AdminReviewsPage() {
         ...(filters.flagged && { flagged: filters.flagged }),
         ...(filters.search && { search: filters.search })
       })
-      
+
       const response = await api.get(`/admin/reviews?${params}`)
       if (response.data.success) {
         setReviews(response.data.data.reviews)
@@ -217,7 +217,7 @@ export default function AdminReviewsPage() {
   }
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Review Management</h1>

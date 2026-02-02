@@ -1,11 +1,11 @@
 'use client'
 
 import { toast, Toaster } from 'react-hot-toast'
-import { 
-  CheckCircle, 
-  AlertTriangle, 
-  XCircle, 
-  Info, 
+import {
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Info,
   X,
   Bell
 } from 'lucide-react'
@@ -59,7 +59,7 @@ export const showToast = {
       ...options
     })
   },
-  
+
   error: (message: string, options?: any) => {
     toast.error(message, {
       style: toastStyles.error,
@@ -71,7 +71,7 @@ export const showToast = {
       ...options
     })
   },
-  
+
   warning: (message: string, options?: any) => {
     toast(message, {
       icon: '⚠️',
@@ -80,7 +80,7 @@ export const showToast = {
       ...options
     })
   },
-  
+
   info: (message: string, options?: any) => {
     toast(message, {
       icon: 'ℹ️',
@@ -111,17 +111,17 @@ export const showToast = {
     }
 
     toast.custom((t) => (
-      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-white shadow-lg rounded-xl pointer-events-auto border-l-4 ${getColors()}`}>
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} w-80 bg-white shadow-lg rounded-xl pointer-events-auto border-l-4 ${getColors()}`}>
         <div className="p-4">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               {getIcon()}
             </div>
-            <div className="ml-3 flex-1">
-              <p className="text-sm font-semibold">
+            <div className="ml-3 flex-1 min-w-0">
+              <p className="text-sm font-semibold truncate">
                 {title}
               </p>
-              <p className="mt-1 text-sm opacity-90">
+              <p className="mt-1 text-sm opacity-90 break-words">
                 {message}
               </p>
               {action && (
@@ -159,13 +159,12 @@ export const showToast = {
 export default function ModernToaster() {
   return (
     <Toaster
-      position="top-right"
+      position="top-center"
       reverseOrder={false}
       gutter={8}
       containerClassName=""
       containerStyle={{
-        top: 80, // Account for header height
-        right: 20,
+        top: 20,
       }}
       toastOptions={{
         // Default options
@@ -179,7 +178,8 @@ export default function ModernToaster() {
           fontSize: '14px',
           fontWeight: '500',
           boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          maxWidth: '400px',
+          maxWidth: '380px', // Fixed width to prevent full screen
+          width: '380px', // Enforce consistent width
         },
         // Individual toast type styles
         success: {

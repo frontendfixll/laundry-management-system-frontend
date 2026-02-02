@@ -38,7 +38,7 @@ export default function NotificationContainer() {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-20 right-4 z-50 space-y-2">
       {toasts.map(toast => (
         <NotificationToast
           key={toast._id}

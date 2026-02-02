@@ -124,23 +124,7 @@ export function BranchAdminSidebar() {
           )}
         </div>
 
-        {/* User Info */}
-        {showText && user && (
-          <div className="flex-shrink-0 p-4 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-cyan-50">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium text-sm">
-                  {user.name?.charAt(0)?.toUpperCase() || 'B'}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{user.name || 'Branch Admin'}</p>
-                <p className="text-xs text-gray-500 truncate">{user.email || ''}</p>
-                <p className="text-xs text-teal-600 font-medium">Branch Admin</p>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Navigation */}
         <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
@@ -176,12 +160,7 @@ export function BranchAdminSidebar() {
             })}
         </nav>
 
-        {/* Version Info */}
-        {showText && (
-          <div className="flex-shrink-0 px-4 py-2 border-t border-gray-200">
-            <div className="text-xs text-gray-400 text-center">v2.1.0</div>
-          </div>
-        )}
+
 
         {/* Logout */}
         <div className="flex-shrink-0 border-t border-gray-200 p-2">
@@ -193,7 +172,12 @@ export function BranchAdminSidebar() {
             )}
           >
             <LogOut className={cn('flex-shrink-0 w-5 h-5 text-gray-400 group-hover:text-red-500', showText ? 'mr-3' : '')} />
-            {showText && 'Sign Out'}
+            {showText && (
+              <div className="flex items-center justify-between w-full">
+                <span>Sign Out</span>
+                <span className="text-xs text-gray-400">v2.1.0</span>
+              </div>
+            )}
           </button>
         </div>
       </>

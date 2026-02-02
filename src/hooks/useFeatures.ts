@@ -39,6 +39,9 @@ export type FeatureKey =
   | 'loyalty_points'
   | 'advanced_analytics'
   | 'api_access'
+  // Support
+  | 'priority_support'
+  | 'platform_support'
   // Limits
   | 'max_orders'
   | 'max_staff'
@@ -59,70 +62,91 @@ export type FeatureKey =
  */
 export function useFeatures() {
   const { user, updateUser } = useAuthStore();
-  
-  // Listen for real-time feature updates
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const handleFeatureUpdate = async (event: CustomEvent) => {
-        console.log('🎯 useFeatures: Received feature update event:', event.detail);
-        
-        try {
-          // Refresh user profile data from server
-          const response = await fetch('/api/auth/profile', {
-            credentials: 'include'
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.data.features) {
-              console.log('🔄 useFeatures: Updating features from server:', data.data.features);
-              
-              // Update user with new features
-              updateUser({
-                features: data.data.features,
-                permissions: data.data.permissions,
-                tenancy: data.data.tenancy
-              });
-              
-              console.log('✅ useFeatures: Features updated successfully');
-            }
-          }
-        } catch (error) {
-          console.error('❌ useFeatures: Error refreshing features:', error);
-        }
-      };
-      
-      // Listen for tenancy feature updates
-      window.addEventListener('tenancyFeaturesUpdated', handleFeatureUpdate as EventListener);
-      
-      return () => {
-        window.removeEventListener('tenancyFeaturesUpdated', handleFeatureUpdate as EventListener);
-      };
-    }
-  }, [updateUser]);
-  
+
+  // Silent update of features is now handled by useSocketIONotifications hook
+  // which dispatches events and updates the auth store directly.
+
   // Get features from user's tenancy subscription
   const features = useMemo(() => {
-    // Priority order:
-    // 1. user.features (from /permissions/sync endpoint - most up-to-date)
-    // 2. user.tenancy.subscription.features
-    // 3. user.subscription.features
+    // Priority order for live updates:
+    // 1. Direct user.features (if set by permission_sync)
+    // 2. Tenancy subscription features (deep path)
+    // 3. User subscription features (fallback)
     const directFeatures = user?.features;
     const tenancyFeatures = user?.tenancy?.subscription?.features;
     const userFeatures = user?.subscription?.features;
-    
-    const result = directFeatures || tenancyFeatures || userFeatures || {};
-    
+
+    // Merge features to ensure stability and live-update reactivity
+    let result: Record<string, any> = {
+      ...(userFeatures || {}),
+      ...(tenancyFeatures || {}),
+      ...(directFeatures || {})
+    };
+
+    // If no features found or empty object, provide default basic features
+    if (!result || Object.keys(result).length === 0) {
+      console.log('🎯 No features found, using defaults');
+      result = {
+        // Core Laundry Services
+        wash_fold: true,
+        dry_cleaning: true,
+        ironing: true,
+        express_delivery: false,
+        subscription_orders: false,
+
+        // Platform Features
+        orders: true,
+        customers: true,
+        inventory: true,
+        services: true,
+        branches: false,
+        branch_admins: false,
+        logistics: false,
+        tickets: true,
+        reviews: true,
+        refunds: true,
+        payments: true,
+        settings: true,
+
+        // Programs (Basic plan gets limited access)
+        campaigns: false,
+        coupons: true,
+        discounts: true,
+        banners: false,
+        wallet: false,
+        referral_program: false,
+        loyalty_points: true,
+        advanced_analytics: false,
+        api_access: false,
+
+        // Limits
+        max_orders: 100,
+        max_staff: 5,
+        max_customers: 500,
+        max_branches: 1,
+
+        // Branding
+        custom_branding: false,
+        custom_logo: false,
+        custom_domain: false,
+        white_label: false,
+
+        // Support
+        priority_support: false,
+        dedicated_manager: false
+      };
+    }
+
     // Debug log to see what features are loaded
     console.log('🎯 Features recomputed:', {
       enabledFeatures: Object.keys(result).filter(k => result[k]),
       totalFeatures: Object.keys(result).length,
-      source: directFeatures ? 'user.features' : tenancyFeatures ? 'tenancy.subscription.features' : 'subscription.features',
+      source: directFeatures ? 'user.features' : tenancyFeatures ? 'tenancy.subscription.features' : userFeatures ? 'subscription.features' : 'default',
       userHasFeatures: !!directFeatures,
       tenancyHasFeatures: !!tenancyFeatures,
       userHasSubscription: !!userFeatures
     });
-    
+
     return result;
   }, [user, user?.features, user?.tenancy?.subscription?.features, user?.subscription?.features]); // Add all dependencies
 
@@ -131,13 +155,13 @@ export function useFeatures() {
    */
   const hasFeature = (key: FeatureKey): boolean => {
     const value = features[key];
-    
+
     // For boolean features
     if (typeof value === 'boolean') return value;
-    
+
     // For number features (limits), check if > 0 or -1 (unlimited)
     if (typeof value === 'number') return value !== 0;
-    
+
     // Default to false if feature not defined
     return false;
   };

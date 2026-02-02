@@ -17,61 +17,69 @@ import {
   CheckCheck,
   X
 } from 'lucide-react'
-import { useRealTimeNotifications } from '@/hooks/useRealTimeNotifications'
+import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
 
 interface Notification {
-  _id: string
-  type: string
+  id: string
   title: string
   message: string
-  icon: string
-  severity: 'info' | 'success' | 'warning' | 'error'
-  data?: any
+  priority: 'P0' | 'P1' | 'P2' | 'P3' | 'P4'
+  category: string
+  eventType: string
   createdAt: string
-  isRead: boolean
+  metadata?: any
+  requiresAck?: boolean
 }
 
-const getNotificationIcon = (iconName: string, severity: string) => {
+const getNotificationIcon = (priority: string, category: string) => {
   const iconProps = { className: "w-4 h-4" }
   
-  switch (iconName) {
-    case 'shield-check':
-    case 'shield':
-      return <Shield {...iconProps} className={`w-4 h-4 ${severity === 'success' ? 'text-green-500' : 'text-blue-500'}`} />
-    case 'package':
-    case 'package-plus':
-    case 'package-check':
-      return <Package {...iconProps} className={`w-4 h-4 ${severity === 'success' ? 'text-green-500' : 'text-blue-500'}`} />
-    case 'credit-card':
-      return <CreditCard {...iconProps} className={`w-4 h-4 ${severity === 'error' ? 'text-red-500' : 'text-green-500'}`} />
-    case 'user-check':
-    case 'user-plus':
-      return <User {...iconProps} className="w-4 h-4 text-blue-500" />
-    case 'settings':
-      return <Settings {...iconProps} className="w-4 h-4 text-gray-500" />
-    case 'star':
-      return <Star {...iconProps} className="w-4 h-4 text-yellow-500" />
-    case 'trending-up':
-      return <TrendingUp {...iconProps} className="w-4 h-4 text-green-500" />
-    case 'check-circle':
-      return <CheckCircle {...iconProps} className="w-4 h-4 text-green-500" />
-    case 'alert-triangle':
-      return <AlertTriangle {...iconProps} className="w-4 h-4 text-yellow-500" />
-    case 'x-circle':
-      return <XCircle {...iconProps} className="w-4 h-4 text-red-500" />
+  // Priority-based coloring
+  const getColorClass = (priority: string) => {
+    switch (priority) {
+      case 'P0': return 'text-red-600'
+      case 'P1': return 'text-orange-500'
+      case 'P2': return 'text-blue-500'
+      case 'P3': return 'text-gray-500'
+      case 'P4': return 'text-gray-400'
+      default: return 'text-blue-500'
+    }
+  }
+  
+  // Category-based icons
+  switch (category) {
+    case 'permissions':
+    case 'security':
+      return <Shield {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
+    case 'orders':
+      return <Package {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
+    case 'payments':
+      return <CreditCard {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
+    case 'admin':
+      return <User {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
+    case 'system':
+      return <Settings {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
+    case 'rewards':
+      return <Star {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
+    case 'marketing':
+      return <TrendingUp {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
     default:
-      return <BellRing {...iconProps} className="w-4 h-4 text-blue-500" />
+      return <BellRing {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
   }
 }
 
-const getSeverityStyles = (severity: string) => {
-  switch (severity) {
-    case 'success':
-      return 'bg-green-50 border-l-green-400'
-    case 'warning':
-      return 'bg-yellow-50 border-l-yellow-400'
-    case 'error':
-      return 'bg-red-50 border-l-red-400'
+const getSeverityStyles = (priority: string) => {
+  switch (priority) {
+    case 'P0':
+      return 'bg-red-50 border-l-red-500'
+    case 'P1':
+      return 'bg-orange-50 border-l-orange-400'
+    case 'P2':
+      return 'bg-blue-50 border-l-blue-400'
+    case 'P3':
+      return 'bg-gray-50 border-l-gray-400'
+    case 'P4':
+      return 'bg-gray-50 border-l-gray-300'
     default:
       return 'bg-blue-50 border-l-blue-400'
   }
@@ -91,14 +99,16 @@ const formatTimeAgo = (dateString: string) => {
 export default function NotificationBell() {
   const {
     notifications,
-    unreadCount,
-    showNotificationPanel,
-    setShowNotificationPanel,
+    stats,
+    isConnected,
+    connectionError,
     markAsRead,
-    markAllAsRead
-  } = useRealTimeNotifications()
+    markAllAsRead,
+    acknowledgeNotification
+  } = useSocketIONotifications()
 
   const [selectedNotifications, setSelectedNotifications] = useState<string[]>([])
+  const [showNotificationPanel, setShowNotificationPanel] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Close panel when clicking outside
@@ -119,13 +129,18 @@ export default function NotificationBell() {
   }, [showNotificationPanel, setShowNotificationPanel])
 
   const handleNotificationClick = (notification: Notification) => {
-    if (!notification.isRead) {
-      markAsRead([notification._id])
+    if (!notification.metadata?.isRead) {
+      markAsRead(notification.id)
+    }
+    
+    // Handle acknowledgment for P0/P1 notifications
+    if (notification.requiresAck && ['P0', 'P1'].includes(notification.priority)) {
+      acknowledgeNotification(notification.id)
     }
     
     // Navigate to relevant page if link exists
-    if (notification.data?.link) {
-      window.location.href = notification.data.link
+    if (notification.metadata?.link) {
+      window.location.href = notification.metadata.link
     }
   }
 
@@ -139,7 +154,7 @@ export default function NotificationBell() {
 
   const handleMarkSelectedAsRead = () => {
     if (selectedNotifications.length > 0) {
-      markAsRead(selectedNotifications)
+      selectedNotifications.forEach(id => markAsRead(id))
       setSelectedNotifications([])
     }
   }
@@ -154,24 +169,36 @@ export default function NotificationBell() {
         <BellRing className="w-6 h-6 text-yellow-500" />
         
         {/* Unread Count Badge */}
-        {unreadCount > 0 && (
+        {stats.unread > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {stats.unread > 99 ? '99+' : stats.unread}
+          </span>
+        )}
+        
+        {/* Connection Status Indicator */}
+        {!isConnected && (
+          <span className="absolute -bottom-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-3 w-3 flex items-center justify-center">
+            !
           </span>
         )}
       </button>
 
       {/* Notification Panel */}
       {showNotificationPanel && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-hidden">
+        <div className="notification-panel absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-[70] max-h-96 overflow-hidden">
           {/* Header */}
           <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
-                {unreadCount > 0 && (
+                {stats.unread > 0 && (
                   <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
-                    {unreadCount} new
+                    {stats.unread} new
+                  </span>
+                )}
+                {!isConnected && (
+                  <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
+                    Reconnecting...
                   </span>
                 )}
               </div>
@@ -184,7 +211,7 @@ export default function NotificationBell() {
                     Mark Read
                   </button>
                 )}
-                {unreadCount > 0 && (
+                {stats.unread > 0 && (
                   <button
                     onClick={markAllAsRead}
                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"

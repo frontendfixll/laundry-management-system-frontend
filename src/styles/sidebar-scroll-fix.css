@@ -1,0 +1,39 @@
+/* Sidebar Scroll Fix - Force scrolling to work */
+
+/* Force the navigation to be scrollable */
+nav[style*="overflowY"] {
+  overflow-y: auto !important;
+  height: calc(100vh - 300px) !important;
+  max-height: calc(100vh - 300px) !important;
+  min-height: 500px !important;
+  display: block !important;
+}
+
+/* Ensure parent containers don't interfere */
+.fixed.inset-y-0.left-0.z-50 {
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Force proper flex layout */
+div[style*="flexDirection: 'column'"] {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+/* Override any conflicting Tailwind classes */
+.overflow-hidden {
+  overflow: visible !important;
+}
+
+.min-h-0 {
+  min-height: 0 !important;
+}
+
+/* Ensure scrollable area gets proper space */
+nav {
+  flex: 1 1 0% !important;
+  overflow-y: auto !important;
+}

@@ -129,40 +129,68 @@ export default function FreshSpinLoginForm() {
             {/* Quick Demo Login */}
             <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Demo Login:</h3>
-              <div className="grid grid-cols-3 gap-2">
-                <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <input
-                    type="radio"
-                    name="demoAccount"
-                    className="w-4 h-4 text-violet-600 focus:ring-violet-500"
-                    onChange={() => {
-                      setFormData({ email: 'testcustomer@demo.com', password: 'password123' })
-                    }}
-                  />
-                  <span className="text-sm text-gray-600">Customer</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <input
-                    type="radio"
-                    name="demoAccount"
-                    className="w-4 h-4 text-violet-600 focus:ring-violet-500"
-                    onChange={() => {
-                      setFormData({ email: 'admin@demo.com', password: 'password123' })
-                    }}
-                  />
-                  <span className="text-sm text-gray-600">Admin</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                  <input
-                    type="radio"
-                    name="demoAccount"
-                    className="w-4 h-4 text-violet-600 focus:ring-violet-500"
-                    onChange={() => {
-                      setFormData({ email: 'supportadmin@laundrypro.com', password: 'deep2025' })
-                    }}
-                  />
-                  <span className="text-sm text-gray-600">Support</span>
-                </label>
+              <div className="space-y-2">
+                {/* First row: 3 items */}
+                <div className="grid grid-cols-3 gap-2">
+                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <input
+                      type="radio"
+                      name="demoAccount"
+                      className="w-4 h-4 text-violet-600 focus:ring-violet-500"
+                      onChange={() => {
+                        setFormData({ email: 'testcustomer@demo.com', password: 'password123' })
+                      }}
+                    />
+                    <span className="text-xs text-gray-600">Customer</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <input
+                      type="radio"
+                      name="demoAccount"
+                      className="w-4 h-4 text-violet-600 focus:ring-violet-500"
+                      onChange={() => {
+                        setFormData({ email: 'admin@demo.com', password: 'password123' })
+                      }}
+                    />
+                    <span className="text-xs text-gray-600">Admin</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <input
+                      type="radio"
+                      name="demoAccount"
+                      className="w-4 h-4 text-violet-600 focus:ring-violet-500"
+                      onChange={() => {
+                        setFormData({ email: 'supportadmin@laundrypro.com', password: 'deep2025' })
+                      }}
+                    />
+                    <span className="text-xs text-gray-600">Support</span>
+                  </label>
+                </div>
+                {/* Second row: 2 items centered */}
+                <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
+                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <input
+                      type="radio"
+                      name="demoAccount"
+                      className="w-4 h-4 text-violet-600 focus:ring-violet-500"
+                      onChange={() => {
+                        setFormData({ email: 'finance@gmail.com', password: 'finance2025' })
+                      }}
+                    />
+                    <span className="text-xs text-gray-600">Finance</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <input
+                      type="radio"
+                      name="demoAccount"
+                      className="w-4 h-4 text-violet-600 focus:ring-violet-500"
+                      onChange={() => {
+                        setFormData({ email: 'auditor@gmail.com', password: 'auditor2025' })
+                      }}
+                    />
+                    <span className="text-xs text-gray-600">Auditor</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

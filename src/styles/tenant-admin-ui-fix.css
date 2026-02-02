@@ -1,0 +1,22 @@
+/* Tenant Admin UI Comprehensive Fix */
+
+/* ===== LAYOUT FOUNDATION ===== */
+.admin-layout {
+  position: relative !important;
+  min-height: 100vh !important;
+  background-color: #f9fafb !important;
+  overflow-x: hidden !important;
+}
+
+/* ===== SIDEBAR FIXES ===== */
+.admin-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 50 !important;
+  width: 288px !important;
+  background-color: white !important;
+  border-right: 1px solid #e5e7eb !important;
+  transition: width 0.3s ease !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;

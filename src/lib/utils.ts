@@ -30,3 +30,11 @@ export function getInitials(name: string): string {
     .toUpperCase()
     .slice(0, 2)
 }
+
+export function formatNumber(num: number): string {
+  return new Intl.NumberFormat('en-IN').format(num)
+}
+
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}

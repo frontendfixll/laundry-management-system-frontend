@@ -114,22 +114,7 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
           </div>
         </div>
 
-        {/* Admin Info - always show on mobile, conditionally on desktop */}
-        {admin && (
-          <div className={`flex-shrink-0 p-4 border-b border-gray-200 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium text-sm">
-                  {admin.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">{admin.name}</p>
-                <p className="text-xs text-gray-500 truncate">{admin.email}</p>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Navigation */}
         <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
@@ -165,7 +150,10 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
             className={`group flex items-center w-full px-2 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
           >
             <LogOut className={`flex-shrink-0 w-5 h-5 mr-3 ${sidebarCollapsed ? 'lg:mr-0' : ''} text-gray-400 group-hover:text-red-500`} />
-            <span className={sidebarCollapsed ? 'lg:hidden' : ''}>Sign Out</span>
+            <div className={`${sidebarCollapsed ? 'lg:hidden' : ''} flex items-center justify-between w-full`}>
+              <span>Sign Out</span>
+              <span className="text-xs text-gray-400">v2.1.0</span>
+            </div>
           </button>
         </div>
       </div>

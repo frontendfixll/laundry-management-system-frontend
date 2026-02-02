@@ -5,8 +5,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { withRouteGuard } from '@/components/withRouteGuard'
-import { 
-  Settings, 
+import {
+  Settings,
   User,
   Lock,
   Bell,
@@ -49,7 +49,7 @@ function AdminSettingsPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  
+
   // Delivery pricing state
   const [deliveryPricing, setDeliveryPricing] = useState<DeliveryPricingConfig>({
     baseDistance: 3,
@@ -175,11 +175,11 @@ function AdminSettingsPage() {
   ]
 
   return (
-    <div className="space-y-6 mt-16">
+    <div className="space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-800">Settings</h1>
-        <p className="text-gray-600">Manage your account settings and preferences</p>
+        <h1 className="text-lg font-bold text-gray-800">Settings</h1>
+        <p className="text-[11px] text-gray-600">Manage your account settings and preferences</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
@@ -191,11 +191,10 @@ function AdminSettingsPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    activeTab === tab.id
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeTab === tab.id
                       ? 'bg-blue-50 text-blue-700'
                       : 'text-gray-600 hover:bg-gray-50'
-                  }`}
+                    }`}
                 >
                   <tab.icon className="w-5 h-5 mr-3" />
                   {tab.label}
@@ -437,9 +436,9 @@ function AdminSettingsPage() {
                         <div>
                           <p className="font-medium text-blue-800">How Delivery Pricing Works</p>
                           <p className="text-sm text-blue-600 mt-1">
-                            • Free delivery within <strong>{deliveryPricing.baseDistance} km</strong> (base distance)<br/>
-                            • ₹{deliveryPricing.perKmRate}/km charged after base distance<br/>
-                            • Maximum serviceable distance: <strong>{deliveryPricing.maxDistance} km</strong><br/>
+                            • Free delivery within <strong>{deliveryPricing.baseDistance} km</strong> (base distance)<br />
+                            • ₹{deliveryPricing.perKmRate}/km charged after base distance<br />
+                            • Maximum serviceable distance: <strong>{deliveryPricing.maxDistance} km</strong><br />
                             • Express orders: <strong>{deliveryPricing.expressMultiplier}x</strong> delivery charge
                           </p>
                         </div>
@@ -574,8 +573,8 @@ function AdminSettingsPage() {
                           </h3>
                           <p className="text-sm text-gray-500">Branches need coordinates for distance-based pricing</p>
                         </div>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={fetchBranchesStatus}
                           disabled={branchesLoading}
@@ -596,11 +595,10 @@ function AdminSettingsPage() {
                       ) : (
                         <div className="space-y-2">
                           {branchesStatus.map((branch) => (
-                            <div 
+                            <div
                               key={branch._id}
-                              className={`flex items-center justify-between p-3 rounded-lg ${
-                                branch.hasCoordinates ? 'bg-green-50' : 'bg-amber-50'
-                              }`}
+                              className={`flex items-center justify-between p-3 rounded-lg ${branch.hasCoordinates ? 'bg-green-50' : 'bg-amber-50'
+                                }`}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`w-2 h-2 rounded-full ${branch.hasCoordinates ? 'bg-green-500' : 'bg-amber-500'}`} />
@@ -643,7 +641,7 @@ function AdminSettingsPage() {
                   Settings saved successfully!
                 </div>
               )}
-              <Button 
+              <Button
                 onClick={activeTab === 'delivery' ? handleSaveDeliveryPricing : handleSave}
                 disabled={saving}
                 className="ml-auto bg-blue-600 hover:bg-blue-700 text-white"

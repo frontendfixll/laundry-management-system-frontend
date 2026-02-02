@@ -1,157 +1,185 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Bell, X, Shield, AlertCircle, CheckCircle, Info, AlertTriangle } from 'lucide-react'
+import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface SlideNotificationProps {
   id: string
+  type: 'success' | 'warning' | 'error' | 'info'
   title: string
   message: string
-  type: 'permission_update' | 'order_update' | 'customer_update' | 'system_alert' | 'role_change' | 'info' | 'success' | 'warning' | 'error'
   duration?: number
+  category?: 'system' | 'action' | 'realtime'
   onClose: (id: string) => void
-  onAction?: () => void
-  actionText?: string
 }
 
-const SlideNotification: React.FC<SlideNotificationProps> = ({
+const typeConfig: Record<'success' | 'warning' | 'error' | 'info', {
+  icon: React.ComponentType<{ className?: string }>
+  bgColor: string
+  borderColor: string
+  iconColor: string
+  titleColor: string
+  messageColor: string
+  progressColor: string
+}> = {
+  success: {
+    icon: CheckCircle,
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    iconColor: 'text-green-500',
+    titleColor: 'text-green-800',
+    messageColor: 'text-green-700',
+    progressColor: 'bg-green-500'
+  },
+  warning: {
+    icon: AlertTriangle,
+    bgColor: 'bg-yellow-50',
+    borderColor: 'border-yellow-200',
+    iconColor: 'text-yellow-500',
+    titleColor: 'text-yellow-800',
+    messageColor: 'text-yellow-700',
+    progressColor: 'bg-yellow-500'
+  },
+  error: {
+    icon: XCircle,
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    iconColor: 'text-red-500',
+    titleColor: 'text-red-800',
+    messageColor: 'text-red-700',
+    progressColor: 'bg-red-500'
+  },
+  info: {
+    icon: Info,
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    iconColor: 'text-blue-500',
+    titleColor: 'text-blue-800',
+    messageColor: 'text-blue-700',
+    progressColor: 'bg-blue-500'
+  }
+}
+
+export function SlideNotification({
   id,
+  type,
   title,
   message,
-  type,
-  duration = 5000,
-  onClose,
-  onAction,
-  actionText
-}) => {
+  duration = 15000, // Changed from 5000 to 15000 (15 seconds)
+  category = 'system',
+  onClose
+}: SlideNotificationProps) {
   const [isVisible, setIsVisible] = useState(false)
-  const [isExiting, setIsExiting] = useState(false)
+  const [isLeaving, setIsLeaving] = useState(false)
 
-  // Show notification with slide-in animation
+  // Ensure type is valid, fallback to 'info' if invalid
+  const validType = type && typeConfig[type] ? type : 'info'
+  const config = typeConfig[validType]
+  const Icon = config.icon
+
+  // Adjust size based on category
+  const getNotificationSize = () => {
+    switch (category) {
+      case 'action':
+        return 'w-64' // Smaller for action feedback
+      case 'realtime':
+        return 'w-72' // Medium for real-time updates
+      case 'system':
+      default:
+        return 'w-80' // Larger for system notifications
+    }
+  }
+
   useEffect(() => {
+    // Slide in animation
     const timer = setTimeout(() => setIsVisible(true), 100)
-    return () => clearTimeout(timer)
-  }, [])
+    
+    // Auto dismiss
+    const dismissTimer = setTimeout(() => {
+      handleClose()
+    }, duration)
 
-  // Auto-hide after duration
-  useEffect(() => {
-    if (duration > 0) {
-      const timer = setTimeout(() => {
-        handleClose()
-      }, duration)
-      return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(dismissTimer)
     }
   }, [duration])
 
   const handleClose = () => {
-    setIsExiting(true)
+    setIsLeaving(true)
     setTimeout(() => {
       onClose(id)
     }, 300) // Match animation duration
   }
 
-  const getNotificationStyles = () => {
-    const baseStyles = "flex items-start gap-3 p-4 rounded-lg shadow-lg border-l-4 backdrop-blur-sm"
-    
-    switch (type) {
-      case 'permission_update':
-        return `${baseStyles} bg-yellow-50 border-yellow-400 text-yellow-800`
-      case 'order_update':
-        return `${baseStyles} bg-blue-50 border-blue-400 text-blue-800`
-      case 'customer_update':
-        return `${baseStyles} bg-green-50 border-green-400 text-green-800`
-      case 'system_alert':
-        return `${baseStyles} bg-red-50 border-red-400 text-red-800`
-      case 'role_change':
-        return `${baseStyles} bg-purple-50 border-purple-400 text-purple-800`
-      case 'success':
-        return `${baseStyles} bg-green-50 border-green-400 text-green-800`
-      case 'warning':
-        return `${baseStyles} bg-yellow-50 border-yellow-400 text-yellow-800`
-      case 'error':
-        return `${baseStyles} bg-red-50 border-red-400 text-red-800`
-      default:
-        return `${baseStyles} bg-blue-50 border-blue-400 text-blue-800`
-    }
-  }
-
-  const getIcon = () => {
-    const iconClass = "w-6 h-6 flex-shrink-0 mt-0.5"
-    
-    switch (type) {
-      case 'permission_update':
-        return <Bell className={`${iconClass} text-yellow-600`} />
-      case 'order_update':
-        return <Bell className={`${iconClass} text-blue-600`} />
-      case 'customer_update':
-        return <Bell className={`${iconClass} text-green-600`} />
-      case 'system_alert':
-        return <AlertTriangle className={`${iconClass} text-red-600`} />
-      case 'role_change':
-        return <Shield className={`${iconClass} text-purple-600`} />
-      case 'success':
-        return <CheckCircle className={`${iconClass} text-green-600`} />
-      case 'warning':
-        return <AlertTriangle className={`${iconClass} text-yellow-600`} />
-      case 'error':
-        return <AlertCircle className={`${iconClass} text-red-600`} />
-      default:
-        return <Info className={`${iconClass} text-blue-600`} />
-    }
-  }
-
   return (
     <div
-      className={`
-        fixed top-4 right-4 z-50 max-w-sm w-full
-        transform transition-all duration-300 ease-in-out
-        ${isVisible && !isExiting 
+      className={cn(
+        'transform transition-all duration-300 ease-in-out mb-3',
+        getNotificationSize(),
+        isVisible && !isLeaving 
           ? 'translate-x-0 opacity-100' 
           : 'translate-x-full opacity-0'
-        }
-      `}
-      style={{
-        animation: isVisible && !isExiting 
-          ? 'slideInRight 0.3s ease-out' 
-          : isExiting 
-          ? 'slideOutRight 0.3s ease-in' 
-          : undefined
-      }}
+      )}
     >
-      <div className={getNotificationStyles()}>
-        {/* Icon */}
-        {getIcon()}
-        
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm mb-1">
-            {title}
+      <div className={cn(
+        'rounded-lg border shadow-lg backdrop-blur-sm',
+        config.bgColor,
+        config.borderColor
+      )}>
+        <div className="p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <Icon className={cn('h-5 w-5', config.iconColor)} />
+            </div>
+            <div className="ml-3 flex-1 min-w-0">
+              <h3 className={cn('text-sm font-medium', config.titleColor)}>
+                {title}
+              </h3>
+              <p className={cn('mt-1 text-sm leading-relaxed', config.messageColor)}>
+                {message}
+              </p>
+            </div>
+            <div className="ml-3 flex-shrink-0">
+              <button
+                onClick={handleClose}
+                className={cn(
+                  'inline-flex rounded-md p-1.5 transition-colors',
+                  'hover:bg-white/50 focus:outline-none focus:ring-2 focus:ring-offset-2',
+                  config.iconColor.replace('text-', 'focus:ring-').replace('-500', '-400')
+                )}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          <div className="text-sm opacity-90 leading-relaxed">
-            {message}
-          </div>
-          
-          {/* Action Button */}
-          {onAction && actionText && (
-            <button
-              onClick={onAction}
-              className="mt-2 px-3 py-1 text-xs font-medium rounded-md bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors"
-            >
-              {actionText}
-            </button>
-          )}
         </div>
         
-        {/* Close Button */}
-        <button
-          onClick={handleClose}
-          className="flex-shrink-0 p-1 rounded-full hover:bg-black hover:bg-opacity-10 transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        {/* Progress bar */}
+        <div className="h-1 bg-black/10 rounded-b-lg overflow-hidden">
+          <div 
+            className={cn(
+              'h-full transition-all ease-linear',
+              config.progressColor
+            )}
+            style={{
+              width: '100%',
+              animation: `shrink ${duration}ms linear forwards`
+            }}
+          />
+        </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes shrink {
+          from { width: 100%; }
+          to { width: 0%; }
+        }
+      `}</style>
     </div>
   )
 }
 
+// Default export for easier importing
 export default SlideNotification

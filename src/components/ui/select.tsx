@@ -96,9 +96,15 @@ const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
       <div
         ref={ref}
         className={cn(
-          "absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover text-popover-foreground shadow-md",
+          "absolute z-[99999] mt-1 max-h-60 w-full overflow-auto rounded-md border bg-white text-gray-900 shadow-xl ring-1 ring-black ring-opacity-5",
           className
         )}
+        style={{ 
+          position: 'absolute',
+          zIndex: 99999,
+          backgroundColor: 'white',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        }}
         {...props}
       >
         <div className="p-1">

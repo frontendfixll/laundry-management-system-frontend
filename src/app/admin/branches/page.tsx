@@ -20,7 +20,7 @@ const getAuthToken = () => {
     try {
       const parsed = JSON.parse(authData)
       return parsed.state?.token
-    } catch (e) {}
+    } catch (e) { }
   }
   // Also check for direct token storage
   return localStorage.getItem('token')
@@ -62,7 +62,7 @@ function BranchesPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingBranch, setEditingBranch] = useState<Branch | null>(null)
-  
+
   // Services management state
   const [showServicesModal, setShowServicesModal] = useState(false)
   const [selectedBranchForServices, setSelectedBranchForServices] = useState<Branch | null>(null)
@@ -82,7 +82,7 @@ function BranchesPage() {
           'Authorization': `Bearer ${token}`
         }
       })
-      
+
       if (response.ok) {
         const data = await response.json()
         setBranches(data.data.branches)
@@ -112,17 +112,17 @@ function BranchesPage() {
     setSelectedBranchForServices(branch)
     setShowServicesModal(true)
     setServicesLoading(true)
-    
+
     try {
       const token = getAuthToken()
-      
+
       // Fetch all services
       const servicesResponse = await fetch(`${API_URL}/admin/services`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-      
+
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json()
         console.log('📦 Services data:', servicesData)
@@ -130,14 +130,14 @@ function BranchesPage() {
       } else {
         console.error('Failed to fetch services:', servicesResponse.status)
       }
-      
+
       // Fetch branch-specific services
       const branchServicesResponse = await fetch(`${API_URL}/admin/branches/${branch._id}/services`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-      
+
       if (branchServicesResponse.ok) {
         const branchServicesData = await branchServicesResponse.json()
         console.log('🏢 Branch services data:', branchServicesData)
@@ -158,7 +158,7 @@ function BranchesPage() {
 
   const handleToggleServiceForBranch = async (serviceId: string, isEnabled: boolean) => {
     if (!selectedBranchForServices) return
-    
+
     try {
       const token = getAuthToken()
       const response = await fetch(
@@ -172,10 +172,10 @@ function BranchesPage() {
           body: JSON.stringify({ isEnabled })
         }
       )
-      
+
       if (response.ok) {
         toast.success(`Service ${isEnabled ? 'enabled' : 'disabled'} for ${selectedBranchForServices.name}`)
-        
+
         // Update local state instead of refetching
         setBranchServices(prev => {
           // Check if service already exists in branch services
@@ -183,7 +183,7 @@ function BranchesPage() {
             const bsServiceId = bs.service?._id || bs.service || bs.serviceId
             return bsServiceId === serviceId
           })
-          
+
           if (existingIndex >= 0) {
             // Update existing service
             const updated = [...prev]
@@ -230,20 +230,20 @@ function BranchesPage() {
     try {
       const token = getAuthToken()
       console.log('🗑️ Deleting branch:', branchId)
-      
+
       const response = await fetch(`${API_URL}/admin/branches-management/${branchId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-      
+
       console.log('Delete response status:', response.status)
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('✅ Delete success:', result)
-        
+
         // Dismiss loading toast and show success
         toast.dismiss(loadingToast)
         toast.success('Branch deactivated successfully!', {
@@ -263,12 +263,12 @@ function BranchesPage() {
             secondary: '#fef3c7',
           },
         })
-        
+
         fetchBranches() // Refresh the list
       } else {
         const error = await response.json().catch(() => ({ message: 'Unknown error' }))
         console.error('❌ Delete error:', error)
-        
+
         // Dismiss loading toast and show error
         toast.dismiss(loadingToast)
         toast.error(`Failed to deactivate branch: ${error.message || 'Unknown error'}`, {
@@ -291,7 +291,7 @@ function BranchesPage() {
       }
     } catch (error) {
       console.error('❌ Error deleting branch:', error)
-      
+
       // Dismiss loading toast and show error
       toast.dismiss(loadingToast)
       toast.error('Failed to deactivate branch. Please try again.', {
@@ -316,13 +316,13 @@ function BranchesPage() {
 
   const filteredBranches = branches.filter(branch => {
     const matchesSearch = branch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         branch.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         branch.address.city.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || 
-                         (statusFilter === 'active' && branch.isActive) ||
-                         (statusFilter === 'inactive' && !branch.isActive)
-    
+      branch.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      branch.address.city.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesStatus = statusFilter === 'all' ||
+      (statusFilter === 'active' && branch.isActive) ||
+      (statusFilter === 'inactive' && !branch.isActive)
+
     return matchesSearch && matchesStatus
   })
 
@@ -330,7 +330,7 @@ function BranchesPage() {
     if (!branch.isActive) {
       return <Badge variant="secondary">Inactive</Badge>
     }
-    
+
     switch (branch.status) {
       case 'active':
         return <Badge variant="default" className="bg-green-500">Active</Badge>
@@ -356,8 +356,8 @@ function BranchesPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Branch Management</h1>
-          <p className="text-gray-600">Manage your laundry branches and locations</p>
+          <h1 className="text-lg font-bold text-gray-900">Branch Management</h1>
+          <p className="text-[11px] text-gray-600">Manage your laundry branches and locations</p>
         </div>
         <Button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
@@ -390,17 +390,17 @@ function BranchesPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Branches</p>
-                <p className="text-2xl font-bold">{branches.length}</p>
+                <p className="text-[11px] text-gray-600">Total Branches</p>
+                <p className="text-lg font-bold">{branches.length}</p>
               </div>
-              <MapPin className="h-8 w-8 text-blue-500" />
+              <MapPin className="h-6 w-6 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -414,7 +414,7 @@ function BranchesPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -428,14 +428,14 @@ function BranchesPage() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Avg Utilization</p>
                 <p className="text-2xl font-bold text-orange-600">
-                  {branches.length > 0 
+                  {branches.length > 0
                     ? Math.round(branches.reduce((sum, b) => sum + b.utilizationRate, 0) / branches.length)
                     : 0}%
                 </p>
@@ -450,17 +450,17 @@ function BranchesPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredBranches.map((branch) => (
           <Card key={branch._id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2 pt-3 px-3">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-lg">{branch.name}</CardTitle>
-                  <p className="text-sm text-gray-600">Code: {branch.code}</p>
+                  <CardTitle className="text-base">{branch.name}</CardTitle>
+                  <p className="text-[11px] text-gray-600">Code: {branch.code}</p>
                 </div>
                 {getStatusBadge(branch)}
               </div>
             </CardHeader>
-            
-            <CardContent className="space-y-4">
+
+            <CardContent className="p-3 pt-0 space-y-3">
               {/* Address */}
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
@@ -572,7 +572,7 @@ function BranchesPage() {
           <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No branches found</h3>
           <p className="text-gray-600 mb-4">
-            {searchTerm || statusFilter !== 'all' 
+            {searchTerm || statusFilter !== 'all'
               ? 'Try adjusting your search or filters'
               : 'Get started by creating your first branch'
             }
@@ -614,7 +614,7 @@ function BranchesPage() {
                   Enable or disable services for {selectedBranchForServices.name}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => {
                   setShowServicesModal(false)
                   setSelectedBranchForServices(null)
@@ -644,17 +644,15 @@ function BranchesPage() {
                   {services.map((service) => {
                     const isEnabled = isServiceEnabledForBranch(service._id)
                     return (
-                      <div 
+                      <div
                         key={service._id}
                         className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            isEnabled ? 'bg-green-100' : 'bg-gray-200'
-                          }`}>
-                            <Package className={`w-5 h-5 ${
-                              isEnabled ? 'text-green-600' : 'text-gray-400'
-                            }`} />
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-green-100' : 'bg-gray-200'
+                            }`}>
+                            <Package className={`w-5 h-5 ${isEnabled ? 'text-green-600' : 'text-gray-400'
+                              }`} />
                           </div>
                           <div>
                             <h4 className="font-medium text-gray-800">{service.name}</h4>
@@ -665,14 +663,12 @@ function BranchesPage() {
                         </div>
                         <button
                           onClick={() => handleToggleServiceForBranch(service._id, !isEnabled)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            isEnabled ? 'bg-green-500' : 'bg-gray-300'
-                          }`}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isEnabled ? 'bg-green-500' : 'bg-gray-300'
+                            }`}
                         >
                           <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              isEnabled ? 'translate-x-6' : 'translate-x-1'
-                            }`}
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isEnabled ? 'translate-x-6' : 'translate-x-1'
+                              }`}
                           />
                         </button>
                       </div>
@@ -684,8 +680,8 @@ function BranchesPage() {
 
             {/* Modal Footer */}
             <div className="flex justify-end gap-3 p-6 border-t border-gray-200 sticky bottom-0 bg-white">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setShowServicesModal(false)
                   setSelectedBranchForServices(null)

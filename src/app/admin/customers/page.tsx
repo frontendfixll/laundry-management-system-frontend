@@ -6,9 +6,9 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { RouteGuard } from '@/components/RouteGuard'
 import { usePermissions } from '@/hooks/usePermissions'
-import { 
-  Users, 
-  Search, 
+import {
+  Users,
+  Search,
   Filter,
   Eye,
   UserCheck,
@@ -109,7 +109,7 @@ interface CustomerDetails extends Customer {
 
 export default function AdminCustomersPage() {
   return (
-    <RouteGuard 
+    <RouteGuard
       requiredPermission={{ module: 'customers', action: 'view' }}
       requiredFeature="customers"
     >
@@ -123,10 +123,10 @@ function AdminCustomersContent() {
   const canExportReports = hasPermission('reports', 'export')
   const router = useRouter()
   const searchParams = useSearchParams()
-  
+
   // Get initial page from URL
   const initialPage = parseInt(searchParams.get('page') || '1', 10)
-  
+
   const [filters, setFilters] = useState({
     page: initialPage,
     limit: 8,
@@ -179,18 +179,18 @@ function AdminCustomersContent() {
     const pages: (number | string)[] = []
     const current = pagination.current
     const total = pagination.pages
-    
+
     if (total <= 7) {
       for (let i = 1; i <= total; i++) pages.push(i)
     } else {
       pages.push(1)
       if (current > 3) pages.push('...')
-      
+
       const start = Math.max(2, current - 1)
       const end = Math.min(total - 1, current + 1)
-      
+
       for (let i = start; i <= end; i++) pages.push(i)
-      
+
       if (current < total - 2) pages.push('...')
       pages.push(total)
     }
@@ -226,7 +226,7 @@ function AdminCustomersContent() {
     setShowProfileModal(true)
     setLoadingDetails(true)
     setCustomerDetails(null)
-    
+
     try {
       // Use adminApi to fetch customer details (handles auth properly)
       const { adminApi } = await import('@/lib/adminApi')
@@ -253,7 +253,7 @@ function AdminCustomersContent() {
       c.stats?.totalSpent || 0,
       new Date(c.createdAt).toLocaleDateString('en-IN')
     ])
-    
+
     const csvContent = [headers, ...csvData].map(row => row.join(',')).join('\n')
     const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = window.URL.createObjectURL(blob)
@@ -286,12 +286,12 @@ function AdminCustomersContent() {
   }
 
   return (
-    <div className="space-y-6 mt-16">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Customer Management</h1>
-          <p className="text-gray-600">Manage customer accounts, VIP status, and view customer analytics</p>
+          <h1 className="text-lg font-bold text-gray-800">Customer Management</h1>
+          <p className="text-[11px] text-gray-600">Manage customer accounts, VIP status, and analytics</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => refetch()}>
@@ -309,17 +309,17 @@ function AdminCustomersContent() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-4">
-              <Users className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center mb-2">
+              <Users className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-blue-100">Total Customers</p>
-            <p className="text-3xl font-bold">{pagination.total}</p>
+            <p className="text-xs text-blue-100">Total Customers</p>
+            <p className="text-xl font-bold">{pagination.total}</p>
           </div>
         </div>
-        
+
         <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
@@ -330,7 +330,7 @@ function AdminCustomersContent() {
             <p className="text-3xl font-bold">{customers.filter(c => c.isActive).length}</p>
           </div>
         </div>
-        
+
         <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
@@ -341,7 +341,7 @@ function AdminCustomersContent() {
             <p className="text-3xl font-bold">{customers.filter(c => c.isVIP).length}</p>
           </div>
         </div>
-        
+
         <div className="relative overflow-hidden bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
@@ -358,13 +358,13 @@ function AdminCustomersContent() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search by name, email, or phone..."
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
           <div className="flex gap-2">
@@ -401,13 +401,13 @@ function AdminCustomersContent() {
             </div>
           </div>
         )}
-        
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">
+
+        <div className="p-3 border-b border-gray-200">
+          <h2 className="text-base font-semibold text-gray-800">
             Customers ({pagination.total})
           </h2>
         </div>
-        
+
         {error && (
           <div className="p-6 bg-red-50 border-b border-red-200">
             <div className="flex items-center">
@@ -416,7 +416,7 @@ function AdminCustomersContent() {
             </div>
           </div>
         )}
-        
+
         <div className="divide-y divide-gray-200">
           {customers.length === 0 ? (
             <div className="p-12 text-center">
@@ -426,58 +426,56 @@ function AdminCustomersContent() {
             </div>
           ) : (
             customers.map((customer) => (
-              <div key={customer._id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-                  <div className="flex items-start space-x-4 flex-1 min-w-0">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-semibold">
+              <div key={customer._id} className="p-3 hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+                  <div className="flex items-start space-x-3 flex-1 min-w-0">
+                    <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-xs font-semibold">
                         {(customer.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <h3 className="text-lg font-semibold text-gray-800">{customer.name || 'Unknown'}</h3>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="text-base font-semibold text-gray-800">{customer.name || 'Unknown'}</h3>
                         {customer.isVIP && (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            <Crown className="w-3 h-3 mr-1" />
+                          <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-medium bg-yellow-100 text-yellow-800">
+                            <Crown className="w-2.5 h-2.5 mr-0.5" />
                             VIP
                           </span>
                         )}
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          customer.isActive 
-                            ? 'bg-green-100 text-green-800' 
+                        <span className={`inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-medium ${customer.isActive
+                            ? 'bg-green-100 text-green-800'
                             : 'bg-red-100 text-red-800'
-                        }`}>
+                          }`}>
                           {customer.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>
-                      
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div className="flex items-center gap-4 flex-wrap">
+
+                      <div className="space-y-0.5 text-[11px] text-gray-600">
+                        <div className="flex items-center gap-3 flex-wrap">
                           <span className="flex items-center truncate">
-                            <Mail className="w-4 h-4 mr-1 flex-shrink-0 text-gray-400" />
+                            <Mail className="w-3.5 h-3.5 mr-1 flex-shrink-0 text-gray-400" />
                             <span className="truncate">{customer.email}</span>
                           </span>
                           <span className="flex items-center">
-                            <Phone className="w-4 h-4 mr-1 flex-shrink-0 text-gray-400" />
+                            <Phone className="w-3.5 h-3.5 mr-1 flex-shrink-0 text-gray-400" />
                             {customer.phone}
                           </span>
                         </div>
-                        <div className="flex items-center gap-4 flex-wrap text-gray-500">
+                        <div className="flex items-center gap-3 flex-wrap text-gray-500">
                           <span className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1 flex-shrink-0" />
+                            <Calendar className="w-3.5 h-3.5 mr-1 flex-shrink-0" />
                             Joined {new Date(customer.createdAt).toLocaleDateString('en-IN')}
                           </span>
                           <span>Orders: <strong className="text-gray-700">{customer.stats?.totalOrders || 0}</strong></span>
-                          <span>Spent: <strong className="text-gray-700">₹{customer.stats?.totalSpent?.toLocaleString() || '0'}</strong></span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => handleViewProfile(customer)}
                       className="whitespace-nowrap"
@@ -485,10 +483,10 @@ function AdminCustomersContent() {
                       <Eye className="w-4 h-4 mr-1" />
                       View Profile
                     </Button>
-                    
+
                     {canUpdate && (
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         className={`whitespace-nowrap ${customer.isActive ? "text-red-600 border-red-300 hover:bg-red-50" : "text-green-600 border-green-300 hover:bg-green-50"}`}
                         onClick={() => handleToggleStatus(customer._id, customer.name, customer.isActive)}
@@ -509,10 +507,10 @@ function AdminCustomersContent() {
                         )}
                       </Button>
                     )}
-                    
+
                     {canUpdate && (
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="outline"
                         className={`whitespace-nowrap ${customer.isVIP ? "text-gray-600 border-gray-300 hover:bg-gray-50" : "text-yellow-600 border-yellow-300 hover:bg-yellow-50"}`}
                         onClick={() => handleToggleVIP(customer._id, customer.name, customer.isVIP)}
@@ -541,31 +539,31 @@ function AdminCustomersContent() {
             <div className="text-sm text-gray-700">
               Showing {((pagination.current - 1) * pagination.limit) + 1} to {Math.min(pagination.current * pagination.limit, pagination.total)} of {pagination.total} customers
             </div>
-            
+
             <div className="flex items-center gap-2">
               {/* First Page */}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handlePageChange(1)} 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(1)}
                 disabled={pagination.current === 1}
                 className="hidden sm:flex"
                 title="First Page"
               >
                 <ChevronsLeft className="w-4 h-4" />
               </Button>
-              
+
               {/* Previous */}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handlePageChange(pagination.current - 1)} 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.current - 1)}
                 disabled={pagination.current === 1}
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span className="hidden sm:inline ml-1">Previous</span>
               </Button>
-              
+
               {/* Page Numbers */}
               <div className="flex items-center gap-1">
                 {getPageNumbers().map((page, index) => (
@@ -584,30 +582,30 @@ function AdminCustomersContent() {
                   )
                 ))}
               </div>
-              
+
               {/* Next */}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handlePageChange(pagination.current + 1)} 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.current + 1)}
                 disabled={pagination.current === pagination.pages}
               >
                 <span className="hidden sm:inline mr-1">Next</span>
                 <ChevronRight className="w-4 h-4" />
               </Button>
-              
+
               {/* Last Page */}
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => handlePageChange(pagination.pages)} 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.pages)}
                 disabled={pagination.current === pagination.pages}
                 className="hidden sm:flex"
                 title="Last Page"
               >
                 <ChevronsRight className="w-4 h-4" />
               </Button>
-              
+
               {/* Go to Page - only show when more than 10 pages */}
               {pagination.pages > 10 && (
                 <form onSubmit={handleGoToPage} className="flex items-center gap-2 ml-4 pl-4 border-l border-gray-200">
@@ -637,7 +635,7 @@ function AdminCustomersContent() {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
               <h3 className="text-xl font-semibold text-gray-800">Customer Profile</h3>
-              <button 
+              <button
                 onClick={() => {
                   setShowProfileModal(false)
                   setCustomerDetails(null)
@@ -667,9 +665,8 @@ function AdminCustomersContent() {
                       </span>
                     )}
                   </div>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${
-                    selectedCustomer.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-1 ${selectedCustomer.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
                     {selectedCustomer.isActive ? 'Active Account' : 'Inactive Account'}
                   </span>
                 </div>
@@ -704,10 +701,10 @@ function AdminCustomersContent() {
                         <Calendar className="w-5 h-5 text-gray-400" />
                         <div>
                           <p className="text-sm text-gray-500">Member Since</p>
-                          <p className="font-medium">{new Date(customerDetails.createdAt).toLocaleDateString('en-IN', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
+                          <p className="font-medium">{new Date(customerDetails.createdAt).toLocaleDateString('en-IN', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
                           })}</p>
                         </div>
                       </div>
@@ -753,7 +750,7 @@ function AdminCustomersContent() {
                           <p className="text-sm text-gray-500">Last Order</p>
                         </div>
                         <p className="text-lg font-bold text-indigo-600">
-                          {customerDetails.orderStats.lastOrderDate 
+                          {customerDetails.orderStats.lastOrderDate
                             ? new Date(customerDetails.orderStats.lastOrderDate).toLocaleDateString('en-IN')
                             : 'Never'}
                         </p>
@@ -851,11 +848,10 @@ function AdminCustomersContent() {
                             </div>
                             <div className="text-right">
                               <p className="font-bold text-gray-800">₹{order.total.toLocaleString()}</p>
-                              <span className={`text-xs px-2 py-1 rounded-full ${
-                                order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                                order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                'bg-blue-100 text-blue-800'
-                              }`}>
+                              <span className={`text-xs px-2 py-1 rounded-full ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                                  order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                    'bg-blue-100 text-blue-800'
+                                }`}>
                                 {order.status}
                               </span>
                             </div>
@@ -918,7 +914,7 @@ function AdminCustomersContent() {
                     <h5 className="text-lg font-semibold text-gray-800 mb-3">Quick Actions</h5>
                     <div className="flex flex-wrap gap-3">
                       {canUpdate && (
-                        <Button 
+                        <Button
                           variant="outline"
                           className={selectedCustomer.isActive ? "text-red-600 border-red-600 hover:bg-red-50" : "text-green-600 border-green-600 hover:bg-green-50"}
                           onClick={() => {
@@ -939,9 +935,9 @@ function AdminCustomersContent() {
                           )}
                         </Button>
                       )}
-                      
+
                       {canUpdate && (
-                        <Button 
+                        <Button
                           variant="outline"
                           className={selectedCustomer.isVIP ? "text-gray-600 border-gray-600 hover:bg-gray-50" : "text-yellow-600 border-yellow-600 hover:bg-yellow-50"}
                           onClick={() => {

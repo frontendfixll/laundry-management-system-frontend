@@ -1,85 +1,56 @@
 'use client'
 
-import {
-  AdminSidebar,
-  AdminSidebarProvider,
-  useAdminSidebar,
-} from '@/components/layout/AdminSidebar'
+import { SimpleSidebar } from '@/components/layout/SimpleSidebar'
 import AdminHeader from '@/components/layout/AdminHeader'
 import NotificationContainer from '@/components/NotificationContainer'
-import NotificationManager from '@/components/notifications/NotificationManager'
-import RefreshPrompt from '@/components/RefreshPrompt'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import ModernToaster from '@/components/ModernToast'
+import { ThemedPageLoader } from '@/components/ui/ThemedSpinner'
 import { useAuthStore } from '@/store/authStore'
-import { useRefreshPromptStore } from '@/store/refreshPromptStore'
-import { useRealTimeNotifications } from '@/hooks/useRealTimeNotifications'
+import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { cn } from '@/lib/utils'
-import { usePermissionSync } from '@/hooks/usePermissionSync'
-import DashboardSkeleton from '@/components/DashboardSkeleton'
+import '@/styles/admin-layout-consolidated.css' // FINAL FIX - Consolidated all layout rules
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
-  const { isCollapsed, setMobileOpen } = useAdminSidebar()
-  const { setAuth, user, _hasHydrated } = useAuthStore() // Add _hasHydrated to check if store is ready
-  const { showPrompt, setShowPrompt } = useRefreshPromptStore() // Add refresh prompt store
-  const { isConnected } = useRealTimeNotifications() // Get connection status
-  
-  // Enable real-time permission sync
-  usePermissionSync({
-    autoReload: false, // Show refresh prompt instead of auto-reload (user wants manual control)
-    onPermissionsUpdated: () => {
-      console.log('🔄 Permissions updated, showing refresh prompt')
-    },
-    onRoleChanged: (oldRole, newRole) => {
-      console.log(`👤 Role changed: ${oldRole} → ${newRole}`)
-    }
-  })
+  const { user, _hasHydrated, sidebarCollapsed } = useAuthStore() // Add sidebarCollapsed
+  const [isMobile, setIsMobile] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-  // DISABLED: Sync permissions on page load
-  // This was causing "Invalid token" errors on dashboard load
-  // Permission sync now happens only via WebSocket events when SuperAdmin changes features
-  // If you need to sync on load, user can manually refresh after seeing the refresh prompt
-  
-  // useEffect(() => {
-  //   const syncOnLoad = async () => {
-  //     // ... sync logic
-  //   };
-  //   if (_hasHydrated && user && user.role === 'admin') {
-  //     syncOnLoad();
-  //   }
-  // }, [setAuth, user, _hasHydrated]);
+  // Handle responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024)
+    }
+
+    handleResize() // Initial check
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Remove the scroll padding useEffect as it's no longer needed with Fixed Shell layout
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Refresh Prompt */}
-      {showPrompt && (
-        <RefreshPrompt
-          onRefresh={() => {
-            setShowPrompt(false);
-            window.location.reload();
-          }}
-          onDismiss={() => setShowPrompt(false)}
-        />
-      )}
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50 admin-layout">
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <SimpleSidebar />
 
-      {/* Sidebar */}
-      <AdminSidebar />
+        {/* Right Side Area */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden main-content-area">
+          {/* Header - Stays at top */}
+          <AdminHeader
+            onMenuClick={() => setMobileOpen(true)}
+          />
 
-      {/* Main Content */}
-      <div
-        className={cn(
-          'transition-all duration-300',
-          isCollapsed ? 'lg:pl-16' : 'lg:pl-64'
-        )}
-      >
-        {/* Header - Fixed */}
-        <AdminHeader onMenuClick={() => setMobileOpen(true)} sidebarCollapsed={isCollapsed} />
-
-        {/* Page Content - Add padding for fixed header (h-16 = 64px) */}
-        <main className="p-4 lg:p-6 mt-16">
-          <div className="max-w-screen-2xl mx-auto">{children}</div>
-        </main>
+          {/* Page Content - Independent Scroll */}
+          <main className="flex-1 overflow-y-auto outline-none dashboard-content p-3 lg:p-4 text-[13px]">
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
 
       {/* Modern Toast Notifications */}
@@ -100,54 +71,45 @@ export default function AdminLayout({
   useEffect(() => {
     // Wait for store to hydrate
     if (!_hasHydrated) {
-      console.log('⏳ Waiting for auth store to hydrate...');
       return;
     }
-    
-    // Immediate check without timeout for better UX
+
+    // Quick check for better UX - no timeout needed
     if (!isAuthenticated || !user) {
-      console.log('⚠️ Not authenticated, redirecting to login');
       router.push('/auth/login');
       return;
     }
 
-    if (user.role !== 'admin') {
-      console.log('⚠️ User is not admin, redirecting to login');
+    // Check if user has admin access (any admin role)
+    const allowedRoles = [
+      'admin', 'tenant_owner', 'tenant_admin', 'tenant_ops_manager',
+      'tenant_finance_manager', 'tenant_staff', 'super_admin',
+      'platform_support', 'platform_finance', 'platform_auditor',
+      'branch_admin', 'staff' // Legacy roles for backward compatibility
+    ];
+
+    if (!allowedRoles.includes(user.role)) {
       router.push('/auth/login');
       return;
     }
 
-    console.log('✅ User authenticated as admin');
     setIsLoading(false);
   }, [isAuthenticated, user, router, _hasHydrated]);
 
   if (!_hasHydrated || isLoading || !isAuthenticated || !user) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Show skeleton layout for better UX */}
-        <div className="lg:pl-64">
-          <div className="h-16 bg-white border-b border-gray-200 flex items-center px-6">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-48"></div>
-            </div>
-          </div>
-          <main className="p-4 lg:p-6">
-            <div className="max-w-screen-2xl mx-auto">
-              <DashboardSkeleton />
-            </div>
-          </main>
-        </div>
-      </div>
+      <ThemedPageLoader
+        text="Loading Dashboard"
+        variant="primary"
+      />
     )
   }
 
   return (
-    <AdminSidebarProvider>
+    <div>
       <AdminLayoutContent>{children}</AdminLayoutContent>
-      {/* Real-time notification toasts */}
+      {/* Smart Notification System - Both flash and bell notifications */}
       <NotificationContainer />
-      {/* Slide notifications (flash notifications) */}
-      <NotificationManager />
-    </AdminSidebarProvider>
+    </div>
   )
 }

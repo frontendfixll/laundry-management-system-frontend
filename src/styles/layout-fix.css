@@ -1,0 +1,307 @@
+/* Layout Fix for Main Dashboard Content */
+
+/* Reset any conflicting styles */
+* {
+  box-sizing: border-box;
+}
+
+/* Admin Layout Container */
+.admin-layout {
+  position: relative !important;
+  min-height: 100vh !important;
+  background-color: #f9fafb !important;
+}
+
+/* Sidebar Positioning */
+.admin-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  z-index: 50 !important;
+  width: 256px !important;
+  /* Match w-64 from layout */
+  transition: width 0.3s ease !important;
+  background-color: white !important;
+  border-right: 1px solid #e5e7eb !important;
+}
+
+.admin-sidebar.sidebar-collapsed {
+  width: 80px !important;
+}
+
+/* Main Content Area */
+.main-content-area {
+  position: relative !important;
+  min-height: 100vh !important;
+  transition: margin-left 0.3s ease !important;
+  margin-left: 0 !important;
+  /* Default for mobile */
+  padding-top: 0 !important;
+  /* Remove padding-top, we use header spacer instead */
+}
+
+/* Desktop Layout */
+@media (min-width: 1024px) {
+  .main-content-area {
+    margin-left: 256px !important;
+    /* Match sidebar width */
+  }
+
+  .admin-layout:has(.sidebar-collapsed) .main-content-area {
+    margin-left: 80px !important;
+    /* Collapsed state */
+  }
+}
+
+/* Header Positioning */
+.admin-header {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  z-index: 60 !important;
+  height: 64px !important;
+  /* Fixed height to match header component */
+  transition: left 0.3s ease !important;
+  left: 0 !important;
+  /* Default for mobile */
+  background-color: white !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Mobile Header Height */
+@media (max-width: 1023px) {
+  .admin-header {
+    height: 64px !important;
+  }
+}
+
+/* Desktop Header Positioning */
+@media (min-width: 1024px) {
+  .admin-header {
+    left: 256px !important;
+    /* Match sidebar width */
+  }
+
+  .admin-layout:has(.sidebar-collapsed) .admin-header {
+    left: 80px !important;
+    /* Collapsed state */
+  }
+}
+
+/* Dashboard Content Spacing */
+.dashboard-content {
+  padding: 24px !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Welcome Banner Styling */
+.welcome-banner {
+  background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
+  border-radius: 16px !important;
+  padding: 32px !important;
+  margin-bottom: 24px !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.welcome-banner::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px) !important;
+  z-index: -1 !important;
+}
+
+/* Dashboard Stats Grid */
+.stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 20px !important;
+  margin-bottom: 32px !important;
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  background: white !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #f3f4f6 !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Stat Cards with Gradients */
+.stat-card {
+  background: white !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid #f3f4f6 !important;
+  transition: all 0.3s ease !important;
+}
+
+.stat-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  opacity: 0.1 !important;
+  z-index: 0 !important;
+}
+
+.stat-card.purple::before {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899) !important;
+}
+
+.stat-card.pink::before {
+  background: linear-gradient(135deg, #ec4899, #f97316) !important;
+}
+
+.stat-card.orange::before {
+  background: linear-gradient(135deg, #f97316, #eab308) !important;
+}
+
+.stat-card.blue::before {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+}
+
+.stat-card-content {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Recent Orders Section */
+.recent-orders {
+  background: white !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #f3f4f6 !important;
+}
+
+/* Smart Quick Actions */
+.smart-quick-actions {
+  background: white !important;
+  border-radius: 16px !important;
+  padding: 24px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid #f3f4f6 !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 16px !important;
+  }
+
+  .welcome-banner {
+    padding: 24px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .dashboard-card,
+  .stat-card,
+  .recent-orders,
+  .smart-quick-actions {
+    padding: 20px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-header {
+    left: 256px !important;
+    /* Match sidebar width */
+  }
+
+  .admin-layout:has(.sidebar-collapsed) .admin-header {
+    left: 80px !important;
+    /* Collapsed state */
+  }
+}
+
+/* Main Content Padding */
+.main-content-area main {
+  padding-top: 72px !important;
+  /* Account for fixed header (64px + 8px gap) */
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  padding-bottom: 24px !important;
+}
+
+@media (min-width: 1024px) {
+  .main-content-area main {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+/* Ensure content container is properly centered */
+.main-content-area main>div {
+  max-width: 1536px !important;
+  /* max-w-screen-2xl */
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+/* Mobile Sidebar Overlay */
+@media (max-width: 1023px) {
+  .admin-sidebar {
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+  }
+
+  .admin-sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  .main-content-area {
+    margin-left: 0 !important;
+  }
+
+  .admin-header {
+    left: 0 !important;
+  }
+}
+
+/* Fix any z-index conflicts */
+.admin-layout .admin-sidebar {
+  z-index: 50 !important;
+}
+
+.admin-layout .admin-header {
+  z-index: 60 !important;
+}
+
+.admin-layout .notification-panel,
+.admin-layout .user-dropdown-panel {
+  z-index: 70 !important;
+}
+
+/* Ensure smooth transitions */
+.admin-layout * {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}

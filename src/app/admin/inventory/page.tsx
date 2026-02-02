@@ -130,7 +130,6 @@ function AdminInventoryPage() {
   
   // Dropdown states
   const [showDropdown, setShowDropdown] = useState(false)
-  const [dropdownSearch, setDropdownSearch] = useState('')
   const dropdownRef = useRef<HTMLDivElement>(null)
   
   const [newItem, setNewItem] = useState({
@@ -497,7 +496,6 @@ function AdminInventoryPage() {
                 onClick={() => {
                   setShowAddModal(false);
                   setNewItem({ itemName: '', currentStock: 0, minThreshold: 10, maxCapacity: 100, unit: 'units', unitCost: 0, supplier: '' });
-                  setDropdownSearch('');
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
@@ -507,126 +505,106 @@ function AdminInventoryPage() {
 
             {/* Modal Body */}
             <div className="p-4 space-y-4">
-              {/* Custom Searchable Dropdown */}
-              <div className="relative" ref={dropdownRef}>
+              {/* Item Selection Row - Select Dropdown and Request Button in same line */}
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Item Name <span className="text-red-500">*</span>
                 </label>
-                <button
-                  type="button"
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  className="w-full px-3 py-2.5 border-2 border-gray-300 rounded-lg text-left flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                >
-                  <span className={newItem.itemName ? 'text-gray-900' : 'text-gray-400'}>
-                    {newItem.itemName ? (
-                      <span className="flex items-center gap-2">
-                        <span className="text-xl">
-                          {INVENTORY_ITEMS.flatMap(cat => cat.items).find(item => item.value === newItem.itemName)?.icon}
-                        </span>
-                        <div>
-                          <div className="font-medium text-sm">
-                            {INVENTORY_ITEMS.flatMap(cat => cat.items).find(item => item.value === newItem.itemName)?.label}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {INVENTORY_ITEMS.flatMap(cat => cat.items).find(item => item.value === newItem.itemName)?.description}
-                          </div>
-                        </div>
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2 text-sm">
-                        <Package className="w-4 h-4" />
-                        Select an item...
-                      </span>
-                    )}
-                  </span>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-                </button>
-
-                {/* Dropdown Menu */}
-                {showDropdown && (
-                  <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-2xl max-h-72 overflow-hidden">
-                    {/* Search Input */}
-                    <div className="p-2 border-b border-gray-200 sticky top-0 bg-white">
-                      <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-                        <input
-                          type="text"
-                          placeholder="Search items..."
-                          value={dropdownSearch}
-                          onChange={(e) => setDropdownSearch(e.target.value)}
-                          className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Items List */}
-                    <div className="overflow-y-auto max-h-80">
-                      {INVENTORY_ITEMS.map((category) => {
-                        const filteredItems = category.items.filter(item =>
-                          item.label.toLowerCase().includes(dropdownSearch.toLowerCase()) ||
-                          item.description.toLowerCase().includes(dropdownSearch.toLowerCase())
-                        );
-
-                        if (filteredItems.length === 0) return null;
-
-                        return (
-                          <div key={category.category}>
-                            {/* Category Header */}
-                            <div className="px-4 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                              <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                {category.category}
-                              </h4>
+                <div className="flex gap-2">
+                  {/* Custom Searchable Dropdown - Made Smaller */}
+                  <div className="relative flex-1" ref={dropdownRef}>
+                    <button
+                      type="button"
+                      onClick={() => setShowDropdown(!showDropdown)}
+                      className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-left flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    >
+                      <span className={newItem.itemName ? 'text-gray-900' : 'text-gray-400'}>
+                        {newItem.itemName ? (
+                          <span className="flex items-center gap-2">
+                            <span className="text-lg">
+                              {INVENTORY_ITEMS.flatMap(cat => cat.items).find(item => item.value === newItem.itemName)?.icon}
+                            </span>
+                            <div>
+                              <div className="font-medium text-sm">
+                                {INVENTORY_ITEMS.flatMap(cat => cat.items).find(item => item.value === newItem.itemName)?.label}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {INVENTORY_ITEMS.flatMap(cat => cat.items).find(item => item.value === newItem.itemName)?.description}
+                              </div>
                             </div>
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2 text-sm">
+                            <Package className="w-4 h-4" />
+                            Select an item...
+                          </span>
+                        )}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                    </button>
 
-                            {/* Category Items */}
-                            {filteredItems.map((item) => (
-                              <button
-                                key={item.value}
-                                type="button"
-                                onClick={() => {
-                                  setNewItem({ ...newItem, itemName: item.value });
-                                  setShowDropdown(false);
-                                  setDropdownSearch('');
-                                }}
-                                className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors flex items-start gap-3 border-l-4 ${
-                                  newItem.itemName === item.value 
-                                    ? 'bg-blue-50 border-blue-500' 
-                                    : 'border-transparent hover:border-blue-200'
-                                }`}
-                              >
-                                <span className="text-2xl flex-shrink-0 mt-0.5">{item.icon}</span>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="font-semibold text-gray-900">{item.label}</span>
-                                    {newItem.itemName === item.value && (
-                                      <Check className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                                    )}
+                    {/* Dropdown Menu - Removed Search Field */}
+                    {showDropdown && (
+                      <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-200 rounded-lg shadow-2xl max-h-60 overflow-hidden">
+                        {/* Items List - Direct without search */}
+                        <div className="overflow-y-auto max-h-60">
+                          {INVENTORY_ITEMS.map((category) => (
+                            <div key={category.category}>
+                              {/* Category Header */}
+                              <div className="px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                  {category.category}
+                                </h4>
+                              </div>
+
+                              {/* Category Items */}
+                              {category.items.map((item) => (
+                                <button
+                                  key={item.value}
+                                  type="button"
+                                  onClick={() => {
+                                    setNewItem({ ...newItem, itemName: item.value });
+                                    setShowDropdown(false);
+                                  }}
+                                  className={`w-full px-3 py-2.5 text-left hover:bg-blue-50 transition-colors flex items-start gap-2 border-l-4 ${
+                                    newItem.itemName === item.value 
+                                      ? 'bg-blue-50 border-blue-500' 
+                                      : 'border-transparent hover:border-blue-200'
+                                  }`}
+                                >
+                                  <span className="text-lg flex-shrink-0 mt-0.5">{item.icon}</span>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="font-semibold text-gray-900 text-sm">{item.label}</span>
+                                      {newItem.itemName === item.value && (
+                                        <Check className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-0.5">{item.description}</p>
                                   </div>
-                                  <p className="text-xs text-gray-500 mt-1">{item.description}</p>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        );
-                      })}
-
-                      {/* No Results */}
-                      {INVENTORY_ITEMS.every(cat => 
-                        cat.items.filter(item =>
-                          item.label.toLowerCase().includes(dropdownSearch.toLowerCase()) ||
-                          item.description.toLowerCase().includes(dropdownSearch.toLowerCase())
-                        ).length === 0
-                      ) && (
-                        <div className="px-4 py-12 text-center text-gray-500">
-                          <Package className="w-16 h-16 mx-auto mb-3 text-gray-300" />
-                          <p className="text-sm font-medium">No items found</p>
-                          <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
+                                </button>
+                              ))}
+                            </div>
+                          ))}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
-                )}
+
+                  {/* Request Item Button - Same line */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setShowRequestModal(true);
+                    }}
+                    className="px-4 py-2 bg-green-50 border-green-200 text-green-700 hover:bg-green-100 hover:border-green-300 whitespace-nowrap"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Request
+                  </Button>
+                </div>
               </div>
 
               {/* Stock Details Grid */}
@@ -757,7 +735,6 @@ function AdminInventoryPage() {
                 onClick={() => {
                   setShowAddModal(false);
                   setNewItem({ itemName: '', currentStock: 0, minThreshold: 10, maxCapacity: 100, unit: 'units', unitCost: 0, supplier: '' });
-                  setDropdownSearch('');
                 }} 
                 className="flex-1 py-2.5 rounded-lg"
                 disabled={saving}

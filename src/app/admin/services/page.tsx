@@ -39,7 +39,7 @@ interface Toast {
 }
 
 const ToastContainer = ({ toasts, removeToast }: { toasts: Toast[], removeToast: (id: number) => void }) => (
-  <div className="fixed top-20 right-4 z-[100] space-y-2">
+  <div className="fixed top-16 right-4 z-[100] space-y-2">
     {toasts.map(toast => (
       <div
         key={toast.id}

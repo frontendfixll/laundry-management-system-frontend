@@ -1,0 +1,127 @@
+/* Header Visibility Fix */
+
+/* Ensure header is always visible and positioned correctly */
+.admin-header {
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 60 !important;
+  height: 64px !important;
+  background-color: white !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Desktop positioning - aggressive overlap to eliminate gap */
+@media (min-width: 1024px) {
+  .admin-header {
+    left: 254px !important; /* Overlap by 2px to ensure no gap */
+    right: 0 !important;
+    padding-left: 0 !important;
+    border-left: 2px solid white !important; /* Cover any visible gap */
+  }
+}
+
+/* Mobile positioning */
+@media (max-width: 1023px) {
+  .admin-header {
+    left: 0 !important;
+    right: 0 !important;
+  }
+}
+
+/* Ensure header container is visible */
+.admin-header-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 64px !important;
+  padding: 0 24px !important;
+  width: 100% !important;
+  visibility: visible !important;
+}
+
+/* Ensure header left side is visible */
+.header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  visibility: visible !important;
+}
+
+/* Ensure header right side is visible */
+.header-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  visibility: visible !important;
+}
+
+/* Force user dropdown to be visible */
+.user-dropdown {
+  display: block !important;
+  visibility: visible !important;
+}
+
+.user-dropdown-trigger {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 12px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  cursor: pointer !important;
+  visibility: visible !important;
+}
+
+/* Force notification bell to be visible */
+.notification-bell {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  cursor: pointer !important;
+  visibility: visible !important;
+}
+
+/* Debug styles - REMOVED - header is working correctly */
+/* .admin-header {
+  border: 2px solid red !important;
+  box-sizing: border-box !important;
+}
+
+.header-right {
+  border: 1px solid blue !important;
+} */
+
+/* Ensure sidebar is exactly 256px with no extra spacing */
+.admin-sidebar,
+.sidebar,
+[class*="sidebar"] {
+  width: 256px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-right: 1px solid #e5e7eb !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure no body margins affect layout */
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure layout container has no margins */
+.admin-layout {
+  margin: 0 !important;
+  padding: 0 !important;
+}

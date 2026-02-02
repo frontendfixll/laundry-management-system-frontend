@@ -1262,6 +1262,68 @@ class SuperAdminAPI {
     
     return this.handleResponse(response)
   }
+
+  // Audit Management
+  async getAuditDashboard(timeframe?: string) {
+    const searchParams = new URLSearchParams()
+    if (timeframe) {
+      searchParams.append('timeframe', timeframe)
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/superadmin/audit/dashboard?${searchParams}`,
+      { headers: this.getAuthHeaders() }
+    )
+    
+    return this.handleResponse(response)
+  }
+
+  async getAuditCompliance() {
+    const response = await fetch(
+      `${API_BASE_URL}/superadmin/audit/compliance`,
+      { headers: this.getAuthHeaders() }
+    )
+    
+    return this.handleResponse(response)
+  }
+
+  async getAuditLogs(params?: {
+    page?: number
+    limit?: number
+    severity?: string
+    action?: string
+    search?: string
+  }) {
+    const searchParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(key, value.toString())
+        }
+      })
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/superadmin/audit/logs?${searchParams}`,
+      { headers: this.getAuthHeaders() }
+    )
+    
+    return this.handleResponse(response)
+  }
+
+  async getAuditMetrics(timeframe?: string) {
+    const searchParams = new URLSearchParams()
+    if (timeframe) {
+      searchParams.append('timeframe', timeframe)
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/superadmin/audit/metrics?${searchParams}`,
+      { headers: this.getAuthHeaders() }
+    )
+    
+    return this.handleResponse(response)
+  }
 }
 
 export const superAdminApi = new SuperAdminAPI()

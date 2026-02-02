@@ -34,7 +34,10 @@ export function middleware(request: NextRequest) {
   // Extract subdomain from hostname
   const subdomain = extractSubdomain(hostname)
   
-  console.log('🌐 Middleware - Hostname:', hostname, 'Subdomain:', subdomain, 'Path:', pathname)
+  // Disable logging to prevent spam - only log for debugging
+  if (process.env.NODE_ENV === 'development' && pathname !== '/login') {
+    console.log('🌐 Middleware - Hostname:', hostname, 'Subdomain:', subdomain, 'Path:', pathname)
+  }
   
   // If we have a valid subdomain (not reserved), handle tenant routing
   if (subdomain && !RESERVED_ROUTES.includes(subdomain)) {

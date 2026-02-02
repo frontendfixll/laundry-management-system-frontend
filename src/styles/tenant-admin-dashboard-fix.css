@@ -1,0 +1,862 @@
+/* Tenant Admin Dashboard Complete CSS Fix */
+
+/* Reset and Base Styles */
+.admin-layout {
+  position: relative !important;
+  min-height: 100vh !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Main Content Area - Fix viewport issue */
+.main-content-area {
+  position: relative !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding-top: 0 !important;
+  background: #f9fafb !important;
+}
+
+/* Ensure content area doesn't get covered by sidebar */
+@media (min-width: 1024px) {
+  .main-content-area {
+    margin-left: 288px !important;
+    /* Default sidebar width */
+  }
+
+  .admin-layout:has(.sidebar-collapsed) .main-content-area {
+    margin-left: 80px !important;
+    /* Collapsed sidebar width */
+  }
+}
+
+@media (max-width: 1023px) {
+  .main-content-area {
+    margin-left: 0 !important;
+  }
+}
+
+/* Header Enhancements */
+.admin-header {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  height: 72px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 60 !important;
+}
+
+.admin-header-container {
+  padding: 0 32px !important;
+  height: 72px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Dashboard Content Area - Fix positioning */
+.dashboard-content {
+  padding: 32px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  min-height: calc(100vh - 72px) !important;
+  position: relative !important;
+  overflow-x: hidden !important;
+  background: transparent !important;
+}
+
+/* Fix content container */
+.dashboard-content>div {
+  max-width: 1600px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+/* Ensure main element positioning */
+main.dashboard-content {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Target actual dashboard classes */
+.space-y-6 {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Fix welcome section positioning */
+.space-y-6>div:first-child {
+  width: 100% !important;
+  margin-bottom: 32px !important;
+}
+
+/* Fix stats grid */
+.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+  width: 100% !important;
+  max-width: 100% !important;
+  gap: 24px !important;
+  margin-bottom: 40px !important;
+}
+
+/* Fix main content grid */
+.grid.grid-cols-1.lg\\:grid-cols-3 {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Enhanced Header Buttons */
+.notification-bell-button,
+.mobile-menu-button,
+.sidebar-toggle-button {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  background: rgba(248, 250, 252, 0.8) !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+.notification-bell-button:hover,
+.mobile-menu-button:hover,
+.sidebar-toggle-button:hover {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ensure only one button shows at a time */
+.header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+/* Hide buttons properly on different screen sizes */
+@media (max-width: 1023px) {
+  .sidebar-toggle-button {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-menu-button {
+    display: none !important;
+  }
+}
+
+/* User Dropdown Enhancement */
+.user-dropdown-trigger {
+  padding: 8px 16px !important;
+  border-radius: 16px !important;
+  background: rgba(248, 250, 252, 0.8) !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  cursor: pointer !important;
+}
+
+.user-dropdown-trigger:hover {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.user-avatar {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.user-name {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  line-height: 1.2 !important;
+}
+
+.user-role {
+  font-size: 13px !important;
+  color: #64748b !important;
+  line-height: 1.2 !important;
+}
+
+/* Dropdown Panels */
+.notification-panel,
+.user-dropdown-panel {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  z-index: 70 !important;
+  position: absolute !important;
+  right: 0 !important;
+  top: 100% !important;
+  margin-top: 12px !important;
+}
+
+.user-dropdown-panel {
+  width: 280px !important;
+  overflow: hidden !important;
+}
+
+/* Dashboard Content Area */
+.main-content-area {
+  padding-top: 72px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dashboard-content {
+  padding: 32px !important;
+  max-width: 1600px !important;
+  margin: 0 auto !important;
+}
+
+/* Welcome Banner Enhancement */
+.welcome-banner {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%) !important;
+  border-radius: 20px !important;
+  padding: 40px !important;
+  margin-bottom: 32px !important;
+  color: white !important;
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  width: 100% !important;
+}
+
+.welcome-banner::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(1px) !important;
+}
+
+.welcome-banner h1 {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  margin-bottom: 8px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.welcome-banner p {
+  font-size: 18px !important;
+  opacity: 0.9 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Stats Grid Enhancement */
+.stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+  gap: 24px !important;
+  margin-bottom: 40px !important;
+  width: 100% !important;
+}
+
+/* Enhanced Stat Cards */
+.stat-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+  border-radius: 20px !important;
+  padding: 32px !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.stat-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+}
+
+.stat-card::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  opacity: 0.05 !important;
+  z-index: 0 !important;
+}
+
+.stat-card.purple::before {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+}
+
+.stat-card.pink::before {
+  background: linear-gradient(135deg, #ec4899, #f97316) !important;
+}
+
+.stat-card.orange::before {
+  background: linear-gradient(135deg, #f97316, #eab308) !important;
+}
+
+.stat-card.blue::before {
+  background: linear-gradient(135deg, #3b82f6, #6366f1) !important;
+}
+
+.stat-card-content {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.stat-card h3 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #64748b !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  margin-bottom: 12px !important;
+}
+
+.stat-card .stat-value {
+  font-size: 36px !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  margin-bottom: 8px !important;
+  line-height: 1 !important;
+}
+
+.stat-card .stat-change {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.stat-change.positive {
+  color: #059669 !important;
+}
+
+.stat-change.negative {
+  color: #dc2626 !important;
+}
+
+/* Dashboard Cards Enhancement */
+.dashboard-card,
+.recent-orders,
+.smart-quick-actions {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+  border-radius: 20px !important;
+  padding: 32px !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+.dashboard-card:hover,
+.recent-orders:hover,
+.smart-quick-actions:hover {
+  box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+}
+
+/* Table Enhancements */
+.dashboard-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 8px !important;
+}
+
+.dashboard-table th {
+  background: rgba(248, 250, 252, 0.8) !important;
+  padding: 16px 20px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #475569 !important;
+  text-align: left !important;
+  border: none !important;
+}
+
+.dashboard-table td {
+  padding: 16px 20px !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  font-size: 14px !important;
+  color: #334155 !important;
+}
+
+.dashboard-table tr:hover td {
+  background: rgba(248, 250, 252, 0.9) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+}
+
+/* Button Enhancements */
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: white !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 8px 15px -3px rgba(99, 102, 241, 0.4) !important;
+}
+
+.btn-secondary {
+  background: rgba(248, 250, 252, 0.8) !important;
+  border: 1px solid rgba(226, 232, 240, 0.6) !important;
+  border-radius: 12px !important;
+  padding: 12px 24px !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  color: #475569 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border-color: rgba(203, 213, 225, 0.8) !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
+  .admin-header-container {
+    padding: 0 24px !important;
+    height: 64px !important;
+  }
+
+  .admin-header {
+    height: 64px !important;
+  }
+
+  .dashboard-content {
+    padding: 24px !important;
+    min-height: calc(100vh - 64px) !important;
+  }
+
+  .welcome-banner {
+    padding: 32px 24px !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .stat-card,
+  .dashboard-card,
+  .recent-orders,
+  .smart-quick-actions {
+    padding: 24px !important;
+  }
+
+  .user-info {
+    display: none !important;
+  }
+
+  .user-dropdown-trigger {
+    padding: 8px !important;
+  }
+
+  .user-dropdown-panel {
+    width: 260px !important;
+    right: 16px !important;
+  }
+
+  .main-content-area {
+    margin-left: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-header-container {
+    padding: 0 16px !important;
+  }
+
+  .dashboard-content {
+    padding: 16px !important;
+  }
+
+  .welcome-banner {
+    padding: 24px 20px !important;
+  }
+
+  .welcome-banner h1 {
+    font-size: 24px !important;
+  }
+
+  .welcome-banner p {
+    font-size: 16px !important;
+  }
+
+  .stat-card .stat-value {
+    font-size: 28px !important;
+  }
+
+  .user-dropdown-panel {
+    width: 240px !important;
+  }
+}
+
+/* Fix scroll behavior */
+html {
+  scroll-padding-top: 80px !important;
+  scroll-behavior: smooth !important;
+}
+
+body {
+  scroll-padding-top: 80px !important;
+}
+
+* {
+  scroll-margin-top: 80px !important;
+}
+
+/* Ensure proper content flow */
+.dashboard-content>* {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Fix any grid or flex overflow issues */
+.grid,
+.flex {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Ensure cards don't overflow */
+.stat-card,
+.dashboard-card {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Smooth Animations */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Loading States */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%) !important;
+  background-size: 200% 100% !important;
+  animation: loading 1.5s infinite !important;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0 !important;
+  }
+
+  100% {
+    background-position: -200% 0 !important;
+  }
+}
+
+/* Focus States for Accessibility */
+.notification-bell-button:focus,
+.mobile-menu-button:focus,
+.sidebar-toggle-button:focus,
+.user-dropdown-trigger:focus,
+.btn-primary:focus,
+.btn-secondary:focus {
+  outline: 2px solid #6366f1 !important;
+  outline-offset: 2px !important;
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+  .admin-layout {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  }
+
+  .admin-header {
+    background: rgba(15, 23, 42, 0.95) !important;
+    border-bottom-color: rgba(51, 65, 85, 0.8) !important;
+  }
+
+  .stat-card,
+  .dashboard-card,
+  .recent-orders,
+  .smart-quick-actions {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border-color: rgba(51, 65, 85, 0.6) !important;
+  }
+
+  .user-name {
+    color: #f1f5f9 !important;
+  }
+
+  .user-role {
+    color: #94a3b8 !important;
+  }
+}
+
+/* Additional Viewport Fixes */
+
+/* Fix specific dashboard elements */
+.bg-white.rounded-2xl {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix responsive container */
+.max-w-screen-2xl {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Ensure all containers are properly sized */
+.container,
+.mx-auto {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Fix any potential overflow from charts or tables */
+.recharts-wrapper,
+.recharts-surface {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Fix table overflow */
+table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* Ensure proper spacing */
+.space-y-6>*+* {
+  margin-top: 24px !important;
+}
+
+.space-y-4>*+* {
+  margin-top: 16px !important;
+}
+
+/* Fix padding for mobile */
+@media (max-width: 640px) {
+  .dashboard-content {
+    padding: 16px !important;
+  }
+
+  .space-y-6>div:first-child {
+    margin-bottom: 24px !important;
+  }
+}
+
+/* Force proper viewport behavior */
+body {
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+html {
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+/* Ensure main layout doesn't overflow */
+.admin-layout,
+.main-content-area,
+.dashboard-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Fix any remaining grid issues */
+.grid {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.grid>* {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Critical Content Area Fixes */
+
+/* Override any conflicting margin/padding */
+.main-content-area {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
+  background: #f9fafb !important;
+}
+
+/* Force correct positioning for desktop */
+@media (min-width: 1024px) {
+  .main-content-area {
+    margin-left: 288px !important;
+    /* w-72 = 288px */
+    width: calc(100% - 288px) !important;
+  }
+
+  /* When sidebar is collapsed */
+  .admin-layout:has(.sidebar-collapsed) .main-content-area,
+  .sidebar-collapsed~.main-content-area {
+    margin-left: 80px !important;
+    /* collapsed width */
+    width: calc(100% - 80px) !important;
+  }
+}
+
+/* Mobile: full width */
+@media (max-width: 1023px) {
+  .main-content-area {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* Ensure header spacer works properly */
+.header-spacer {
+  display: block !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+}
+
+/* Fix dashboard content positioning */
+main.dashboard-content {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-height: calc(100vh - 72px) !important;
+}
+
+@media (max-width: 1023px) {
+  main.dashboard-content {
+    min-height: calc(100vh - 64px) !important;
+  }
+}
+
+/* Ensure content is visible and properly positioned */
+.dashboard-content .space-y-6 {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+}
+
+/* Fix loading state positioning */
+.min-h-screen.bg-gray-50.flex.items-center.justify-center {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(249, 250, 251, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Ensure sidebar doesn't cover content */
+.admin-sidebar {
+  z-index: 50 !important;
+}
+
+.admin-header {
+  z-index: 60 !important;
+}
+
+.main-content-area {
+  z-index: 1 !important;
+}
+
+/* Force proper layout flow */
+.admin-layout {
+  display: block !important;
+  min-height: 100vh !important;
+  position: relative !important;
+}
+
+.admin-layout .main-content-area {
+  min-width: 0 !important;
+  min-height: 100vh !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Ensure content is properly positioned */
+.main-content-area {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.dashboard-content {
+  position: relative !important;
+  z-index: 1 !important;
+  min-height: calc(100vh - 72px) !important;
+}
+
+@media (max-width: 1023px) {
+  .dashboard-content {
+    min-height: calc(100vh - 64px) !important;
+  }
+}
+
+/* Simple Loader Styles */
+
+/* Basic spinner animation */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading text */
+.text-gray-600 {
+  color: #4b5563;
+}

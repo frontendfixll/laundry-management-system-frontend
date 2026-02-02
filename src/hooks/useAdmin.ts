@@ -11,8 +11,11 @@ export interface DashboardMetrics {
   expressOrders: number
   totalCustomers: number
   activeCustomers: number
+  newCustomers?: number
   pendingComplaints: number
   totalBranches: number
+  totalRevenue?: number
+  revenueGrowth?: number
 }
 
 export interface Order {

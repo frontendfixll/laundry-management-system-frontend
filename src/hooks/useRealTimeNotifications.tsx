@@ -1,17 +1,17 @@
 'use client'
 
-import React from 'react'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { io, Socket } from 'socket.io-client'
 import toast from 'react-hot-toast'
 import { useAuthStore, UserRole } from '@/store/authStore'
-import { 
-  Bell, 
-  CheckCircle, 
-  AlertTriangle, 
-  XCircle, 
-  Shield, 
-  Package, 
+import { useUnifiedNotifications } from './useUnifiedNotifications'
+import {
+  Bell,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Shield,
+  Package,
   CreditCard,
   User,
   Settings,
@@ -31,18 +31,6 @@ interface Notification {
   isRead: boolean
 }
 
-interface NotificationToast {
-  id: string
-  title: string
-  message: string
-  icon: React.ReactNode
-  severity: 'info' | 'success' | 'warning' | 'error'
-  action?: {
-    label: string
-    onClick: () => void
-  }
-}
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
 const getAuthToken = () => {
@@ -52,13 +40,13 @@ const getAuthToken = () => {
       const parsed = JSON.parse(data)
       return parsed.state?.token || parsed.token
     }
-  } catch {}
+  } catch { }
   return localStorage.getItem('token')
 }
 
 const getNotificationIcon = (iconName: string, severity: string) => {
   const iconProps = { className: "w-5 h-5" }
-  
+
   switch (iconName) {
     case 'shield-check':
     case 'shield':
@@ -89,19 +77,6 @@ const getNotificationIcon = (iconName: string, severity: string) => {
   }
 }
 
-const getSeverityStyles = (severity: string) => {
-  switch (severity) {
-    case 'success':
-      return 'bg-green-50 border-green-200 text-green-800'
-    case 'warning':
-      return 'bg-yellow-50 border-yellow-200 text-yellow-800'
-    case 'error':
-      return 'bg-red-50 border-red-200 text-red-800'
-    default:
-      return 'bg-blue-50 border-blue-200 text-blue-800'
-  }
-}
-
 export const useRealTimeNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -111,12 +86,24 @@ export const useRealTimeNotifications = () => {
   const lastPollRef = useRef<string>(new Date().toISOString())
   const [showNotificationPanel, setShowNotificationPanel] = useState(false)
 
+  // Add debounce mechanism to prevent rapid re-fetches
+  const lastFetchTimeRef = useRef<number>(0)
+  const FETCH_DEBOUNCE_MS = 5000 // 5 seconds minimum between fetches
+
+  // Use unified notification system - Smart notifications with both flash and bell
+  const {
+    showPermissionUpdateNotification,
+    showFeatureUpdateNotification,
+    showRoleChangeNotification,
+    showRealtimeUpdate
+  } = useUnifiedNotifications()
+
   // Polling fallback for serverless environments
   const startPolling = () => {
     if (pollingIntervalRef.current) return
 
     console.log('🔄 Starting notification polling (serverless fallback)')
-    
+
     pollingIntervalRef.current = setInterval(async () => {
       try {
         const token = getAuthToken()
@@ -126,21 +113,40 @@ export const useRealTimeNotifications = () => {
           headers: { Authorization: `Bearer ${token}` },
           credentials: 'include'
         })
-        
+
         const data = await response.json()
-        
+
         if (data.success && data.data.hasNew) {
           console.log('📬 New notifications via polling:', data.data.notifications.length)
-          
+
           // Add new notifications
           data.data.notifications.forEach((notification: Notification) => {
-            setNotifications(prev => [notification, ...prev])
+            setNotifications(prev => {
+              // Check if notification already exists to prevent duplicates
+              const exists = prev.find(n => n._id === notification._id)
+              if (exists) return prev
+
+              const updated = [notification, ...prev]
+              // Sort by createdAt to maintain proper order
+              const sorted = updated.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              console.log('🔔 Bell notification added via polling (persistent)')
+              return sorted
+            })
+
+            // Show flash notification (SEPARATE from bell notification)
             showToastNotification(notification)
+
+            // Emit custom event for bell component (without auto-opening modal)
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('newNotificationReceived', {
+                detail: notification
+              }))
+            }
           })
-          
+
           // Update unread count
           setUnreadCount(data.data.unreadCount)
-          
+
           // Update last poll timestamp
           lastPollRef.current = data.data.timestamp
         }
@@ -148,14 +154,6 @@ export const useRealTimeNotifications = () => {
         console.error('Polling error:', error)
       }
     }, 10000) // Poll every 10 seconds
-  }
-
-  const stopPolling = () => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current)
-      pollingIntervalRef.current = null
-      console.log('⏹️ Stopped notification polling')
-    }
   }
 
   // Initialize WebSocket connection
@@ -186,7 +184,7 @@ export const useRealTimeNotifications = () => {
     socket.on('connect_error', (error) => {
       console.log('❌ WebSocket connection error:', error.message)
       setIsConnected(false)
-      
+
       // Start polling fallback if WebSocket fails
       if (!pollingIntervalRef.current) {
         console.log('🔄 Starting polling fallback for notifications')
@@ -194,52 +192,67 @@ export const useRealTimeNotifications = () => {
       }
     })
 
-    // Listen for new notifications
+    // Listen for all notification types with smart routing
     socket.on('notification', (notification: Notification) => {
       console.log('🔔 New notification received:', notification)
-      
-      // Add to notifications list
-      setNotifications(prev => [notification, ...prev])
+
+      // Add to notifications list (bell notifications) - maintain chronological order
+      // These are PERSISTENT and independent of flash messages
+      setNotifications(prev => {
+        const updated = [notification, ...prev]
+        // Sort by createdAt to maintain proper order
+        const sorted = updated.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        console.log('🔔 Bell notification added (persistent, independent of flash)')
+        return sorted
+      })
       setUnreadCount(prev => prev + 1)
-      
-      // Show toast notification
-      showToastNotification(notification)
-    })
 
-    // Listen for permission updates
-    socket.on('permissionsUpdated', (data: any) => {
-      console.log('🔄 Permissions updated:', data)
-      
-      // Update user permissions in auth store directly
-      if (data.permissions) {
-        const { updateUser } = useAuthStore.getState()
-        updateUser({ permissions: data.permissions })
-        
-        toast.success('Your permissions have been updated', {
-          icon: '🔄',
-          duration: 4000
-        })
-        
-        console.log('✅ Permissions updated in store without reload')
+      // Emit custom event for bell component (without auto-opening modal)
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('newNotificationReceived', {
+          detail: notification
+        }))
       }
+
+      // Show contextual flash notification based on type (SEPARATE from bell notification)
+      showRealtimeUpdate(
+        notification.severity,
+        notification.title,
+        notification.message,
+        notification.severity === 'error' || notification.type.includes('payment')
+      )
     })
 
-    // Listen for role changes
+    // Listen for permission updates - both flash and bell notifications
+    socket.on('permissionsUpdated', (data: any) => {
+      console.log('🔄 Permissions updated (legacy event):', data)
+      handlePermissionUpdate(data)
+    })
+
+    socket.on('tenancyPermissionsUpdated', (data: any) => {
+      console.log('� Tenancy permissions updated:', data)
+      handlePermissionUpdate(data)
+    })
+
+    // Listen for role changes - both flash and bell notifications
     socket.on('roleChanged', (data: any) => {
       console.log('👤 Role changed:', data)
-      
-      // Update user role in auth store directly
+
       if (data.newRole) {
         const { updateUser } = useAuthStore.getState()
         updateUser({ role: data.newRole as UserRole })
-        
-        toast.success(`Your role has been updated to ${data.newRole}`, {
-          icon: '👤',
-          duration: 5000
-        })
-        
+
+        // Use smart notification system
+        showRoleChangeNotification(data.oldRole || 'previous role', data.newRole)
+
         console.log('✅ Role updated in store without reload')
       }
+    })
+
+    // Listen for feature updates - both flash and bell notifications
+    socket.on('tenancyFeaturesUpdated', (data: any) => {
+      console.log('✨ Tenancy features updated:', data)
+      showFeatureUpdateNotification(data)
     })
 
     // Cleanup on unmount
@@ -252,11 +265,18 @@ export const useRealTimeNotifications = () => {
     }
   }, [])
 
-  // Fetch initial notifications and start fallback if needed
+  // Fetch initial notifications and start fallback if needed - PREVENT UNNECESSARY RE-FETCHES
+  const hasInitiallyFetchedRef = useRef(false)
+
   useEffect(() => {
-    fetchNotifications()
-    fetchUnreadCount()
-    
+    // Only fetch on initial mount, not on every isConnected change
+    if (!hasInitiallyFetchedRef.current) {
+      console.log('🔄 Initial notification fetch (first time only)')
+      fetchNotifications()
+      fetchUnreadCount()
+      hasInitiallyFetchedRef.current = true
+    }
+
     // Start polling fallback after 5 seconds if WebSocket hasn't connected
     const fallbackTimer = setTimeout(() => {
       if (!isConnected && !pollingIntervalRef.current) {
@@ -264,20 +284,65 @@ export const useRealTimeNotifications = () => {
         startPolling()
       }
     }, 5000)
-    
+
     return () => clearTimeout(fallbackTimer)
-  }, [isConnected])
+  }, []) // Remove isConnected dependency to prevent re-fetches
 
   const fetchNotifications = async () => {
+    // DEBOUNCE: Prevent rapid re-fetches that could overwrite recent notifications
+    const now = Date.now()
+    if (now - lastFetchTimeRef.current < FETCH_DEBOUNCE_MS) {
+      console.log('🚫 Fetch debounced - preventing rapid re-fetch that could overwrite recent notifications')
+      return
+    }
+    lastFetchTimeRef.current = now
+
     try {
       const token = getAuthToken()
-      const response = await fetch(`${API_URL}/notifications?limit=20`, {
+      const response = await fetch(`${API_URL}/admin/notifications?limit=50&sort=createdAt:-1`, { // Increased limit and added sort
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include'
       })
       const data = await response.json()
       if (data.success) {
-        setNotifications(data.data.notifications || [])
+        // Sort notifications by createdAt in descending order (newest first)
+        const serverNotifications = (data.data.notifications || []).sort((a: Notification, b: Notification) => {
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        })
+
+        // PRESERVE RECENT NOTIFICATIONS: Merge with existing notifications, prioritizing recent ones
+        setNotifications(prev => {
+          if (prev.length === 0) {
+            // First fetch - use server data
+            console.log('🔄 First notification fetch - using server data')
+            return serverNotifications
+          } else {
+            // Subsequent fetch - preserve recent notifications and merge with server data
+            console.log('🔄 Preserving recent notifications during fetch')
+
+            // Get the most recent notification timestamp from current state
+            const mostRecentTime = prev.length > 0 ? new Date(prev[0].createdAt).getTime() : 0
+
+            // Only add server notifications that are newer than what we have, or fill gaps
+            const newServerNotifications = serverNotifications.filter(serverNotif => {
+              const serverTime = new Date(serverNotif.createdAt).getTime()
+              const existsInCurrent = prev.find(currentNotif => currentNotif._id === serverNotif._id)
+
+              // Include if it's newer than our most recent, or if it doesn't exist in current
+              return !existsInCurrent && serverTime >= mostRecentTime - (24 * 60 * 60 * 1000) // Within last 24 hours
+            })
+
+            // Merge and sort
+            const merged = [...prev, ...newServerNotifications]
+            const uniqueNotifications = merged.filter((notif, index, arr) =>
+              arr.findIndex(n => n._id === notif._id) === index
+            )
+
+            return uniqueNotifications.sort((a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            ).slice(0, 50) // Keep only latest 50
+          }
+        })
       }
     } catch (error) {
       console.error('Failed to fetch notifications:', error)
@@ -287,7 +352,7 @@ export const useRealTimeNotifications = () => {
   const fetchUnreadCount = async () => {
     try {
       const token = getAuthToken()
-      const response = await fetch(`${API_URL}/notifications/unread-count`, {
+      const response = await fetch(`${API_URL}/admin/notifications/unread-count`, {
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include'
       })
@@ -303,7 +368,7 @@ export const useRealTimeNotifications = () => {
   const markAsRead = async (notificationIds: string[]) => {
     try {
       const token = getAuthToken()
-      await fetch(`${API_URL}/notifications/mark-read`, {
+      await fetch(`${API_URL}/admin/notifications/mark-read`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -312,11 +377,11 @@ export const useRealTimeNotifications = () => {
         credentials: 'include',
         body: JSON.stringify({ notificationIds })
       })
-      
+
       // Update local state
-      setNotifications(prev => 
-        prev.map(notif => 
-          notificationIds.includes(notif._id) 
+      setNotifications(prev =>
+        prev.map(notif =>
+          notificationIds.includes(notif._id)
             ? { ...notif, isRead: true }
             : notif
         )
@@ -330,12 +395,12 @@ export const useRealTimeNotifications = () => {
   const markAllAsRead = async () => {
     try {
       const token = getAuthToken()
-      await fetch(`${API_URL}/notifications/read-all`, {
+      await fetch(`${API_URL}/admin/notifications/read-all`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include'
       })
-      
+
       // Update local state
       setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })))
       setUnreadCount(0)
@@ -346,9 +411,9 @@ export const useRealTimeNotifications = () => {
 
   const showToastNotification = (notification: Notification) => {
     const icon = getNotificationIcon(notification.icon, notification.severity)
-    
+
     const toastOptions = {
-      duration: notification.severity === 'error' ? 6000 : 4000,
+      duration: notification.severity === 'error' ? 15000 : 15000, // Changed both to 15000 (15 seconds)
       style: {
         background: '#fff',
         color: '#333',
@@ -389,6 +454,126 @@ export const useRealTimeNotifications = () => {
       </div>
     ), toastOptions)
   }
+
+  // Helper function to handle permission updates from WebSocket
+  const handlePermissionUpdate = useCallback(async (data: any) => {
+    console.log('🔄 Processing permission update:', data)
+
+    try {
+      // Always refresh from server to get latest data
+      const response = await fetch(`${API_URL}/auth/profile`, {
+        credentials: 'include'
+      })
+
+      if (response.ok) {
+        const profileData = await response.json()
+        if (profileData.success) {
+          const { handlePermissionUpdate } = useAuthStore.getState()
+
+          // Use the optimized permission update method to prevent re-renders
+          handlePermissionUpdate({
+            permissions: profileData.data.permissions,
+            features: profileData.data.features,
+            role: profileData.data.role
+          })
+
+          console.log('✅ Permissions refreshed from server without page re-render')
+
+          // Show smart notification - both flash (warning) and bell (system)
+          showPermissionUpdateNotification(data)
+
+          // Add to notification center for bell icon (batched update) - PERSISTENT
+          const notificationForCenter = {
+            _id: `permission-update-${Date.now()}`,
+            type: 'tenancy_permissions_updated',
+            title: 'Permissions Updated',
+            message: 'Your access permissions have been updated by SuperAdmin',
+            icon: 'shield-check',
+            severity: 'warning' as const,
+            data: {
+              permissions: profileData.data.permissions,
+              features: profileData.data.features
+            },
+            createdAt: new Date().toISOString(),
+            isRead: false
+          }
+
+          // Batch state updates to prevent multiple re-renders - BELL NOTIFICATIONS ARE PERSISTENT
+          setNotifications(prev => {
+            const updated = [notificationForCenter, ...prev]
+            const sorted = updated.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            console.log('🔔 Permission update added to bell (persistent, independent of flash)')
+            return sorted
+          })
+          setUnreadCount(prev => prev + 1)
+
+          // Trigger custom events for components to react WITHOUT causing re-renders
+          if (typeof window !== 'undefined') {
+            // Use a debounced custom event to prevent multiple rapid updates
+            clearTimeout((window as any).__permissionUpdateTimeout)
+              ; (window as any).__permissionUpdateTimeout = setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('permissionsUpdated', {
+                  detail: {
+                    permissions: profileData.data.permissions,
+                    features: profileData.data.features
+                  }
+                }))
+              }, 100) // 100ms debounce
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error refreshing permissions:', error)
+
+      // Fallback: use data from WebSocket if server refresh fails
+      if (data.updates?.permissions || data.permissions) {
+        const { handlePermissionUpdate } = useAuthStore.getState()
+        handlePermissionUpdate({
+          permissions: data.updates?.permissions || data.permissions
+        })
+
+        // Show smart notification - both flash (warning) and bell (system)
+        showPermissionUpdateNotification(data)
+
+        // Add to notification center for bell icon (batched update) - PERSISTENT
+        const fallbackNotification = {
+          _id: `permission-fallback-${Date.now()}`,
+          type: 'tenancy_permissions_updated',
+          title: 'Permissions Updated',
+          message: 'Your access permissions have been updated by SuperAdmin',
+          icon: 'shield-check',
+          severity: 'warning' as const,
+          data: {
+            permissions: data.updates?.permissions || data.permissions
+          },
+          createdAt: new Date().toISOString(),
+          isRead: false
+        }
+
+        // Batch state updates to prevent multiple re-renders - BELL NOTIFICATIONS ARE PERSISTENT
+        setNotifications(prev => {
+          const updated = [fallbackNotification, ...prev]
+          const sorted = updated.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          console.log('🔔 Fallback permission update added to bell (persistent)')
+          return sorted
+        })
+        setUnreadCount(prev => prev + 1)
+
+        // Trigger custom events for components to react WITHOUT causing re-renders
+        if (typeof window !== 'undefined') {
+          // Use a debounced custom event to prevent multiple rapid updates
+          clearTimeout((window as any).__permissionUpdateTimeout)
+            ; (window as any).__permissionUpdateTimeout = setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('permissionsUpdated', {
+                detail: {
+                  permissions: data.updates?.permissions || data.permissions
+                }
+              }))
+            }, 100) // 100ms debounce
+        }
+      }
+    }
+  }, [showPermissionUpdateNotification])
 
   return {
     notifications,

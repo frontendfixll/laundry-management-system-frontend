@@ -12,19 +12,18 @@ import ModernToaster from '@/components/ModernToast'
 import ConnectionStatus from '@/components/ConnectionStatus'
 import { useAuthStore } from '@/store/authStore'
 import { useRefreshPromptStore } from '@/store/refreshPromptStore'
-import { useRealTimeNotifications } from '@/hooks/useRealTimeNotifications'
+import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { usePermissionSync } from '@/hooks/usePermissionSync'
-import DashboardSkeleton from '@/components/DashboardSkeleton'
 
 function SupportLayoutContent({ children }: { children: React.ReactNode }) {
   const { isCollapsed, setMobileOpen } = useSupportSidebar()
   const { setAuth, user, _hasHydrated } = useAuthStore()
   const { showPrompt, setShowPrompt } = useRefreshPromptStore()
-  const { isConnected } = useRealTimeNotifications()
-  
+  const { isConnected } = useSocketIONotifications()
+
   // Enable real-time permission sync for support users too
   usePermissionSync({
     autoReload: false,
@@ -89,42 +88,29 @@ export default function SupportLayout({
   useEffect(() => {
     // Wait for store to hydrate
     if (!_hasHydrated) {
-      console.log('⏳ Waiting for auth store to hydrate...');
       return;
     }
-    
-    // Immediate check without timeout for better UX
+
+    // Quick check for better UX - no timeout needed
     if (!isAuthenticated || !user) {
-      console.log('⚠️ Not authenticated, redirecting to login');
       router.push('/auth/login');
       return;
     }
 
     if (user.role !== 'support') {
-      console.log('⚠️ User is not support, redirecting to login');
       router.push('/auth/login');
       return;
     }
 
-    console.log('✅ User authenticated as support');
     setIsLoading(false);
   }, [isAuthenticated, user, router, _hasHydrated]);
 
   if (!_hasHydrated || isLoading || !isAuthenticated || !user) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Show skeleton layout for better UX */}
-        <div className="lg:pl-64">
-          <div className="h-16 bg-white border-b border-gray-200 flex items-center px-6">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-48"></div>
-            </div>
-          </div>
-          <main className="p-4 lg:p-6">
-            <div className="max-w-screen-2xl mx-auto">
-              <DashboardSkeleton />
-            </div>
-          </main>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto mb-2"></div>
+          <p className="text-sm text-gray-600">Loading...</p>
         </div>
       </div>
     )

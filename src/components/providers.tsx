@@ -25,8 +25,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       </TenancyThemeProvider>
       <Toaster 
         position="top-center"
+        containerStyle={{
+          zIndex: 99999, // Higher than modal z-index (9999)
+        }}
         toastOptions={{
-          duration: 4000,
+          duration: 15000, // Changed from 4000 to 15000 (15 seconds)
           style: {
             background: '#ffffff',
             color: '#374151',
@@ -36,12 +39,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
             fontSize: '14px',
             fontWeight: '500',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            zIndex: 99999, // Ensure individual toasts also have high z-index
           },
           success: {
             style: {
               background: '#f0fdf4',
               color: '#166534',
               border: '1px solid #22c55e',
+              zIndex: 99999,
             },
             iconTheme: {
               primary: '#22c55e',
@@ -53,6 +58,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               background: '#fef2f2',
               color: '#991b1b',
               border: '1px solid #f87171',
+              zIndex: 99999,
             },
             iconTheme: {
               primary: '#f87171',

@@ -1,0 +1,244 @@
+/* Admin Header Right-Top Area Fix */
+
+/* Ensure proper z-index hierarchy */
+.admin-header {
+  z-index: 60 !important;
+  background-color: white !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+  height: 64px !important; /* Fixed height */
+}
+
+.admin-header-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  height: 64px !important;
+  padding: 0 24px !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Header Left Side */
+.admin-header .header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+/* Header Right Side */
+.admin-header .header-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+/* User Dropdown */
+.admin-header .user-dropdown {
+  position: relative !important;
+  z-index: 65 !important;
+}
+
+.user-dropdown-trigger {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 8px 12px !important;
+  border-radius: 12px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  min-width: 0 !important;
+}
+
+.user-dropdown-trigger:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+}
+
+.user-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+.user-info {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.user-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.user-role {
+  font-size: 12px !important;
+  color: #6b7280 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Notification panel positioning fix - positioned from top-right of viewport */
+.notification-panel {
+  position: fixed !important;
+  right: 24px !important;
+  top: 72px !important; /* Below header */
+  z-index: 70 !important;
+  max-width: 384px !important;
+  width: 384px !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* User dropdown positioning fix */
+.user-dropdown-panel {
+  position: absolute !important;
+  right: 0 !important;
+  top: 100% !important;
+  margin-top: 8px !important;
+  z-index: 70 !important;
+  width: 224px !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.mobile-menu-button:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+}
+
+/* Desktop Sidebar Toggle */
+.sidebar-toggle-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.sidebar-toggle-button:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+}
+
+/* Fix for mobile responsiveness */
+@media (max-width: 768px) {
+  .admin-header-container {
+    padding: 0 16px !important;
+  }
+  
+  .notification-panel {
+    width: 320px !important;
+    max-width: calc(100vw - 32px) !important;
+    right: 16px !important;
+  }
+  
+  .user-dropdown-panel {
+    width: 200px !important;
+    max-width: calc(100vw - 32px) !important;
+    right: 16px !important;
+  }
+  
+  .user-info {
+    display: none !important;
+  }
+  
+  .user-dropdown-trigger {
+    padding: 8px !important;
+    min-width: auto !important;
+  }
+}
+
+/* Ensure proper stacking context */
+.admin-layout {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-sidebar {
+  z-index: 50 !important;
+}
+
+.admin-header {
+  z-index: 60 !important;
+}
+
+.notification-dropdown,
+.user-dropdown {
+  z-index: 70 !important;
+}
+
+/* Fix any potential conflicts with modals */
+.modal-overlay {
+  z-index: 80 !important;
+}
+
+.modal-content {
+  z-index: 90 !important;
+}
+
+/* Toast notifications should be highest */
+.toast-container {
+  z-index: 100 !important;
+}
+
+/* Notification Bell Fixed Position Styling */
+.notification-bell-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  background-color: #f9fafb !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+.notification-bell-button:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+}

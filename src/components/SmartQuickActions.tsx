@@ -90,22 +90,8 @@ export function SmartQuickActions({ maxActions = 6, showAnalytics = false }: Sma
               <div className="font-semibold text-gray-800">{action.name}</div>
               <div className="text-xs text-gray-500 flex items-center gap-2">
                 {action.description}
-                {showAnalytics && action.clickCount > 0 && (
-                  <span className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full text-xs">
-                    {action.clickCount} clicks
-                  </span>
-                )}
               </div>
             </div>
-
-            {/* Click count badge for popular actions */}
-            {action.clickCount > 0 && (
-              <div className="ml-2">
-                <div className="w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">
-                  {action.clickCount}
-                </div>
-              </div>
-            )}
           </Link>
         ))}
       </div>
