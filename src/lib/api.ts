@@ -5,9 +5,12 @@ import toast from 'react-hot-toast'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
+// Ensure API_URL ends with /api for proper endpoint construction
+const baseURL = API_URL?.endsWith('/api') ? API_URL : `${API_URL}/api`
+
 // Create axios instance
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: baseURL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -55,8 +55,8 @@ export default function LoginPage() {
       // The path might be /[tenant]/auth/login
       const pathTenant = pathSegments.length >= 3 && pathSegments[1] === 'auth' ? pathSegments[0] : null
 
-      // Determine which tenant to use
-      const identifiedSlug = subdomain || pathTenant || tenantParam || lastTenant
+      // Determine which tenant to use - fallback to 'test' if none found
+      const identifiedSlug = subdomain || pathTenant || tenantParam || lastTenant || 'test'
       setTenantSlug(identifiedSlug)
 
       console.log('🔍 Login Page - Hostname:', hostname)
