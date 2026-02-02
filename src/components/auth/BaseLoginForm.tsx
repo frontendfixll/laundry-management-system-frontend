@@ -84,9 +84,20 @@ export default function BaseLoginForm({
             redirectPath = redirectUrl;
             console.log(`🔄 Customer redirect (URL already has tenant): ${redirectPath}`);
           } else if (redirectUrl.startsWith('/')) {
-            // Redirect URL is absolute but doesn't have tenant, prepend tenant slug
-            redirectPath = `/${tenantSlug}${redirectUrl}`;
-            console.log(`🔄 Customer redirect with tenant context: ${redirectPath}`);
+            // For subdomain-based tenants, redirect URL should be used as-is
+            // because the subdomain already provides the tenant context
+            const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+            const isSubdomainTenant = hostname.includes('.') && !hostname.startsWith('localhost');
+            
+            if (isSubdomainTenant) {
+              // For subdomain tenants (e.g., tenacy.laundrylobby.com), use redirect URL as-is
+              redirectPath = redirectUrl;
+              console.log(`🔄 Customer redirect (subdomain tenant): ${redirectPath}`);
+            } else {
+              // For path-based tenants (e.g., localhost:3000/tenant), prepend tenant slug
+              redirectPath = `/${tenantSlug}${redirectUrl}`;
+              console.log(`🔄 Customer redirect with tenant context: ${redirectPath}`);
+            }
           } else {
             // Redirect URL is relative, build full path
             redirectPath = `/${tenantSlug}/${redirectUrl}`;
@@ -94,8 +105,18 @@ export default function BaseLoginForm({
           }
         } else if (tenantSlug) {
           // If no redirect URL but we have tenant context, go to tenant dashboard
-          redirectPath = `/${tenantSlug}/dashboard`;
-          console.log(`🔄 Customer redirect to tenant dashboard: ${redirectPath}`);
+          const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+          const isSubdomainTenant = hostname.includes('.') && !hostname.startsWith('localhost');
+          
+          if (isSubdomainTenant) {
+            // For subdomain tenants, go to root dashboard
+            redirectPath = '/dashboard';
+            console.log(`🔄 Customer redirect to subdomain tenant dashboard: ${redirectPath}`);
+          } else {
+            // For path-based tenants, include tenant slug
+            redirectPath = `/${tenantSlug}/dashboard`;
+            console.log(`🔄 Customer redirect to tenant dashboard: ${redirectPath}`);
+          }
         } else {
           // Fallback to regular customer dashboard
           redirectPath = '/customer/dashboard';
