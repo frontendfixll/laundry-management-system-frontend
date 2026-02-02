@@ -72,25 +72,38 @@ export default function BaseLoginForm({
         toast.dismiss(successToast);
       }, 500);
 
-      // Strict role-based redirect logic - no exceptions
-      const roleRoutes: Record<string, string> = {
-        customer: '/customer/dashboard',
-        admin: '/admin/dashboard',
-        branch_admin: '/branch-admin/dashboard',
-        center_admin: '/center-admin/dashboard',
-        branch_manager: '/center-admin/dashboard',
-        staff: '/staff/dashboard',
-        superadmin: '/superadmin/dashboard',
-        support: '/support/dashboard', // Add support role
-      };
+      // Handle tenant-aware redirects
+      let redirectPath: string;
 
-      // Always redirect to role-specific dashboard (ignore redirect URL for non-customers)
-      let redirectPath = roleRoutes[user.role] || '/auth/login';
+      if (user.role === 'customer') {
+        // For customers, check if we have a redirect URL and tenant context
+        if (redirectUrl && tenantSlug) {
+          // If redirect URL is provided and we're in tenant context, redirect to tenant-specific URL
+          redirectPath = `/${tenantSlug}${redirectUrl}`;
+          console.log(`🔄 Customer redirect with tenant context: ${redirectPath}`);
+        } else if (tenantSlug) {
+          // If no redirect URL but we have tenant context, go to tenant dashboard
+          redirectPath = `/${tenantSlug}/dashboard`;
+          console.log(`🔄 Customer redirect to tenant dashboard: ${redirectPath}`);
+        } else {
+          // Fallback to regular customer dashboard
+          redirectPath = '/customer/dashboard';
+          console.log(`🔄 Customer redirect to regular dashboard: ${redirectPath}`);
+        }
+      } else {
+        // For non-customers, use role-based routing
+        const roleRoutes: Record<string, string> = {
+          admin: '/admin/dashboard',
+          branch_admin: '/branch-admin/dashboard',
+          center_admin: '/center-admin/dashboard',
+          branch_manager: '/center-admin/dashboard',
+          staff: '/staff/dashboard',
+          superadmin: '/superadmin/dashboard',
+          support: '/support/dashboard',
+        };
 
-      // Prefix with tenant slug if provided and on localhost to maintain context
-      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-      if (tenantSlug && isLocalhost && !redirectPath.startsWith(`/${tenantSlug}`)) {
-        redirectPath = `/${tenantSlug}${redirectPath}`;
+        redirectPath = roleRoutes[user.role] || '/auth/login';
+        console.log(`🔄 Non-customer redirect: ${redirectPath}`);
       }
 
       console.log(`🔄 Login successful - redirecting ${user.role} to: ${redirectPath}`);
