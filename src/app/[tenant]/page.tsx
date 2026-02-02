@@ -9,8 +9,9 @@ import BookingModal from '@/components/BookingModal'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
 import { TenantProvider } from '@/contexts/TenantContext'
-import BannerCarousel from '@/components/customer/BannerCarousel'
+import toast from 'react-hot-toast'
 import BannerDisplay from '@/components/customer/BannerDisplay'
+import BannerCarousel from '@/components/customer/BannerCarousel'
 
 // Dynamic imports for templates
 const OriginalTemplate = dynamic(() => import('@/components/landing/templates/OriginalTemplate'), { ssr: false })
@@ -61,7 +62,7 @@ interface TenantBranding {
 function mapHexToThemeColor(hex?: string): ThemeColor {
   if (!hex) return 'teal'
   const lowerHex = hex.toLowerCase()
-  
+
   // Check for teal/cyan colors
   if (lowerHex.includes('14b8a6') || lowerHex.includes('0d9488') || lowerHex.includes('2dd4bf')) return 'teal'
   // Check for blue colors
@@ -72,7 +73,7 @@ function mapHexToThemeColor(hex?: string): ThemeColor {
   if (lowerHex.includes('f97316') || lowerHex.includes('ea580c') || lowerHex.includes('fb923c')) return 'orange'
   // Check for green colors
   if (lowerHex.includes('22c55e') || lowerHex.includes('16a34a') || lowerHex.includes('10b981')) return 'teal'
-  
+
   return 'teal'
 }
 
@@ -81,9 +82,9 @@ export default function TenantLandingPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tenant = params.tenant as string
-  
+
   const { isAuthenticated, user } = useAuthStore()
-  
+
   const [tenantData, setTenantData] = useState<TenantBranding | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -96,20 +97,20 @@ export default function TenantLandingPage() {
         setLoading(true)
         setError(null)
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-        
+
         console.log('Fetching tenant branding for:', tenant)
         const response = await fetch(`${apiUrl}/public/tenancy/branding/${tenant}`)
-        
+
         const data = await response.json()
         console.log('Tenant branding response:', data)
-        
+
         if (!response.ok || !data.success) {
           setError('not_found')
           return
         }
-        
+
         setTenantData(data.data)
-        
+
         // Save tenant slug to sessionStorage for auth pages to use
         console.log('🏪 Tenant Page - Saving tenant to sessionStorage:', tenant)
         sessionStorage.setItem('lastVisitedTenant', tenant as string)
@@ -151,7 +152,7 @@ export default function TenantLandingPage() {
     const moveBannerBeforeFooter = () => {
       const bannerSection = document.getElementById('promotional-banner-section')
       const footer = document.querySelector('footer')
-      
+
       if (bannerSection && footer && footer.parentNode) {
         // Move banner before footer
         footer.parentNode.insertBefore(bannerSection, footer)
@@ -165,6 +166,31 @@ export default function TenantLandingPage() {
 
   const handleBookNow = () => {
     console.log('handleBookNow called, isAuthenticated:', isAuthenticated)
+
+    // Check if user is a tenant admin trying to place order
+    if (isAuthenticated && user) {
+      const adminRoles = ['admin', 'tenant_admin', 'tenant_owner', 'branch_admin', 'superadmin', 'super_admin']
+      if (adminRoles.includes(user.role)) {
+        // Show flash message for admin users
+        toast.error('Please login with another email to place an order. Admin accounts cannot place orders.', {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            background: '#FEF2F2',
+            color: '#DC2626',
+            border: '1px solid #FECACA',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            fontSize: '14px',
+            fontWeight: '500',
+            maxWidth: '400px',
+          },
+          icon: '🚫',
+        })
+        return
+      }
+    }
+
     if (!isAuthenticated) {
       // Redirect to login with return URL (properly encoded)
       const returnUrl = encodeURIComponent(`/${tenant}?openBooking=true`)
@@ -203,8 +229,8 @@ export default function TenantLandingPage() {
           <p className="text-gray-500 mb-8">
             The laundry "<strong>{tenant}</strong>" doesn't exist or is not active.
           </p>
-          <a 
-            href="/" 
+          <a
+            href="/"
             className="inline-flex items-center px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
           >
             Go to Homepage
@@ -217,7 +243,7 @@ export default function TenantLandingPage() {
   // Get template and theme - prioritize branding.landingPageTemplate
   const template = tenantData.branding?.landingPageTemplate || tenantData.landingPageTemplate || 'original'
   const themeColor = mapHexToThemeColor(tenantData.branding?.theme?.primaryColor)
-  
+
   // Common props for all templates
   const templateProps = {
     themeColor,
@@ -259,7 +285,7 @@ export default function TenantLandingPage() {
   }
 
   return (
-    <TenantProvider 
+    <TenantProvider
       tenant={{
         name: tenantData.name,
         slug: tenantData.slug,
@@ -280,17 +306,17 @@ export default function TenantLandingPage() {
       <div className="relative">
         {/* Global Strip Banner - Top of page */}
         <BannerDisplay position="GLOBAL_STRIP_TOP" />
-        
+
         {/* Home Hero Banner - Large banner at top */}
         <BannerDisplay position="HOME_HERO_TOP" className="mb-6" />
-        
+
         {renderTemplate()}
-        
+
         {/* Home Slider Banner - Mid page carousel */}
         <div className="my-8">
           <BannerDisplay position="HOME_SLIDER_MID" />
         </div>
-        
+
         {/* Promotional Banner Section - Will appear before footer */}
         <div id="promotional-banner-section" className="w-full bg-gradient-to-b from-gray-50 to-white py-12 border-t border-gray-100">
           <div className="container mx-auto px-4">
@@ -298,16 +324,16 @@ export default function TenantLandingPage() {
             <BannerCarousel page="HOME" />
           </div>
         </div>
-        
+
         {/* Home Strip Banner - Bottom */}
         <BannerDisplay position="HOME_STRIP_BOTTOM" />
-        
+
         {/* Global Floating Corner Banner */}
         <BannerDisplay position="GLOBAL_FLOATING_CORNER" />
       </div>
-      
-      <BookingModal 
-        isOpen={showBookingModal} 
+
+      <BookingModal
+        isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onLoginRequired={handleLoginRequired}
         tenantBranches={tenantData.branches}

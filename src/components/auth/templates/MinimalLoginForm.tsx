@@ -16,7 +16,7 @@ export default function MinimalLoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const setAuth = useAuthStore((state) => state.setAuth)
-  const redirectUrl = searchParams.get('redirect')
+  const redirectUrl = searchParams?.get('redirect')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,7 +58,7 @@ export default function MinimalLoginForm() {
           <div className="absolute bottom-32 right-16 w-32 h-32 border border-white rounded-full"></div>
           <div className="absolute bottom-20 left-32 w-16 h-16 border border-white rounded-full"></div>
         </div>
-        
+
         <div className="relative z-10 max-w-md">
           {/* Logo */}
           <div className="flex items-center space-x-3 mb-8">
@@ -73,12 +73,12 @@ export default function MinimalLoginForm() {
             Simplicity<br />
             <span className="text-indigo-300 font-normal">Redefined</span>
           </h1>
-          
+
           {/* Description */}
           <p className="text-lg text-gray-300 font-light mb-10">
             Experience the future of laundry services with our premium care and attention to detail.
           </p>
-          
+
           {/* Features */}
           <div className="space-y-5">
             <div className="flex items-start space-x-4">
@@ -200,17 +200,6 @@ export default function MinimalLoginForm() {
                 <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100">
                   <input type="radio" name="demo" className="text-indigo-600" onChange={() => setFormData({ email: 'supportadmin@laundrypro.com', password: 'deep2025' })} />
                   <span className="text-xs text-gray-600">Support</span>
-                </label>
-              </div>
-              {/* Second row: 2 items centered */}
-              <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-                <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100">
-                  <input type="radio" name="demo" className="text-indigo-600" onChange={() => setFormData({ email: 'finance@gmail.com', password: 'finance2025' })} />
-                  <span className="text-xs text-gray-600">Finance</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100">
-                  <input type="radio" name="demo" className="text-indigo-600" onChange={() => setFormData({ email: 'auditor@gmail.com', password: 'auditor2025' })} />
-                  <span className="text-xs text-gray-600">Auditor</span>
                 </label>
               </div>
             </div>

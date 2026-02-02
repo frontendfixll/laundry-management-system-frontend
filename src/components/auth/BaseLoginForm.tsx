@@ -20,10 +20,10 @@ interface BaseLoginFormProps {
   }
 }
 
-export default function BaseLoginForm({ 
-  template, 
-  leftSideContent, 
-  customStyling 
+export default function BaseLoginForm({
+  template,
+  leftSideContent,
+  customStyling
 }: BaseLoginFormProps) {
   const [formData, setFormData] = useState({
     email: '',
@@ -34,8 +34,8 @@ export default function BaseLoginForm({
   const router = useRouter()
   const searchParams = useSearchParams()
   const setAuth = useAuthStore((state) => state.setAuth)
-  
-  const redirectUrl = searchParams.get('redirect')
+
+  const redirectUrl = searchParams?.get('redirect')
   const theme = getTemplateTheme(template)
   const content = getTemplateContent(template)
 
@@ -46,11 +46,11 @@ export default function BaseLoginForm({
     try {
       const response = await authAPI.login(formData);
       console.log('Login response:', response);
-      
+
       // Extract token and user from the correct location
       const token = response.data?.token || response.data?.data?.token;
       const user = response.data?.user || response.data?.data?.user;
-      
+
       console.log('Extracted token:', token ? 'Found' : 'Not found');
       console.log('Extracted user:', user ? 'Found' : 'Not found');
 
@@ -59,12 +59,12 @@ export default function BaseLoginForm({
       }
 
       setAuth(user, token);
-      
+
       // Show success message very briefly and dismiss quickly
       const successToast = toast.success('Login successful!', {
         duration: 800, // Show for only 800ms
       });
-      
+
       // Dismiss success toast even more quickly for faster UX
       setTimeout(() => {
         toast.dismiss(successToast);
@@ -84,20 +84,20 @@ export default function BaseLoginForm({
 
       // Always redirect to role-specific dashboard (ignore redirect URL for non-customers)
       const redirectPath = roleRoutes[user.role] || '/auth/login';
-      
+
       console.log(`🔄 Login successful - redirecting ${user.role} to: ${redirectPath}`);
-      
+
       // Immediate redirect for faster UX
       router.push(redirectPath);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Login failed';
-      
+
       if (error.response?.data?.requiresEmailVerification) {
         toast.error('Please verify your email address before logging in');
         router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
         return;
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -119,8 +119,8 @@ export default function BaseLoginForm({
     <div className={containerClass}>
       {/* Back Button - Fixed Top Left */}
       <div className="absolute top-6 left-6 z-20">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className={`inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm text-${theme.primary}-600 hover:text-${theme.primary}-700 hover:bg-white transition-all duration-200`}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -138,7 +138,7 @@ export default function BaseLoginForm({
         )}
 
         {/* Right Side - Login Form */}
-        <div className={`w-full ${leftSideContent ? 'lg:w-[45%]' : 'max-w-md'} flex items-center justify-center px-6 py-12 lg:px-12`}>
+        <div className={`w-full ${leftSideContent ? 'lg:w-[45%]' : 'max-w-md'} flex items-start justify-start px-6 pt-24 lg:px-12`}>
           <div className="w-full max-w-md">
             {/* Login Form Card */}
             <div className={formCardClass}>
@@ -282,27 +282,6 @@ export default function BaseLoginForm({
                       onChange={() => setFormData({ email: 'supportadmin@laundrypro.com', password: 'deep2025' })}
                     />
                     <span className="text-xs text-gray-600">Support</span>
-                  </label>
-                </div>
-                {/* Second row: 2 items centered */}
-                <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <input
-                      type="radio"
-                      name="demoAccount"
-                      className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
-                      onChange={() => setFormData({ email: 'finance@gmail.com', password: 'finance2025' })}
-                    />
-                    <span className="text-xs text-gray-600">Finance</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <input
-                      type="radio"
-                      name="demoAccount"
-                      className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
-                      onChange={() => setFormData({ email: 'auditor@gmail.com', password: 'auditor2025' })}
-                    />
-                    <span className="text-xs text-gray-600">Auditor</span>
                   </label>
                 </div>
               </div>

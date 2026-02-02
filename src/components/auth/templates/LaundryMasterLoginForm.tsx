@@ -185,33 +185,12 @@ export default function LaundryMasterLoginForm() {
                     <span className="text-xs font-medium text-gray-700">🎧</span>
                   </button>
                 </div>
-                {/* Second row: 2 items */}
-                <div className="grid grid-cols-2 gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ email: 'finance@gmail.com', password: 'finance2025' })}
-                    className="flex items-center justify-center py-1.5 px-1 rounded-md bg-white hover:bg-purple-100 border border-purple-300 transition-colors"
-                  >
-                    <span className="text-xs font-medium text-gray-700">💰</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ email: 'auditor@gmail.com', password: 'auditor2025' })}
-                    className="flex items-center justify-center py-1.5 px-1 rounded-md bg-white hover:bg-purple-100 border border-purple-300 transition-colors"
-                  >
-                    <span className="text-xs font-medium text-gray-700">🔍</span>
-                  </button>
-                </div>
                 {/* Labels row */}
                 <div className="space-y-1">
                   <div className="grid grid-cols-3 gap-1 text-center">
                     <span className="text-xs text-gray-600">Customer</span>
                     <span className="text-xs text-gray-600">Admin</span>
                     <span className="text-xs text-gray-600">Support</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1 text-center">
-                    <span className="text-xs text-gray-600">Finance</span>
-                    <span className="text-xs text-gray-600">Auditor</span>
                   </div>
                 </div>
               </div>

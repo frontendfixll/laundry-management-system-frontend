@@ -17,7 +17,7 @@ export default function FreshSpinLoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const setAuth = useAuthStore((state) => state.setAuth)
-  const redirectUrl = searchParams.get('redirect')
+  const redirectUrl = searchParams?.get('redirect')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -166,31 +166,6 @@ export default function FreshSpinLoginForm() {
                     <span className="text-xs text-gray-600">Support</span>
                   </label>
                 </div>
-                {/* Second row: 2 items centered */}
-                <div className="grid grid-cols-2 gap-2 max-w-xs mx-auto">
-                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <input
-                      type="radio"
-                      name="demoAccount"
-                      className="w-4 h-4 text-violet-600 focus:ring-violet-500"
-                      onChange={() => {
-                        setFormData({ email: 'finance@gmail.com', password: 'finance2025' })
-                      }}
-                    />
-                    <span className="text-xs text-gray-600">Finance</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <input
-                      type="radio"
-                      name="demoAccount"
-                      className="w-4 h-4 text-violet-600 focus:ring-violet-500"
-                      onChange={() => {
-                        setFormData({ email: 'auditor@gmail.com', password: 'auditor2025' })
-                      }}
-                    />
-                    <span className="text-xs text-gray-600">Auditor</span>
-                  </label>
-                </div>
               </div>
             </div>
           </div>
@@ -206,9 +181,9 @@ export default function FreshSpinLoginForm() {
       <div className="hidden lg:block lg:w-[55%] bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full" style={{backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px'}}></div>
+          <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
         </div>
-        
+
         {/* Floating Elements */}
         <div className="absolute top-20 left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-20 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl"></div>

@@ -48,9 +48,9 @@ interface UseSocketIONotificationsReturn {
   refresh: () => Promise<void>;
 }
 
-const SOCKET_URL = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:5000'
-  : window.location.origin;
+const SOCKET_URL = typeof window !== 'undefined'
+  ? (process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : window.location.origin)
+  : 'http://localhost:5000'; // Fallback for SSR/SSG
 
 export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
   const [notifications, setNotifications] = useState<Notification[]>([]);

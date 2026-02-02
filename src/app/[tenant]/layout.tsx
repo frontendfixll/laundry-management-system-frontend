@@ -41,27 +41,6 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Redirect admins away from tenant pages (except in preview mode)
-  useEffect(() => {
-    if (user && ['admin', 'center_admin', 'branch_admin', 'branch_manager'].includes(user.role)) {
-      // Allow access in preview mode
-      if (!isAdminPreviewMode) {
-        const adminDashboardRoutes: Record<string, string> = {
-          admin: '/admin/dashboard',
-          center_admin: '/center-admin/dashboard',
-          branch_admin: '/branch-admin/dashboard',
-          branch_manager: '/center-admin/dashboard'
-        }
-        
-        const adminDashboard = adminDashboardRoutes[user.role]
-        if (adminDashboard) {
-          console.log(`🔄 Admin ${user.role} accessing tenant page, redirecting to: ${adminDashboard}`)
-          router.replace(adminDashboard)
-          return
-        }
-      }
-    }
-  }, [user, router, isAdminPreviewMode])
 
   useEffect(() => {
     const fetchTenantBranding = async () => {
@@ -69,20 +48,20 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
         setLoading(true)
         setError(null)
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-        
+
         console.log('🏪 [TenantLayout] Fetching tenant branding for:', tenant)
         const response = await fetch(`${apiUrl}/public/tenancy/branding/${tenant}`)
-        
+
         const data = await response.json()
         console.log('🏪 [TenantLayout] Tenant branding response:', data)
-        
+
         if (!response.ok || !data.success) {
           setError('not_found')
           return
         }
-        
+
         setTenantData(data.data)
-        
+
         // Save tenant slug to sessionStorage for auth pages to use
         console.log('🏪 [TenantLayout] Saving tenant to sessionStorage:', tenant)
         sessionStorage.setItem('lastVisitedTenant', tenant as string)
@@ -121,8 +100,8 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
           <p className="text-gray-500 mb-8">
             The laundry "<strong>{tenant}</strong>" doesn't exist or is not active.
           </p>
-          <a 
-            href="/" 
+          <a
+            href="/"
             className="inline-flex items-center px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
           >
             Go to Homepage
@@ -136,7 +115,7 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
   const template = tenantData.branding?.landingPageTemplate || tenantData.landingPageTemplate || 'original'
 
   return (
-    <TenantProvider 
+    <TenantProvider
       tenant={{
         name: tenantData.name,
         slug: tenantData.slug,
