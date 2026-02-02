@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSuperAdminStore } from '@/store/superAdminStore'
-import { 
+import {
   LayoutDashboard,
   Building2,
   Users,
@@ -68,15 +68,15 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
     <>
       {/* Mobile Overlay */}
       {mobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onMobileClose}
         />
       )}
-      
+
       {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-xl transition-all duration-300 flex flex-col w-64 ${sidebarWidth} ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-        
+
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-gray-200">
           {/* Logo - always show on mobile, conditionally on desktop */}
@@ -89,7 +89,7 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
               <p className="text-xs text-gray-500">LaundryLobby</p>
             </div>
           </div>
-          
+
           {/* Buttons */}
           <div className="flex items-center">
             {/* Mobile close button */}
@@ -99,7 +99,7 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
-            
+
             {/* Desktop collapse toggle */}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -120,20 +120,19 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
         <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto min-h-0">
           {navigation.map((item) => {
             if (!hasPermission(item.permission)) return null
-            
+
             const isActive = pathname === item.href
             const Icon = item.icon
-            
+
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={onMobileClose}
-                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  isActive
+                className={`group flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-colors ${isActive
                     ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 <Icon className={`flex-shrink-0 w-5 h-5 mr-3 ${sidebarCollapsed ? 'lg:mx-auto lg:mr-0' : ''} ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'}`} />
                 {/* Always show text on mobile, conditionally on desktop */}
@@ -152,7 +151,7 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
             <LogOut className={`flex-shrink-0 w-5 h-5 mr-3 ${sidebarCollapsed ? 'lg:mr-0' : ''} text-gray-400 group-hover:text-red-500`} />
             <div className={`${sidebarCollapsed ? 'lg:hidden' : ''} flex items-center justify-between w-full`}>
               <span>Sign Out</span>
-              <span className="text-xs text-gray-400">v2.1.0</span>
+              <span className="text-xs text-gray-400">v1.0.0</span>
             </div>
           </button>
         </div>

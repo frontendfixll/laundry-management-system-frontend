@@ -48,9 +48,9 @@ const navigation = [
   { name: 'Services', href: '/admin/services', icon: Sparkles },
   { name: 'Branches', href: '/admin/branches', icon: MapPin },
   { name: 'Branch Admins', href: '/admin/branch-admins', icon: Users },
-  { 
-    name: 'Programs', 
-    icon: Gift, 
+  {
+    name: 'Programs',
+    icon: Gift,
     isExpandable: true,
     subItems: [
       { name: 'Campaigns', href: '/admin/campaigns', icon: Target },
@@ -63,9 +63,9 @@ const navigation = [
     ]
   },
   { name: 'Logistics', href: '/admin/logistics', icon: Truck },
-  { 
-    name: 'Support', 
-    icon: Shield, 
+  {
+    name: 'Support',
+    icon: Shield,
     isExpandable: true,
     subItems: [
       { name: 'Support Users', href: '/admin/support/users', icon: Users },
@@ -76,9 +76,9 @@ const navigation = [
   { name: 'Refunds', href: '/admin/refunds', icon: RefreshCw },
   { name: 'Payments', href: '/admin/payments', icon: CreditCard },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-  { 
-    name: 'Marketplace', 
-    icon: ShoppingBag, 
+  {
+    name: 'Marketplace',
+    icon: ShoppingBag,
     isExpandable: true,
     subItems: [
       { name: 'My Add-ons', href: '/admin/addons/my-addons', icon: Package },
@@ -102,11 +102,11 @@ interface SidebarContextType {
 
 const SidebarContext = createContext<SidebarContextType>({
   isCollapsed: false,
-  setIsCollapsed: () => {},
+  setIsCollapsed: () => { },
   mobileOpen: false,
-  setMobileOpen: () => {},
+  setMobileOpen: () => { },
   expandedItems: [],
-  toggleExpanded: () => {},
+  toggleExpanded: () => { },
 })
 
 export const useAdminSidebar = () => useContext(SidebarContext)
@@ -121,7 +121,7 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
     if (saved) {
       setIsCollapsed(JSON.parse(saved))
     }
-    
+
     const savedExpanded = localStorage.getItem('admin-sidebar-expanded')
     if (savedExpanded) {
       setExpandedItems(JSON.parse(savedExpanded))
@@ -137,17 +137,17 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
     const newExpanded = expandedItems.includes(itemName)
       ? expandedItems.filter(item => item !== itemName)
       : [...expandedItems, itemName]
-    
+
     setExpandedItems(newExpanded)
     localStorage.setItem('admin-sidebar-expanded', JSON.stringify(newExpanded))
   }
 
   return (
     <SidebarContext.Provider
-      value={{ 
-        isCollapsed, 
-        setIsCollapsed: handleSetCollapsed, 
-        mobileOpen, 
+      value={{
+        isCollapsed,
+        setIsCollapsed: handleSetCollapsed,
+        mobileOpen,
         setMobileOpen,
         expandedItems,
         toggleExpanded
@@ -160,12 +160,28 @@ export function AdminSidebarProvider({ children }: { children: React.ReactNode }
 
 export function AdminSidebar() {
   const { logout, user } = useAuthStore()
-  const pathname = usePathname()
+  const pathname = usePathname() || ''
   const { isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen, expandedItems, toggleExpanded } = useAdminSidebar()
 
   const handleLogout = () => {
     logout()
-    window.location.href = '/'
+    // Redirect to tenant landing page if available to maintain context
+    const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : []
+    const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+    let slug = tenantCookie ? tenantCookie.split('=')[1] : null
+
+    // Fallback: Check URL path if cookie is missing
+    if (!slug && typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean)
+      const potentialSlug = pathSegments[0]
+      // Check if the first segment is not a reserved route
+      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      if (potentialSlug && !reserved.includes(potentialSlug)) {
+        slug = potentialSlug
+      }
+    }
+
+    window.location.href = slug ? `/${slug}` : '/'
   }
 
   const handleLinkClick = () => {
@@ -181,7 +197,7 @@ export function AdminSidebar() {
       return pathname === item.href || pathname.startsWith(item.href + '/')
     }
     if (item.subItems) {
-      return item.subItems.some((subItem: any) => 
+      return item.subItems.some((subItem: any) =>
         pathname === subItem.href || pathname.startsWith(subItem.href + '/')
       )
     }
@@ -199,11 +215,10 @@ export function AdminSidebar() {
           {/* Parent Item */}
           <button
             onClick={() => toggleExpanded(item.name)}
-            className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-              isActive
-                ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-            }`}
+            className={`group flex items-center w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors ${isActive
+              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
+              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+              }`}
           >
             <Icon className={`flex-shrink-0 w-5 h-5 mr-4 ${isCollapsed ? 'lg:mx-auto lg:mr-0' : ''} ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'}`} />
             {/* Always show text on mobile, conditionally on desktop */}
@@ -231,11 +246,10 @@ export function AdminSidebar() {
                     key={subItem.name}
                     href={subItem.href}
                     onClick={handleLinkClick}
-                    className={`group flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${
-                      isSubActive
-                        ? 'bg-blue-100 text-blue-700 border-l-4 border-blue-500 shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
+                    className={`group flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${isSubActive
+                      ? 'bg-blue-100 text-blue-700 border-l-4 border-blue-500 shadow-sm'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
                   >
                     <SubIcon className={`flex-shrink-0 w-4 h-4 mr-3 ${isSubActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-600'}`} />
                     <span className="font-medium">{subItem.name}</span>
@@ -254,11 +268,10 @@ export function AdminSidebar() {
         key={item.name}
         href={item.href}
         onClick={handleLinkClick}
-        className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-          isActive
-            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-        }`}
+        className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${isActive
+          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
+          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+          }`}
       >
         <Icon className={`flex-shrink-0 w-5 h-5 mr-4 ${isCollapsed ? 'lg:mx-auto lg:mr-0' : ''} ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'}`} />
         {/* Always show text on mobile, conditionally on desktop */}
@@ -274,15 +287,15 @@ export function AdminSidebar() {
     <>
       {/* Mobile Overlay */}
       {mobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
-      
+
       {/* Sidebar - Start from top */}
       <div className={`admin-sidebar fixed top-0 bottom-0 left-0 z-50 bg-white shadow-xl transition-all duration-300 flex flex-col w-72 ${sidebarWidth} ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
-        
+
         {/* Header - Fixed height to match main header */}
         <div className="sidebar-header flex-shrink-0 flex items-center justify-between h-16 px-4 border-b border-gray-200 bg-white">
           {/* Logo - always show on mobile, conditionally on desktop */}
@@ -294,7 +307,7 @@ export function AdminSidebar() {
               <h1 className="text-lg font-bold text-gray-900 truncate">LaundryLobby</h1>
             </div>
           </div>
-          
+
           {/* Collapsed Logo - show only when collapsed on desktop */}
           {isCollapsed && (
             <div className="sidebar-collapsed-logo hidden lg:flex items-center justify-center w-full">
@@ -303,7 +316,7 @@ export function AdminSidebar() {
               </div>
             </div>
           )}
-          
+
           {/* Buttons */}
           <div className="sidebar-header-buttons flex items-center flex-shrink-0">
             {/* Mobile close button - Only show on mobile */}
@@ -314,7 +327,7 @@ export function AdminSidebar() {
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
-            
+
             {/* Desktop collapse toggle - Main collapse control */}
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}

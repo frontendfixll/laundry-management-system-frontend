@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { 
-  Sparkles, ChevronDown, ShoppingBag, MapPin, User, LogOut, Menu, X, 
+import {
+  Sparkles, ChevronDown, ShoppingBag, MapPin, User, LogOut, Menu, X,
   Phone, Waves, Mail, Clock, Sun, Moon, Globe, Check
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
@@ -23,23 +23,23 @@ const languageOptions = [
 ]
 
 const colorClasses = {
-  teal: { 
-    primary: 'bg-teal-500', hover: 'hover:bg-teal-600', text: 'text-teal-500', 
+  teal: {
+    primary: 'bg-teal-500', hover: 'hover:bg-teal-600', text: 'text-teal-500',
     border: 'border-teal-500', hoverText: 'hover:text-teal-500', lightBg: 'hover:bg-teal-50',
     light: 'bg-teal-50', accent: '#14b8a6'
   },
-  blue: { 
-    primary: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-blue-500', 
+  blue: {
+    primary: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-blue-500',
     border: 'border-blue-500', hoverText: 'hover:text-blue-500', lightBg: 'hover:bg-blue-50',
     light: 'bg-blue-50', accent: '#3b82f6'
   },
-  purple: { 
-    primary: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-purple-500', 
+  purple: {
+    primary: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-purple-500',
     border: 'border-purple-500', hoverText: 'hover:text-purple-500', lightBg: 'hover:bg-purple-50',
     light: 'bg-purple-50', accent: '#8b5cf6'
   },
-  orange: { 
-    primary: 'bg-orange-500', hover: 'hover:bg-orange-600', text: 'text-orange-500', 
+  orange: {
+    primary: 'bg-orange-500', hover: 'hover:bg-orange-600', text: 'text-orange-500',
     border: 'border-orange-500', hoverText: 'hover:text-orange-500', lightBg: 'hover:bg-orange-50',
     light: 'bg-orange-50', accent: '#f97316'
   },
@@ -59,12 +59,12 @@ export default function TemplateHeader() {
 
   // Translation helper
   const t = (key: string) => getTranslation(language, key)
-  
+
   // Detect tenant from URL as fallback (in case context is not set)
   const tenantFromUrl = pathname?.split('/')[1]
-  const isOnTenantRoute = tenantFromUrl && 
-    tenantFromUrl !== 'auth' && 
-    tenantFromUrl !== 'admin' && 
+  const isOnTenantRoute = tenantFromUrl &&
+    tenantFromUrl !== 'auth' &&
+    tenantFromUrl !== 'admin' &&
     tenantFromUrl !== 'customer' &&
     tenantFromUrl !== 'center-admin' &&
     tenantFromUrl !== 'branch' &&
@@ -73,18 +73,18 @@ export default function TemplateHeader() {
     tenantFromUrl !== 'help' &&
     tenantFromUrl !== 'about' &&
     tenantFromUrl !== 'contact'
-  
+
   // Use context values if available, otherwise use URL detection
   const effectiveTenantSlug = tenant?.slug || (isOnTenantRoute ? tenantFromUrl : null)
   const effectiveIsTenantPage = isTenantPage || isOnTenantRoute
-  
+
   // Get display name and logo from tenant or default
   const displayName = tenant?.businessName || tenant?.name || 'LaundryLobby'
   const logoUrl = tenant?.logo
-  
+
   // Use tenant template if on tenant page, otherwise use localStorage
-  const activeTemplate = (effectiveIsTenantPage && tenant?.landingPageTemplate) 
-    ? tenant.landingPageTemplate as TemplateType 
+  const activeTemplate = (effectiveIsTenantPage && tenant?.landingPageTemplate)
+    ? tenant.landingPageTemplate as TemplateType
     : template
 
   // Handle language change
@@ -94,7 +94,7 @@ export default function TemplateHeader() {
     window.dispatchEvent(new CustomEvent('languageChange', { detail: { language: lang } }))
     setShowLangMenu(false)
   }
-  
+
   // Helper to generate tenant-aware URLs
   const getLink = (path: string) => {
     // Debug logging
@@ -108,7 +108,7 @@ export default function TemplateHeader() {
       contextTenant: tenant?.slug,
       contextIsTenantPage: isTenantPage
     });
-    
+
     // Use effective values (context or URL detection)
     if (effectiveIsTenantPage && effectiveTenantSlug) {
       // For tenant pages, keep URLs within tenant space
@@ -177,7 +177,7 @@ export default function TemplateHeader() {
       const savedTemplate = localStorage.getItem('landing_template') as TemplateType
       const savedLanguage = localStorage.getItem('landing_language') as Language
       const savedScheme = localStorage.getItem('landing_scheme')
-      
+
       if (savedColor && ['teal', 'blue', 'purple', 'orange'].includes(savedColor)) {
         setThemeColor(savedColor)
       }
@@ -238,11 +238,11 @@ export default function TemplateHeader() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between">
               {/* Logo */}
-              <Link href={isTenantPage ? `/${tenant?.slug}` : '/'} className="flex items-center gap-2">
+              <Link href={getLink('/')} className="flex items-center gap-2">
                 {logoUrl ? (
                   <img src={logoUrl} alt={displayName} className="w-10 h-10 rounded-lg object-contain" />
                 ) : (
-                  <div 
+                  <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: colors.accent }}
                   >
@@ -254,161 +254,161 @@ export default function TemplateHeader() {
 
               {/* Navigation - Rounded Pill Shape */}
               <div className="hidden md:flex items-center">
-                <nav 
+                <nav
                   className="flex items-center gap-1 px-2 py-1.5 rounded-full"
                   style={{ backgroundColor: colors.accent }}
                 >
-                <Link href={getLink('/')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname === '/' || pathname === `/${tenant?.slug}` ? 'bg-white/20' : ''}`}>{t('nav.home')}</Link>
-                <Link href={getLink('/services')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname?.includes('/services') ? 'bg-white/20' : ''}`}>{t('nav.services')}</Link>
-                <Link href={getLink('/pricing')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname?.includes('/pricing') ? 'bg-white/20' : ''}`}>{t('nav.pricing')}</Link>
-                <Link href={getLink('/help')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname?.includes('/help') ? 'bg-white/20' : ''}`}>{t('nav.help')}</Link>
-              </nav>
-            </div>
+                  <Link href={getLink('/')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname === '/' || pathname === `/${tenant?.slug}` ? 'bg-white/20' : ''}`}>{t('nav.home')}</Link>
+                  <Link href={getLink('/services')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname?.includes('/services') ? 'bg-white/20' : ''}`}>{t('nav.services')}</Link>
+                  <Link href={getLink('/pricing')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname?.includes('/pricing') ? 'bg-white/20' : ''}`}>{t('nav.pricing')}</Link>
+                  <Link href={getLink('/help')} className={`text-white font-medium px-4 py-1.5 text-sm rounded-full hover:bg-white/20 transition-colors ${pathname?.includes('/help') ? 'bg-white/20' : ''}`}>{t('nav.help')}</Link>
+                </nav>
+              </div>
 
-            {/* Right Side */}
-            <div className="hidden md:flex items-center gap-3">
-              {/* Dark Mode Toggle */}
-              <button
-                onClick={toggleDarkMode}
-                className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                {isDarkMode ? (
-                  <Sun className="w-5 h-5 text-yellow-400" />
-                ) : (
-                  <Moon className="w-5 h-5 text-gray-600" />
-                )}
-              </button>
-              
-              {isAuthenticated ? (
-                <>
-                  <Link href={getDashboardUrl()}>
-                    <Button 
-                      variant="outline"
-                      className={`rounded-full px-4 h-8 text-sm ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
-                    >
-                      <User className="w-4 h-4 mr-1" />
-                      {t('nav.dashboard')}
-                    </Button>
-                  </Link>
-                  <Button 
-                    className="text-white rounded-full px-4 h-8 text-sm"
-                    style={{ backgroundColor: colors.accent }}
-                    onClick={handleBookNow}
-                  >
-                    {t('nav.bookNow')}
-                  </Button>
-                  <div className="relative group">
-                    <button className={`flex items-center gap-2 py-2 ${textMuted}`}>
-                      <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: colors.accent }}
+              {/* Right Side */}
+              <div className="hidden md:flex items-center gap-3">
+                {/* Dark Mode Toggle */}
+                <button
+                  onClick={toggleDarkMode}
+                  className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}
+                  title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                >
+                  {isDarkMode ? (
+                    <Sun className="w-5 h-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-gray-600" />
+                  )}
+                </button>
+
+                {isAuthenticated ? (
+                  <>
+                    <Link href={getDashboardUrl()}>
+                      <Button
+                        variant="outline"
+                        className={`rounded-full px-4 h-8 text-sm ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                       >
-                        <span className="text-white text-sm font-medium">
-                          {user?.name?.charAt(0).toUpperCase() || 'U'}
-                        </span>
-                      </div>
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                    <div className={`absolute right-0 top-full mt-1 w-56 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${dropdownBg}`}>
-                      <div className="py-2">
-                        <Link href={isTenantPage && tenant?.slug ? `/${tenant.slug}/dashboard` : '/customer/dashboard'} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
-                          <User className="w-4 h-4 mr-3" />{t('nav.dashboard')}
-                        </Link>
-                        <Link href="/customer/orders" className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
-                          <ShoppingBag className="w-4 h-4 mr-3" />{t('nav.myOrders')}
-                        </Link>
-                        <Link href="/customer/addresses" className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
-                          <MapPin className="w-4 h-4 mr-3" />{t('nav.addresses')}
-                        </Link>
-                        <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
-                        <div className="px-4 py-2">
-                          <p className={`text-xs font-medium mb-2 ${textMuted}`}><Globe className="w-3 h-3 inline mr-1" />Language</p>
-                          <div className="flex gap-1">
-                            {languageOptions.map(opt => (
-                              <button key={opt.code} onClick={() => handleLanguageChange(opt.code)} className={`flex-1 px-2 py-1 text-xs rounded ${language === opt.code ? 'text-white' : textMuted}`} style={language === opt.code ? { backgroundColor: colors.accent } : {}}>{opt.flag}</button>
-                            ))}
-                          </div>
-                        </div>
-                        <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
-                        <button 
-                          onClick={handleLogout} 
-                          className={`flex items-center w-full px-4 py-2 text-red-600 ${isDarkMode ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
+                        <User className="w-4 h-4 mr-1" />
+                        {t('nav.dashboard')}
+                      </Button>
+                    </Link>
+                    <Button
+                      className="text-white rounded-full px-4 h-8 text-sm"
+                      style={{ backgroundColor: colors.accent }}
+                      onClick={handleBookNow}
+                    >
+                      {t('nav.bookNow')}
+                    </Button>
+                    <div className="relative group">
+                      <button className={`flex items-center gap-2 py-2 ${textMuted}`}>
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: colors.accent }}
                         >
-                          <LogOut className="w-4 h-4 mr-3" />{t('nav.logout')}
-                        </button>
+                          <span className="text-white text-sm font-medium">
+                            {user?.name?.charAt(0).toUpperCase() || 'U'}
+                          </span>
+                        </div>
+                        <ChevronDown className="w-4 h-4" />
+                      </button>
+                      <div className={`absolute right-0 top-full mt-1 w-56 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${dropdownBg}`}>
+                        <div className="py-2">
+                          <Link href={getDashboardUrl()} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
+                            <User className="w-4 h-4 mr-3" />{t('nav.dashboard')}
+                          </Link>
+                          <Link href={getLink('/customer/orders')} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
+                            <ShoppingBag className="w-4 h-4 mr-3" />{t('nav.myOrders')}
+                          </Link>
+                          <Link href={getLink('/customer/addresses')} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
+                            <MapPin className="w-4 h-4 mr-3" />{t('nav.addresses')}
+                          </Link>
+                          <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
+                          <div className="px-4 py-2">
+                            <p className={`text-xs font-medium mb-2 ${textMuted}`}><Globe className="w-3 h-3 inline mr-1" />Language</p>
+                            <div className="flex gap-1">
+                              {languageOptions.map(opt => (
+                                <button key={opt.code} onClick={() => handleLanguageChange(opt.code)} className={`flex-1 px-2 py-1 text-xs rounded ${language === opt.code ? 'text-white' : textMuted}`} style={language === opt.code ? { backgroundColor: colors.accent } : {}}>{opt.flag}</button>
+                              ))}
+                            </div>
+                          </div>
+                          <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
+                          <button
+                            onClick={handleLogout}
+                            className={`flex items-center w-full px-4 py-2 text-red-600 ${isDarkMode ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
+                          >
+                            <LogOut className="w-4 h-4 mr-3" />{t('nav.logout')}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <Link href={getLoginUrl()}>
-                    <Button variant="outline" className={`${colors.border} ${colors.text} h-8 text-sm`}>
-                      {t('nav.login')}
-                    </Button>
-                  </Link>
-                  <Button 
-                    className="text-white rounded-full h-8 text-sm"
-                    style={{ backgroundColor: colors.accent }}
-                    onClick={handleBookNow}
-                  >
-                    {t('nav.bookNow')}
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile: Dark Mode Toggle + Menu Button */}
-            <div className="md:hidden flex items-center gap-2">
-              <button
-                onClick={toggleDarkMode}
-                className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}
-                title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                {isDarkMode ? (
-                  <Sun className="w-5 h-5 text-yellow-400" />
+                  </>
                 ) : (
-                  <Moon className="w-5 h-5 text-gray-600" />
+                  <div className="flex items-center gap-3">
+                    <Link href={getLoginUrl()}>
+                      <Button variant="outline" className={`${colors.border} ${colors.text} h-8 text-sm`}>
+                        {t('nav.login')}
+                      </Button>
+                    </Link>
+                    <Button
+                      className="text-white rounded-full h-8 text-sm"
+                      style={{ backgroundColor: colors.accent }}
+                      onClick={handleBookNow}
+                    >
+                      {t('nav.bookNow')}
+                    </Button>
+                  </div>
                 )}
-              </button>
-              <button 
-                className={`p-2 rounded-lg ${hoverBg}`}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className={`w-6 h-6 ${textColor}`} /> : <Menu className={`w-6 h-6 ${textColor}`} />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+              </div>
 
-      {/* FreshSpin Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className={`md:hidden fixed top-[60px] left-0 right-0 z-40 ${headerBg} border-b ${headerBorder} shadow-lg`}>
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-col gap-3">
-              <Link href={getLink('/')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.home')}</Link>
-              <Link href={getLink('/services')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.services')}</Link>
-              <Link href={getLink('/pricing')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.pricing')}</Link>
-              <Link href={getLink('/help')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.help')}</Link>
-              <hr className={isDarkMode ? 'border-gray-700' : ''} />
-              {isAuthenticated ? (
-                <>
-                  <Link href={getDashboardUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.dashboard')}</Link>
-                  <button onClick={() => { handleBookNow(); setMobileMenuOpen(false); }} className="text-white py-2 px-4 rounded-full font-medium text-center" style={{ backgroundColor: colors.accent }}>{t('nav.bookNow')}</button>
-                  <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-red-500 font-medium py-2 text-left">{t('nav.logout')}</button>
-                </>
-              ) : (
-                <>
-                  <Link href={getLoginUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.login')}</Link>
-                  <button onClick={() => { handleBookNow(); setMobileMenuOpen(false); }} className="text-white py-2 px-4 rounded-full font-medium text-center" style={{ backgroundColor: colors.accent }}>{t('nav.bookNow')}</button>
-                </>
-              )}
+              {/* Mobile: Dark Mode Toggle + Menu Button */}
+              <div className="md:hidden flex items-center gap-2">
+                <button
+                  onClick={toggleDarkMode}
+                  className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}
+                  title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                >
+                  {isDarkMode ? (
+                    <Sun className="w-5 h-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="w-5 h-5 text-gray-600" />
+                  )}
+                </button>
+                <button
+                  className={`p-2 rounded-lg ${hoverBg}`}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                  {mobileMenuOpen ? <X className={`w-6 h-6 ${textColor}`} /> : <Menu className={`w-6 h-6 ${textColor}`} />}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        </header>
+
+        {/* FreshSpin Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className={`md:hidden fixed top-[60px] left-0 right-0 z-40 ${headerBg} border-b ${headerBorder} shadow-lg`}>
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex flex-col gap-3">
+                <Link href={getLink('/')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.home')}</Link>
+                <Link href={getLink('/services')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.services')}</Link>
+                <Link href={getLink('/pricing')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.pricing')}</Link>
+                <Link href={getLink('/help')} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.help')}</Link>
+                <hr className={isDarkMode ? 'border-gray-700' : ''} />
+                {isAuthenticated ? (
+                  <>
+                    <Link href={getDashboardUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.dashboard')}</Link>
+                    <button onClick={() => { handleBookNow(); setMobileMenuOpen(false); }} className="text-white py-2 px-4 rounded-full font-medium text-center" style={{ backgroundColor: colors.accent }}>{t('nav.bookNow')}</button>
+                    <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-red-500 font-medium py-2 text-left">{t('nav.logout')}</button>
+                  </>
+                ) : (
+                  <>
+                    <Link href={getLoginUrl()} onClick={() => setMobileMenuOpen(false)} className={`font-medium py-2 ${textMuted}`}>{t('nav.login')}</Link>
+                    <button onClick={() => { handleBookNow(); setMobileMenuOpen(false); }} className="text-white py-2 px-4 rounded-full font-medium text-center" style={{ backgroundColor: colors.accent }}>{t('nav.bookNow')}</button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
@@ -453,11 +453,11 @@ export default function TemplateHeader() {
                   <Moon className={`w-5 h-5 ${textMuted}`} />
                 )}
               </button>
-              
+
               {isAuthenticated ? (
                 <>
                   <Link href={isTenantPage && tenant?.slug ? `/${tenant.slug}/dashboard` : '/customer/dashboard'}>
-                    <Button 
+                    <Button
                       variant="outline"
                       className={`${colors.border} ${colors.text} px-4 py-2 rounded-md font-medium hidden sm:flex`}
                     >
@@ -465,7 +465,7 @@ export default function TemplateHeader() {
                       {t('nav.dashboard')}
                     </Button>
                   </Link>
-                  <Button 
+                  <Button
                     className={`${colors.primary} ${colors.hover} text-white px-5 py-2 rounded-md font-medium hidden sm:flex`}
                     onClick={handleBookNow}
                   >
@@ -482,13 +482,13 @@ export default function TemplateHeader() {
                     </button>
                     <div className={`absolute right-0 top-full mt-1 w-56 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${dropdownBg}`}>
                       <div className="py-2">
-                        <Link href={isTenantPage && tenant?.slug ? `/${tenant.slug}/dashboard` : '/customer/dashboard'} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
+                        <Link href={getDashboardUrl()} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
                           <User className="w-4 h-4 mr-3" />{t('nav.dashboard')}
                         </Link>
-                        <Link href="/customer/orders" className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
+                        <Link href={getLink('/customer/orders')} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
                           <ShoppingBag className="w-4 h-4 mr-3" />{t('nav.myOrders')}
                         </Link>
-                        <Link href="/customer/addresses" className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
+                        <Link href={getLink('/customer/addresses')} className={`flex items-center px-4 py-2 ${textMuted} ${dropdownHover}`}>
                           <MapPin className="w-4 h-4 mr-3" />{t('nav.addresses')}
                         </Link>
                         <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
@@ -501,8 +501,8 @@ export default function TemplateHeader() {
                           </div>
                         </div>
                         <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
-                        <button 
-                          onClick={handleLogout} 
+                        <button
+                          onClick={handleLogout}
                           className={`flex items-center w-full px-4 py-2 text-red-600 ${isDarkMode ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
                         >
                           <LogOut className="w-4 h-4 mr-3" />{t('nav.logout')}
@@ -540,7 +540,7 @@ export default function TemplateHeader() {
                   <Moon className="w-5 h-5 text-gray-600" />
                 )}
               </button>
-              <button 
+              <button
                 className={`p-2 rounded-lg ${hoverBg}`}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
@@ -589,7 +589,7 @@ export default function TemplateHeader() {
               {logoUrl ? (
                 <img src={logoUrl} alt={displayName} className="w-10 h-10 rounded-xl object-contain" />
               ) : (
-                <div 
+                <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{ backgroundColor: colors.accent }}
                 >
@@ -629,11 +629,11 @@ export default function TemplateHeader() {
                   <Moon className={`w-5 h-5 ${textMuted}`} />
                 )}
               </button>
-              
+
               {isAuthenticated ? (
                 <>
                   <Link href={isTenantPage && tenant?.slug ? `/${tenant.slug}/dashboard` : '/customer/dashboard'}>
-                    <Button 
+                    <Button
                       variant="outline"
                       className={`px-5 py-2.5 rounded-full font-medium ${isDarkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-800' : 'border-gray-300 text-gray-700 hover:bg-gray-100'}`}
                     >
@@ -641,7 +641,7 @@ export default function TemplateHeader() {
                       {t('nav.dashboard')}
                     </Button>
                   </Link>
-                  <Button 
+                  <Button
                     className="text-white px-6 py-2.5 rounded-full font-medium hover:opacity-90 transition-opacity"
                     style={{ backgroundColor: colors.accent }}
                     onClick={handleBookNow}
@@ -650,7 +650,7 @@ export default function TemplateHeader() {
                   </Button>
                   <div className="relative group">
                     <button className={`flex items-center gap-2 ${textMuted}`}>
-                      <div 
+                      <div
                         className="w-9 h-9 rounded-full flex items-center justify-center text-white font-medium"
                         style={{ backgroundColor: colors.accent }}
                       >
@@ -660,13 +660,13 @@ export default function TemplateHeader() {
                     </button>
                     <div className={`absolute right-0 top-full mt-2 w-56 rounded-xl shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${dropdownBg}`}>
                       <div className="py-2">
-                        <Link href={isTenantPage && tenant?.slug ? `/${tenant.slug}/dashboard` : '/customer/dashboard'} className={`flex items-center px-4 py-2.5 ${textMuted} ${dropdownHover}`}>
+                        <Link href={getDashboardUrl()} className={`flex items-center px-4 py-2.5 ${textMuted} ${dropdownHover}`}>
                           <User className="w-4 h-4 mr-3" />{t('nav.dashboard')}
                         </Link>
-                        <Link href="/customer/orders" className={`flex items-center px-4 py-2.5 ${textMuted} ${dropdownHover}`}>
+                        <Link href={getLink('/customer/orders')} className={`flex items-center px-4 py-2.5 ${textMuted} ${dropdownHover}`}>
                           <ShoppingBag className="w-4 h-4 mr-3" />{t('nav.myOrders')}
                         </Link>
-                        <Link href="/customer/addresses" className={`flex items-center px-4 py-2.5 ${textMuted} ${dropdownHover}`}>
+                        <Link href={getLink('/customer/addresses')} className={`flex items-center px-4 py-2.5 ${textMuted} ${dropdownHover}`}>
                           <MapPin className="w-4 h-4 mr-3" />{t('nav.addresses')}
                         </Link>
                         <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
@@ -679,8 +679,8 @@ export default function TemplateHeader() {
                           </div>
                         </div>
                         <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
-                        <button 
-                          onClick={handleLogout} 
+                        <button
+                          onClick={handleLogout}
                           className={`flex items-center w-full px-4 py-2.5 text-red-500 ${isDarkMode ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
                         >
                           <LogOut className="w-4 h-4 mr-3" />{t('nav.logout')}
@@ -694,7 +694,7 @@ export default function TemplateHeader() {
                   <Link href={getLoginUrl()} className={`font-medium ${textMuted} transition-colors hover:opacity-80`}>
                     {t('nav.login')}
                   </Link>
-                  <Button 
+                  <Button
                     className="text-white px-6 py-2.5 rounded-full font-medium hover:opacity-90 transition-opacity"
                     style={{ backgroundColor: colors.accent }}
                     onClick={handleBookNow}
@@ -718,7 +718,7 @@ export default function TemplateHeader() {
                   <Moon className="w-5 h-5 text-gray-600" />
                 )}
               </button>
-              <button 
+              <button
                 className="p-2"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
@@ -736,7 +736,7 @@ export default function TemplateHeader() {
                 <Link href={getLink('/pricing')} className={`font-medium ${textMuted}`}>{t('nav.pricing')}</Link>
                 <Link href={getLink('/help')} className={`font-medium ${textMuted}`}>{t('nav.help')}</Link>
                 <hr className={isDarkMode ? 'border-gray-700' : ''} />
-                <Button 
+                <Button
                   className="text-white rounded-full font-medium w-full hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: colors.accent }}
                 >
@@ -765,7 +765,7 @@ export default function TemplateHeader() {
             )}
             <span className={`text-2xl font-bold ${textColor}`}>{displayName}</span>
           </Link>
-          
+
           {/* Mobile: Dark Mode Toggle + Menu Button */}
           <div className="md:hidden flex items-center gap-2">
             <button
@@ -779,20 +779,20 @@ export default function TemplateHeader() {
                 <Moon className="w-5 h-5 text-gray-600" />
               )}
             </button>
-            <button 
+            <button
               className={`p-2 rounded-lg ${hoverBg}`}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className={`w-6 h-6 ${textColor}`} /> : <Menu className={`w-6 h-6 ${textColor}`} />}
             </button>
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-8">
             <Link href={getLink('/')} className={`${pathname === '/' || pathname === `/${tenant?.slug}` ? `${colors.text} font-medium` : textMuted} ${colors.hoverText} transition-colors`}>{t('nav.home')}</Link>
             <Link href={getLink('/services')} className={`${pathname?.includes('/services') ? `${colors.text} font-medium` : textMuted} ${colors.hoverText} transition-colors`}>{t('nav.services')}</Link>
             <Link href={getLink('/pricing')} className={`${pathname?.includes('/pricing') ? `${colors.text} font-medium` : textMuted} ${colors.hoverText} transition-colors`}>{t('nav.pricing')}</Link>
             <Link href={getLink('/help')} className={`${pathname?.includes('/help') ? `${colors.text} font-medium` : textMuted} ${colors.hoverText} transition-colors`}>{t('nav.help')}</Link>
-            
+
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 {/* Dark Mode Toggle */}
@@ -841,7 +841,7 @@ export default function TemplateHeader() {
                         </div>
                       </div>
                       <hr className={`my-2 ${isDarkMode ? 'border-gray-700' : ''}`} />
-                      <button 
+                      <button
                         onClick={handleLogout}
                         className={`flex items-center w-full px-4 py-2 text-red-600 ${isDarkMode ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
                       >

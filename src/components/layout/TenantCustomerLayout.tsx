@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter, usePathname } from 'next/navigation'
-import { 
-  Home, ShoppingBag, Star, Users2, Wallet, Gift, MapPin, User, 
-  HelpCircle, LogOut, ChevronLeft, ChevronRight, Sparkles, 
+import {
+  Home, ShoppingBag, Star, Users2, Wallet, Gift, MapPin, User,
+  HelpCircle, LogOut, ChevronLeft, ChevronRight, Sparkles,
   ArrowLeft, Menu, X
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
@@ -44,9 +44,37 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
   const params = useParams()
   const router = useRouter()
   const pathname = usePathname()
-  const tenant = params.tenant as string
+
+  // Robust tenant detection: Params -> Cookie -> URL Path
+  const [tenant, setTenant] = useState<string>((params?.tenant as string) || '')
   const { user, isAuthenticated, logout } = useAuthStore()
-  
+
+  useEffect(() => {
+    // If params has tenant, use it
+    if (params?.tenant) {
+      setTenant(params.tenant as string)
+      return
+    }
+
+    // Try to get from cookie
+    const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : []
+    const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+    if (tenantCookie) {
+      setTenant(tenantCookie.split('=')[1])
+      return
+    }
+
+    // Fallback: Try to get from URL path
+    if (typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean)
+      const potentialSlug = pathSegments[0]
+      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      if (potentialSlug && !reserved.includes(potentialSlug)) {
+        setTenant(potentialSlug)
+      }
+    }
+  }, [params])
+
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(propTenantInfo || null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -68,7 +96,20 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
   // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push(`/${tenant}`)
+      if (tenant) {
+        router.push(`/${tenant}`)
+      } else {
+        // If we can't find tenant, we might be on a rewritten path. 
+        // Try one last check on pathname before giving up
+        const pathSegments = window.location.pathname.split('/').filter(Boolean)
+        const potentialSlug = pathSegments[0]
+        const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+        if (potentialSlug && !reserved.includes(potentialSlug)) {
+          router.push(`/${potentialSlug}`)
+        } else {
+          router.push('/')
+        }
+      }
     }
   }, [isAuthenticated, tenant, router])
 
@@ -96,11 +137,30 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
   }, [tenant, tenantInfo])
 
   // Generate navigation with current path highlighting
-  const sidebarNavigation = useMemo(() => getSidebarNavigation(tenant, pathname), [tenant, pathname])
+  const sidebarNavigation = useMemo(() => getSidebarNavigation(tenant, pathname || ''), [tenant, pathname])
 
   const handleLogout = () => {
-    logout()
-    router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/dashboard`)}`)
+    // DO NOT call logout() here. It triggers the authStore listener which fires the 
+    // protection useEffect above, causing a race condition redirect to '/'.
+    // Instead, manually clear the storage and force a hard reload.
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('laundry-auth')
+      localStorage.removeItem('token')
+      localStorage.removeItem('tenant-sidebar-collapsed')
+    }
+
+    // Use the resolved tenant for redirect
+    const targetSlug = tenant || (typeof window !== 'undefined' ?
+      window.location.pathname.split('/').filter(Boolean)[0] : '')
+
+    // Ensure we don't redirect to a reserved word
+    const finalSlug = ['customer', 'admin', 'auth'].includes(targetSlug) ? '' : targetSlug
+
+    const redirectUrl = finalSlug
+      ? `/${finalSlug}/auth/login?redirect=${encodeURIComponent(`/${finalSlug}/dashboard`)}`
+      : '/auth/login'
+
+    window.location.href = redirectUrl
   }
 
   if (!isAuthenticated) return null
@@ -147,7 +207,7 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
               <button className="lg:hidden p-2 hover:bg-gray-100 rounded-lg" onClick={() => setSidebarOpen(false)}>
                 <X className="w-5 h-5 text-gray-500" />
               </button>
-              <button 
+              <button
                 className="hidden lg:flex p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={toggleSidebarCollapse}
                 title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -188,11 +248,10 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
                   key={item.name}
                   href={item.href}
                   title={sidebarCollapsed ? item.name : undefined}
-                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 rounded-xl transition-all ${
-                    isActive 
-                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30' 
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 rounded-xl transition-all ${isActive
+                    ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30'
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`} />
@@ -204,16 +263,16 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
 
           {/* Sidebar Footer */}
           <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'} border-t border-gray-100 space-y-2`}>
-            <Link 
-              href={`/${tenant}`} 
+            <Link
+              href={`/${tenant}`}
               title={sidebarCollapsed ? 'Back to Store' : undefined}
               className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-all`}
             >
               <ArrowLeft className="w-5 h-5 text-gray-400 flex-shrink-0" />
               {!sidebarCollapsed && <span className="font-medium">Back to Store</span>}
             </Link>
-            <button 
-              onClick={handleLogout} 
+            <button
+              onClick={handleLogout}
               title={sidebarCollapsed ? 'Logout' : undefined}
               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all`}
             >

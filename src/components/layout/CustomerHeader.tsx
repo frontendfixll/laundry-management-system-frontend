@@ -109,14 +109,36 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
   }
 
   const handleLogout = () => {
-    logout()
-    window.location.href = '/'
+    // DO NOT call logout() here. It triggers the authStore listener which fires the 
+    // protection useEffect in layout, causing a race condition redirect to '/'.
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('laundry-auth')
+      localStorage.removeItem('token')
+    }
+
+    // Redirect to tenant landing page if available to maintain context
+    const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : []
+    const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+    let slug = tenantCookie ? tenantCookie.split('=')[1] : null
+
+    // Fallback: Check URL path if cookie is missing (e.g., /dgsfg/customer/dashboard)
+    if (!slug && typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean)
+      const potentialSlug = pathSegments[0]
+      // Check if the first segment is not a reserved route
+      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      if (potentialSlug && !reserved.includes(potentialSlug)) {
+        slug = potentialSlug
+      }
+    }
+
+    window.location.href = slug ? `/${slug}` : '/'
   }
 
   const markAsRead = async (id: string) => {
     try {
       await api.put('/customer/notifications/mark-read', { notificationIds: [id] })
-      setNotifications(prev => 
+      setNotifications(prev =>
         prev.map(n => n._id === id ? { ...n, isRead: true } : n)
       )
       setUnreadCount(prev => Math.max(0, prev - 1))
@@ -182,9 +204,9 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
         <div className="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
           {/* New Order Button */}
           <Link href="/customer/orders/new">
-            <Button 
+            <Button
               className="text-white shadow-lg text-xs sm:text-sm px-2 sm:px-4"
-              style={{ 
+              style={{
                 background: `linear-gradient(to right, ${theme?.primaryColor || '#14b8a6'}, ${theme?.accentColor || '#06b6d4'})`,
               }}
             >
@@ -195,7 +217,7 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
 
           {/* Notifications */}
           <div className="relative" ref={notifDropdownRef}>
-            <button 
+            <button
               onClick={handleBellClick}
               className="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
             >
@@ -214,7 +236,7 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
                 <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                   <h3 className="font-semibold text-gray-800">Notifications</h3>
                   {unreadCount > 0 && (
-                    <button 
+                    <button
                       onClick={markAllAsRead}
                       className="text-xs text-teal-600 hover:text-teal-700 font-medium"
                     >
@@ -239,12 +261,11 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
                   ) : (
                     <div className="divide-y divide-gray-50">
                       {notifications.map((notif) => (
-                        <div 
+                        <div
                           key={notif._id}
                           onClick={() => !notif.isRead && markAsRead(notif._id)}
-                          className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                            !notif.isRead ? 'bg-teal-50/50' : ''
-                          }`}
+                          className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${!notif.isRead ? 'bg-teal-50/50' : ''
+                            }`}
                         >
                           <div className="flex gap-3">
                             <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
@@ -281,9 +302,9 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
               onClick={handleUserClick}
               className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
             >
-              <div 
+              <div
                 className="w-9 h-9 rounded-full flex items-center justify-center"
-                style={{ 
+                style={{
                   background: `linear-gradient(to right, ${theme?.primaryColor || '#14b8a6'}, ${theme?.accentColor || '#06b6d4'})`,
                 }}
               >
@@ -318,32 +339,32 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
 
                 {/* Menu Items */}
                 <div className="py-2">
-                  <Link 
-                    href="/customer/profile" 
+                  <Link
+                    href="/customer/profile"
                     onClick={() => setShowUserDropdown(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <User className="w-4 h-4 text-gray-400" />
                     My Profile
                   </Link>
-                  <Link 
-                    href="/customer/orders" 
+                  <Link
+                    href="/customer/orders"
                     onClick={() => setShowUserDropdown(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <Package className="w-4 h-4 text-gray-400" />
                     My Orders
                   </Link>
-                  <Link 
-                    href="/customer/addresses" 
+                  <Link
+                    href="/customer/addresses"
                     onClick={() => setShowUserDropdown(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     <Settings className="w-4 h-4 text-gray-400" />
                     Addresses
                   </Link>
-                  <Link 
-                    href="/" 
+                  <Link
+                    href="/"
                     onClick={() => setShowUserDropdown(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >

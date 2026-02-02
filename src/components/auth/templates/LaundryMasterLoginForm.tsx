@@ -9,7 +9,7 @@ import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Crown, Star, Award, Zap } from 'lucide-react'
 
-export default function LaundryMasterLoginForm() {
+export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: string | null }) {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -23,22 +23,42 @@ export default function LaundryMasterLoginForm() {
     setIsLoading(true)
     try {
       const response = await authAPI.login(formData)
-      const { token, user } = response.data.data
+
+      // Safe extraction
+      const token = response.data?.token || response.data?.data?.token;
+      const user = response.data?.user || response.data?.data?.user;
+
+      if (!token || !user) {
+        throw new Error('Invalid login response');
+      }
+
       setAuth(user, token)
       toast.success('Login successful!')
+
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
       if (redirectUrl) {
-        router.push(decodeURIComponent(redirectUrl))
+        let finalRedirect = decodeURIComponent(redirectUrl)
+        if (tenantSlug && isLocalhost && !finalRedirect.startsWith(`/${tenantSlug}`)) {
+          finalRedirect = `/${tenantSlug}${finalRedirect}`;
+        }
+        router.push(finalRedirect)
       } else {
         const routes: Record<string, string> = {
           superadmin: '/superadmin/dashboard',
           admin: '/admin/dashboard',
           branch_admin: '/branch-admin/dashboard',
           center_admin: '/center-admin/dashboard',
-          branch_manager: '/branch-manager/dashboard',
+          branch_manager: '/center_admin/dashboard',
           support: '/support/dashboard',
           customer: '/customer/dashboard'
         }
-        router.push(routes[user.role] || '/')
+
+        let redirectPath = routes[user.role] || '/'
+        if (tenantSlug && isLocalhost && !redirectPath.startsWith(`/${tenantSlug}`)) {
+          redirectPath = `/${tenantSlug}${redirectPath}`;
+        }
+        router.push(redirectPath)
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Login failed')
@@ -96,7 +116,7 @@ export default function LaundryMasterLoginForm() {
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="flex items-center justify-center py-6 px-4 min-h-screen">
           <div className="w-full max-w-md">
-            <Link href="/" className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-4 text-sm font-semibold">
+            <Link href={tenantSlug ? `/${tenantSlug}` : "/"} className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-4 text-sm font-semibold">
               <ArrowLeft className="w-4 h-4 mr-2" />Back to Home
             </Link>
 

@@ -29,19 +29,38 @@ export default function CustomerLayout({
   useEffect(() => {
     // Wait a bit for store to initialize
     const timer = setTimeout(() => {
+      // Robust tenant detection for redirect
+      let tenantSlug = ''
+      if (typeof window !== 'undefined') {
+        const cookies = document.cookie.split('; ')
+        const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+        tenantSlug = tenantCookie ? tenantCookie.split('=')[1] : ''
+
+        if (!tenantSlug) {
+          const pathSegments = window.location.pathname.split('/').filter(Boolean)
+          const potentialSlug = pathSegments[0]
+          const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+          if (potentialSlug && !reserved.includes(potentialSlug)) {
+            tenantSlug = potentialSlug
+          }
+        }
+      }
+
+      const loginPath = tenantSlug ? `/${tenantSlug}/auth/login` : '/auth/login'
+
       if (!isAuthenticated || !user) {
-        router.push('/auth/login')
+        router.push(loginPath)
         return
       }
-      
+
       if (user.role !== 'customer') {
-        router.push('/auth/login')
+        router.push(loginPath)
         return
       }
-      
+
       setIsLoading(false)
     }, 200)
-    
+
     return () => clearTimeout(timer)
   }, [isAuthenticated, user, router])
 
@@ -60,20 +79,20 @@ export default function CustomerLayout({
     <div className="min-h-screen bg-gray-50">
       {/* Real-time notification toasts */}
       <NotificationContainer />
-      
+
       {/* Sidebar */}
-      <CustomerSidebar 
-        mobileOpen={mobileMenuOpen} 
+      <CustomerSidebar
+        mobileOpen={mobileMenuOpen}
         onMobileClose={handleMobileClose}
         collapsed={sidebarCollapsed}
         onCollapsedChange={setSidebarCollapsed}
       />
-      
+
       {/* Main Content */}
       <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
         {/* Header */}
         <CustomerHeader onMenuClick={handleMenuClick} sidebarCollapsed={sidebarCollapsed} />
-        
+
         {/* Page Content - Top padding for fixed header (h-16 = 64px, so pt-20 = 80px gives breathing room) */}
         <main className="pt-20 px-4 pb-4 lg:px-8 lg:pb-8">
           <div className="max-w-screen-2xl mx-auto">{children}</div>

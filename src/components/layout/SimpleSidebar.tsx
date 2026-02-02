@@ -42,9 +42,21 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 import { useFeatures, FeatureKey } from '@/hooks/useFeatures'
 import { usePermissions } from '@/hooks/usePermissions'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useBranding } from '@/hooks/useBranding'
 
-const enhancedNavigation = [
+interface NavigationItem {
+  name: string;
+  href?: string;
+  icon: any;
+  permission: { module: string; action: string } | null;
+  feature: FeatureKey | null;
+  isExpandable?: boolean;
+  subItems?: any[];
+  external?: boolean;
+}
+
+const enhancedNavigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: Home, permission: null, feature: null },
   { name: 'Tenancies', href: '/admin/tenancies', icon: Building2, permission: null, feature: null },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingBag, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
@@ -136,8 +148,46 @@ export function SimpleSidebar() {
 
   const pathname = usePathname()
   const { user, logout, sidebarCollapsed, setSidebarCollapsed } = useAuthStore()
+  const { branding } = useBranding()
+
+  // Debug log for branding
+  useEffect(() => {
+    if (branding && process.env.NODE_ENV === 'development') {
+      console.log('💎 SimpleSidebar - Branding loaded:', {
+        name: branding.name,
+        slug: branding.slug,
+        businessName: branding.branding?.businessName,
+        logoUrl: branding.branding?.logo?.url
+      });
+    }
+  }, [branding]);
   const { hasFeature } = useFeatures()
   const { hasPermission: checkUserPermission, isSuperAdmin } = usePermissions()
+
+  // Dynamic navigation with branding slug
+  const dynamicNavigation = React.useMemo(() => {
+    return enhancedNavigation.map(item => {
+      if (item.name === 'Branding') {
+        return {
+          ...item,
+          isExpandable: true,
+          subItems: [
+            { name: 'Design Settings', href: '/admin/branding', icon: Palette, permission: { module: 'settings', action: 'view' }, feature: 'custom_branding' as FeatureKey },
+            ...(branding?.slug ? [{
+              name: 'View Landing Page',
+              href: `/${branding.slug}`,
+              icon: Image,
+              permission: { module: 'settings', action: 'view' },
+              feature: 'custom_branding' as FeatureKey,
+              external: true
+            }] : [])
+          ]
+        };
+      }
+      return item;
+    });
+  }, [branding?.slug]);
+
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -150,7 +200,24 @@ export function SimpleSidebar() {
     await new Promise(resolve => setTimeout(resolve, 800))
 
     logout()
-    window.location.href = '/auth/login'
+
+    // Redirect to tenant landing page if available to maintain context
+    const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : []
+    const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+    let slug = tenantCookie ? tenantCookie.split('=')[1] : null
+
+    // Fallback: Check URL path if cookie is missing
+    if (!slug && typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean)
+      const potentialSlug = pathSegments[0]
+      // Check if the first segment is not a reserved route
+      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      if (potentialSlug && !reserved.includes(potentialSlug)) {
+        slug = potentialSlug
+      }
+    }
+
+    window.location.href = slug ? `/${slug}/auth/login` : '/auth/login'
   }
 
   const toggleExpanded = (itemName: string) => {
@@ -225,6 +292,9 @@ export function SimpleSidebar() {
                   <Link
                     key={subItem.name}
                     href={subItem.href}
+                    target={subItem.external ? "_blank" : undefined}
+                    rel={subItem.external ? "noopener noreferrer" : undefined}
+                    onClick={() => setMobileOpen(false)}
                     className={cn(
                       'group flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors',
                       isSubActive
@@ -247,6 +317,9 @@ export function SimpleSidebar() {
       <Link
         key={item.name}
         href={item.href}
+        target={item.external ? "_blank" : undefined}
+        rel={item.external ? "noopener noreferrer" : undefined}
+        title={sidebarCollapsed ? item.name : undefined}
         className={cn(
           'group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors',
           isActive
@@ -286,20 +359,48 @@ export function SimpleSidebar() {
         <div className="sidebar-header flex-shrink-0 flex items-center justify-between h-12 px-4 border-b border-gray-200 bg-white">
           {/* Logo - always show on mobile, conditionally on desktop */}
           {!sidebarCollapsed && (
-            <div className="flex items-center space-x-3 transition-opacity duration-300">
-              <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center">
-                <span className="text-white font-bold text-sm">L</span>
+            <div className="flex items-center space-x-3 transition-opacity duration-300 max-w-full overflow-hidden">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm"
+                style={{ background: branding?.branding?.theme?.primaryColor || '#2563eb' }}
+              >
+                {branding?.branding?.logo?.url ? (
+                  <img
+                    src={branding.branding.logo.url}
+                    alt={branding.branding.businessName || branding.name}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <span className="text-white font-bold text-sm">
+                    {(branding?.branding?.businessName || branding?.name || 'LaundryLobby').charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">LaundryLobby</h1>
-                <p className="text-xs text-gray-500">Admin Panel</p>
+              <div className="min-w-0">
+                <h1 className="text-sm font-semibold text-gray-900 truncate">
+                  {branding?.branding?.businessName || branding?.name || 'LaundryLobby'}
+                </h1>
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Admin Panel</p>
               </div>
             </div>
           )}
           {sidebarCollapsed && (
             <div className="flex items-center justify-center flex-1 transition-opacity duration-300">
-              <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center">
-                <span className="text-white font-bold text-sm">L</span>
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shadow-sm"
+                style={{ background: branding?.branding?.theme?.primaryColor || '#2563eb' }}
+              >
+                {branding?.branding?.logo?.url ? (
+                  <img
+                    src={branding.branding.logo.url}
+                    alt={branding.branding.businessName || branding.name}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <span className="text-white font-bold text-sm">
+                    {(branding?.branding?.businessName || branding?.name || 'L').charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
             </div>
           )}
@@ -333,7 +434,7 @@ export function SimpleSidebar() {
         <div className="flex-1 flex flex-col min-h-0">
           {/* Navigation - Scrollable with proper overflow handling */}
           <nav className={`flex-1 px-0 py-6 space-y-0 ${sidebarCollapsed ? 'overflow-hidden lg:overflow-visible' : 'overflow-y-auto'}`}>
-            {enhancedNavigation
+            {dynamicNavigation
               .filter(item => {
                 const hasPermissionResult = hasPermissionCheck(item.permission)
                 const hasFeatureResult = checkFeature(item.feature as FeatureKey | null)
@@ -377,7 +478,7 @@ export function SimpleSidebar() {
             {/* Version Info */}
             <div className={`px-6 py-3 border-t border-gray-200 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
               <div className="text-xs text-gray-400 font-light">
-                v2.1.0
+                v1.0.0
               </div>
             </div>
 

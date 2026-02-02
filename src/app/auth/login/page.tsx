@@ -8,18 +8,26 @@ import LaundryMasterLoginForm from '@/components/auth/templates/LaundryMasterLog
 import { getCurrentTemplate, getTemplateTheme, getTemplateContent, LandingPageTemplate } from '@/utils/templateUtils'
 import { Sparkles, Truck, Clock, Shield, CheckCircle } from 'lucide-react'
 
+const RESERVED_ROUTES = [
+  'admin', 'auth', 'api', 'branch', 'center-admin', 'customer', 'debug-login',
+  'help', 'pricing', 'role-switcher', 'services', 'test-auth', 'track',
+  'version', 'releases', '_next', 'favicon.ico', 'images', 'public', 'www',
+  'superadmin', 'marketing'
+]
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
 export default function LoginPage() {
   const [template, setTemplate] = useState<string>('original')
   const [isLoading, setIsLoading] = useState(true)
+  const [tenantSlug, setTenantSlug] = useState<string | null>(null)
 
   useEffect(() => {
     const detectTemplate = async () => {
       // Check if we're on a tenant subdomain
       const hostname = window.location.hostname
       const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
-      
+
       // Extract subdomain (e.g., "dgsfg" from "dgsfg.example.com")
       // Skip Vercel preview URLs (*.vercel.app) as they're not real tenant subdomains
       let subdomain: string | null = null
@@ -27,44 +35,51 @@ export default function LoginPage() {
         const parts = hostname.split('.')
         const isVercelUrl = hostname.endsWith('.vercel.app')
         const isRenderUrl = hostname.endsWith('.onrender.com')
-        
+
         // Only extract subdomain for real custom domains (not deployment platforms)
         // For custom domains: subdomain.yourdomain.com has 3+ parts
         if (parts.length > 2 && !isVercelUrl && !isRenderUrl) {
           subdomain = parts[0]
         }
       }
-      
+
       // Also check URL params for tenant (used when redirecting from tenant pages)
       const urlParams = new URLSearchParams(window.location.search)
       const tenantParam = urlParams.get('tenant')
-      
+
       // Also check sessionStorage for last visited tenant (set by tenant pages)
       const lastTenant = sessionStorage.getItem('lastVisitedTenant')
-      
+
+      // Also check path segments (important for localhost /[tenant]/auth/login)
+      const pathSegments = window.location.pathname.split('/').filter(Boolean)
+      // The path might be /[tenant]/auth/login
+      const pathTenant = pathSegments.length >= 3 && pathSegments[1] === 'auth' ? pathSegments[0] : null
+
       // Determine which tenant to use
-      const tenantSlug = subdomain || tenantParam || lastTenant
-      
+      const identifiedSlug = subdomain || pathTenant || tenantParam || lastTenant
+      setTenantSlug(identifiedSlug)
+
       console.log('🔍 Login Page - Hostname:', hostname)
+      console.log('🔍 Login Page - Path detected slug:', pathTenant)
       console.log('🔍 Login Page - Subdomain detected:', subdomain)
       console.log('🔍 Login Page - Tenant param:', tenantParam)
       console.log('🔍 Login Page - Last visited tenant:', lastTenant)
-      console.log('🔍 Login Page - Using tenant:', tenantSlug)
-      
+      console.log('🔍 Login Page - Using tenant:', identifiedSlug)
+
       // If we have a tenant, fetch tenant branding
-      if (tenantSlug && tenantSlug !== 'www') {
+      if (identifiedSlug && identifiedSlug !== 'www' && !RESERVED_ROUTES.includes(identifiedSlug)) {
         try {
-          console.log('🔍 Login Page - Fetching tenant branding for:', tenantSlug)
-          const response = await fetch(`${API_URL}/public/tenancy/branding/${tenantSlug}`)
+          console.log('🔍 Login Page - Fetching tenant branding for:', identifiedSlug)
+          const response = await fetch(`${API_URL}/public/tenancy/branding/${identifiedSlug}`)
           const data = await response.json()
-          
+
           console.log('🔍 Login Page - Tenant branding response:', data)
-          
+
           if (data.success && data.data) {
             // Get template from tenant branding
-            const tenantTemplate = data.data.branding?.landingPageTemplate || 
-                                   data.data.landingPageTemplate || 
-                                   'original'
+            const tenantTemplate = data.data.branding?.landingPageTemplate ||
+              data.data.landingPageTemplate ||
+              'original'
             console.log('🔍 Login Page - Using tenant template:', tenantTemplate)
             setTemplate(tenantTemplate)
             setIsLoading(false)
@@ -74,7 +89,7 @@ export default function LoginPage() {
           console.error('🔍 Login Page - Error fetching tenant branding:', error)
         }
       }
-      
+
       // Fallback to localStorage for non-tenant pages
       const detectedTemplate = getCurrentTemplate()
       console.log('🔍 Login Page - Detected template from localStorage:', detectedTemplate)
@@ -82,7 +97,7 @@ export default function LoginPage() {
       setTemplate(detectedTemplate)
       setIsLoading(false)
     }
-    
+
     detectTemplate()
   }, [])
 
@@ -97,15 +112,15 @@ export default function LoginPage() {
 
   // Use template-specific login forms for templates 2, 3, and 4
   if (template === 'minimal') {
-    return <MinimalLoginForm />
+    return <MinimalLoginForm tenantSlug={tenantSlug} />
   }
 
   if (template === 'freshspin') {
-    return <FreshSpinLoginForm />
+    return <FreshSpinLoginForm tenantSlug={tenantSlug} />
   }
 
   if (template === 'starter') {
-    return <LaundryMasterLoginForm />
+    return <LaundryMasterLoginForm tenantSlug={tenantSlug} />
   }
 
   // Original template (template 1) - keep existing design
@@ -280,7 +295,7 @@ export default function LoginPage() {
             <li>• Express delivery</li>
           </ul>
         </div>
-        
+
         <div className="bg-gradient-to-r from-violet-100 to-purple-100 rounded-xl p-6">
           <h3 className="font-bold text-violet-800 mb-2">Master Benefits</h3>
           <ul className="space-y-2 text-sm text-violet-700">
@@ -308,8 +323,9 @@ export default function LoginPage() {
   }
 
   return (
-    <BaseLoginForm 
+    <BaseLoginForm
       template={template}
+      tenantSlug={tenantSlug}
       leftSideContent={getLeftContent()}
     />
   )

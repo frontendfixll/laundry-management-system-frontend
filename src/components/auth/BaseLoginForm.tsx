@@ -12,6 +12,7 @@ import { LandingPageTemplate, getTemplateTheme, getTemplateContent } from '@/uti
 
 interface BaseLoginFormProps {
   template: LandingPageTemplate
+  tenantSlug?: string | null
   leftSideContent?: React.ReactNode
   customStyling?: {
     containerClass?: string
@@ -22,6 +23,7 @@ interface BaseLoginFormProps {
 
 export default function BaseLoginForm({
   template,
+  tenantSlug,
   leftSideContent,
   customStyling
 }: BaseLoginFormProps) {
@@ -83,7 +85,13 @@ export default function BaseLoginForm({
       };
 
       // Always redirect to role-specific dashboard (ignore redirect URL for non-customers)
-      const redirectPath = roleRoutes[user.role] || '/auth/login';
+      let redirectPath = roleRoutes[user.role] || '/auth/login';
+
+      // Prefix with tenant slug if provided and on localhost to maintain context
+      const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      if (tenantSlug && isLocalhost && !redirectPath.startsWith(`/${tenantSlug}`)) {
+        redirectPath = `/${tenantSlug}${redirectPath}`;
+      }
 
       console.log(`🔄 Login successful - redirecting ${user.role} to: ${redirectPath}`);
 
@@ -120,7 +128,7 @@ export default function BaseLoginForm({
       {/* Back Button - Fixed Top Left */}
       <div className="absolute top-6 left-6 z-20">
         <Link
-          href="/"
+          href={tenantSlug ? `/${tenantSlug}` : "/"}
           className={`inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-lg shadow-sm text-${theme.primary}-600 hover:text-${theme.primary}-700 hover:bg-white transition-all duration-200`}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />

@@ -37,7 +37,23 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
 
   const handleLogout = () => {
     logout()
-    window.location.href = '/'
+    // Redirect to tenant landing page if available to maintain context
+    const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : []
+    const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+    let slug = tenantCookie ? tenantCookie.split('=')[1] : null
+
+    // Fallback: Check URL path if cookie is missing
+    if (!slug && typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean)
+      const potentialSlug = pathSegments[0]
+      // Check if the first segment is not a reserved route
+      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      if (potentialSlug && !reserved.includes(potentialSlug)) {
+        slug = potentialSlug
+      }
+    }
+
+    window.location.href = slug ? `/${slug}` : '/'
   }
 
   return (

@@ -45,9 +45,21 @@ import { useAdminDashboard } from '@/hooks/useAdmin'
 import { useFeatures, FeatureKey } from '@/hooks/useFeatures'
 import { usePermissions } from '@/hooks/usePermissions'
 import SidebarChatbox from '@/components/support/SidebarChatbox'
+import { useBranding } from '@/hooks/useBranding'
+
+interface NavigationItem {
+  name: string;
+  href?: string;
+  icon: any;
+  permission?: { module: string; action: string } | null;
+  feature?: FeatureKey | null;
+  isExpandable?: boolean;
+  subItems?: any[];
+  external?: boolean;
+}
 
 // Navigation items with permission requirements and feature requirements
-const navigation = [
+const navigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: Home, permission: null, feature: null },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingBag, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
   { name: 'Barcode Scanner', href: '/admin/scanner', icon: QrCode, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
@@ -123,7 +135,16 @@ const navigation = [
       { name: 'Analytics', href: '/admin/blog/analytics', icon: BarChart3, permission: null, feature: null },
     ]
   },
-  { name: 'Branding', href: '/admin/branding', icon: Palette, permission: { module: 'settings', action: 'view' }, feature: 'custom_branding' as FeatureKey },
+  {
+    name: 'Branding',
+    icon: Palette,
+    permission: { module: 'settings', action: 'view' },
+    feature: 'custom_branding' as FeatureKey,
+    isExpandable: true,
+    subItems: [
+      { name: 'Design Settings', href: '/admin/branding', icon: Palette, permission: { module: 'settings', action: 'view' }, feature: 'custom_branding' as FeatureKey },
+    ]
+  },
   { name: 'Settings', href: '/admin/settings', icon: Settings, permission: { module: 'settings', action: 'view' }, feature: 'settings' as FeatureKey },
   { name: 'Help', href: '/admin/support', icon: HelpCircle, permission: null, feature: null },
 ]
@@ -298,6 +319,40 @@ export function AdminSidebar() {
   const pathname = usePathname()
   const { isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen, expandedItems, toggleExpanded, sidebarScrollTop, setSidebarScrollTop } = useAdminSidebar()
   const { user, logout, updateUser } = useAuthStore()
+  const { branding } = useBranding()
+
+  // Debug log for branding
+  React.useEffect(() => {
+    if (branding && process.env.NODE_ENV === 'development') {
+      console.log('💎 AdminSidebar - Branding loaded:', {
+        name: branding.name,
+        slug: branding.slug,
+        businessName: branding.branding?.businessName,
+        logoUrl: branding.branding?.logo?.url
+      });
+    }
+  }, [branding]);
+
+  // Dynamic navigation with branding slug
+  const dynamicNavigation = React.useMemo(() => {
+    return navigation.map(item => {
+      if (item.name === 'Branding' && item.subItems) {
+        const updatedSubItems = [...item.subItems];
+        if (branding?.slug) {
+          updatedSubItems.push({
+            name: 'View Landing Page',
+            href: `/${branding.slug}`,
+            icon: Image,
+            permission: { module: 'settings', action: 'view' },
+            feature: 'custom_branding' as FeatureKey,
+            external: true
+          });
+        }
+        return { ...item, subItems: updatedSubItems };
+      }
+      return item;
+    });
+  }, [branding?.slug]);
   const { metrics, loading: metricsLoading } = useAdminDashboard()
   const { hasFeature, planName, isTrialPeriod, trialEndsAt } = useFeatures()
   const { hasPermission: checkUserPermission, isSuperAdmin } = usePermissions()
@@ -358,7 +413,23 @@ export function AdminSidebar() {
 
   const handleLogout = () => {
     logout()
-    window.location.href = '/'
+    // Redirect to tenant landing page if available to maintain context
+    const cookies = typeof document !== 'undefined' ? document.cookie.split('; ') : []
+    const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+    let slug = tenantCookie ? tenantCookie.split('=')[1] : null
+
+    // Fallback: Check URL path if cookie is missing
+    if (!slug && typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/').filter(Boolean)
+      const potentialSlug = pathSegments[0]
+      // Check if the first segment is not a reserved route
+      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      if (potentialSlug && !reserved.includes(potentialSlug)) {
+        slug = potentialSlug
+      }
+    }
+
+    window.location.href = slug ? `/${slug}` : '/'
   }
 
   const closeMobile = () => {
@@ -433,6 +504,8 @@ export function AdminSidebar() {
                       href={subItem.href}
                       scroll={false}
                       onClick={closeMobile}
+                      target={subItem.external ? "_blank" : undefined}
+                      rel={subItem.external ? "noopener noreferrer" : undefined}
                       className={cn(
                         'group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all',
                         isSubActive
@@ -465,6 +538,8 @@ export function AdminSidebar() {
         href={item.href}
         scroll={false}
         onClick={closeMobile}
+        target={item.external ? "_blank" : undefined}
+        rel={item.external ? "noopener noreferrer" : undefined}
         title={!showText ? item.name : undefined}
         className={cn(
           'group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all',
@@ -510,20 +585,32 @@ export function AdminSidebar() {
         }}>
           {/* Logo/Brand - Only show when expanded or mobile */}
           {(isMobile || !isCollapsed) && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
               <div style={{
                 width: '32px',
                 height: '32px',
-                background: 'linear-gradient(to right, #3b82f6, #6366f1)',
+                background: branding?.branding?.theme?.primaryColor || 'linear-gradient(to right, #3b82f6, #6366f1)',
                 borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                overflow: 'hidden',
+                flexShrink: 0
               }}>
-                <span style={{ color: 'white', fontSize: '20px' }}>⭐</span>
+                {branding?.branding?.logo?.url ? (
+                  <img
+                    src={branding.branding.logo.url}
+                    alt={branding.branding.businessName || branding.name}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                ) : (
+                  <span style={{ color: 'white', fontSize: '18px', fontWeight: 'bold' }}>
+                    {(branding?.branding?.businessName || branding?.name || 'LaundryLobby').charAt(0).toUpperCase()}
+                  </span>
+                )}
               </div>
-              <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#111827' }}>
-                LaundryLobby
+              <h1 style={{ fontSize: '15px', fontWeight: 'bold', color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {branding?.branding?.businessName || branding?.name || 'LaundryLobby'}
               </h1>
             </div>
           )}
@@ -588,9 +675,9 @@ export function AdminSidebar() {
               console.log('👤 Current user features:', Object.keys(user?.features || {}));
               console.log('👤 Current user permissions:', user?.permissions ? Object.keys(user.permissions) : 'No permissions');
 
-              const filteredNav = navigation
+              const filteredNav = dynamicNavigation
                 .filter(item => {
-                  const hasPermissionResult = hasPermissionCheck(item.permission, checkUserPermission, isSuperAdmin);
+                  const hasPermissionResult = hasPermissionCheck(item.permission || null, checkUserPermission, isSuperAdmin);
                   const hasFeatureResult = checkFeature(hasFeature, item.feature as FeatureKey | null);
 
                   // Enhanced debug logging for each item
@@ -716,7 +803,9 @@ export function AdminSidebar() {
             {(isMobile || !isCollapsed) && (
               <div className="flex items-center justify-between w-full">
                 <span>Sign Out</span>
-                <span className="text-xs text-gray-400">v2.1.0</span>
+                <div className="text-xs text-gray-400 text-center">
+                  v1.0.0
+                </div>
               </div>
             )}
           </button>

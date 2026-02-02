@@ -3,9 +3,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { 
-  ShoppingBag, Clock, CheckCircle, Truck, Plus, MapPin, Calendar, ArrowRight, 
-  Package, Sparkles, User, HelpCircle, Star, Gift, ChevronRight, ChevronLeft, BarChart3, 
+import {
+  ShoppingBag, Clock, CheckCircle, Truck, Plus, MapPin, Calendar, ArrowRight,
+  Package, Sparkles, User, HelpCircle, Star, Gift, ChevronRight, ChevronLeft, BarChart3,
   TrendingUp, ArrowLeft, Home, LogOut, Menu, X, Wallet, MessageSquare, Award
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -58,7 +58,7 @@ function DonutChart({ data, size = 200 }: { data: { value: number; color: string
       <div className="relative" style={{ width: size, height: size }}>
         {hoveredIndex !== null && <div className="absolute inset-0 rounded-full blur-2xl opacity-40 transition-all duration-500" style={{ backgroundColor: data[hoveredIndex].color }} />}
         <svg width={size} height={size} className="transform -rotate-90 relative z-10">
-          <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="#f1f5f9" strokeWidth={strokeWidth} />
+          <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#f1f5f9" strokeWidth={strokeWidth} />
           {data.map((item, i) => {
             if (item.value === 0) return null
             const pct = item.value / total, animPct = pct * animationProgress
@@ -66,7 +66,7 @@ function DonutChart({ data, size = 200 }: { data: { value: number; color: string
             const dashoffset = -currentOffset * circumference * animationProgress
             const isHov = hoveredIndex === i
             currentOffset += pct
-            return <circle key={i} cx={size/2} cy={size/2} r={radius} fill="none" stroke={item.color} strokeWidth={isHov ? strokeWidth + 10 : strokeWidth} strokeDasharray={dasharray} strokeDashoffset={dashoffset} strokeLinecap="round" className="transition-all duration-300 cursor-pointer" style={{ filter: isHov ? `drop-shadow(0 0 15px ${item.color})` : 'none', opacity: hoveredIndex !== null && !isHov ? 0.3 : 1 }} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)} />
+            return <circle key={i} cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={item.color} strokeWidth={isHov ? strokeWidth + 10 : strokeWidth} strokeDasharray={dasharray} strokeDashoffset={dashoffset} strokeLinecap="round" className="transition-all duration-300 cursor-pointer" style={{ filter: isHov ? `drop-shadow(0 0 15px ${item.color})` : 'none', opacity: hoveredIndex !== null && !isHov ? 0.3 : 1 }} onMouseEnter={() => setHoveredIndex(i)} onMouseLeave={() => setHoveredIndex(null)} />
           })}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
@@ -152,7 +152,7 @@ function SpendingChart({ orders }: { orders: any[] }) {
               <div className="flex items-center gap-3">
                 <span className={`text-sm font-bold w-10 transition-colors ${isHov ? 'text-teal-600' : 'text-gray-600'}`}>{item.month}</span>
                 <div className="flex-1 h-9 bg-gray-100 rounded-lg overflow-hidden relative">
-                  <div className="h-full rounded-lg transition-all duration-700 flex items-center justify-end pr-3" style={{ width: `${barWidth}%`, background: `linear-gradient(90deg, ${colors[i]}, ${colors[(i+1)%6]})`, transitionDelay: `${i * 100}ms`, boxShadow: isHov ? `0 4px 15px ${colors[i]}50` : 'none' }}>
+                  <div className="h-full rounded-lg transition-all duration-700 flex items-center justify-end pr-3" style={{ width: `${barWidth}%`, background: `linear-gradient(90deg, ${colors[i]}, ${colors[(i + 1) % 6]})`, transitionDelay: `${i * 100}ms`, boxShadow: isHov ? `0 4px 15px ${colors[i]}50` : 'none' }}>
                     {barWidth > 25 && <span className="text-xs font-bold text-white drop-shadow">₹{item.amount.toLocaleString()}</span>}
                   </div>
                   {barWidth <= 25 && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-bold text-gray-600">₹{item.amount}</span>}
@@ -185,9 +185,9 @@ const getSidebarNavigation = (tenantSlug: string) => [
 export default function TenantDashboard() {
   const params = useParams()
   const router = useRouter()
-  const tenant = params.tenant as string
+  const tenant = (params?.tenant as string) || ''
   const { user, token, isAuthenticated, logout } = useAuthStore()
-  
+
   // Redirect admins to their proper dashboard
   useEffect(() => {
     if (user && ['admin', 'center_admin', 'branch_admin', 'branch_manager'].includes(user.role)) {
@@ -197,7 +197,7 @@ export default function TenantDashboard() {
         branch_admin: '/branch-admin/dashboard',
         branch_manager: '/center-admin/dashboard'
       }
-      
+
       const adminDashboard = adminDashboardRoutes[user.role]
       if (adminDashboard) {
         console.log(`🔄 Admin ${user.role} accessing tenant dashboard, redirecting to: ${adminDashboard}`)
@@ -206,7 +206,7 @@ export default function TenantDashboard() {
       }
     }
   }, [user, router])
-  
+
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -264,7 +264,7 @@ export default function TenantDashboard() {
   useEffect(() => {
     const fetchTenantOrders = async () => {
       if (!token || !tenantInfo?.tenancyId) return
-      
+
       try {
         setLoading(true)
         const response = await fetch(`${API_URL}/customer/orders?tenancyId=${tenantInfo.tenancyId}`, {
@@ -282,7 +282,7 @@ export default function TenantDashboard() {
         setLoading(false)
       }
     }
-    
+
     if (tenantInfo?.tenancyId) {
       fetchTenantOrders()
     }
@@ -298,12 +298,12 @@ export default function TenantDashboard() {
   useEffect(() => {
     if (orders.length > 0) {
       const active = orders.filter(o => ['placed', 'picked', 'in_process', 'ready', 'out_for_delivery'].includes(o.status)).length
-      setStats({ 
-        total: orders.length, 
-        active, 
-        completed: orders.filter(o => o.status === 'delivered').length, 
-        pending: orders.filter(o => o.status === 'placed').length, 
-        cancelled: orders.filter(o => o.status === 'cancelled').length 
+      setStats({
+        total: orders.length,
+        active,
+        completed: orders.filter(o => o.status === 'delivered').length,
+        pending: orders.filter(o => o.status === 'placed').length,
+        cancelled: orders.filter(o => o.status === 'cancelled').length
       })
     }
   }, [orders])
@@ -315,16 +315,16 @@ export default function TenantDashboard() {
   ], [stats])
 
   const recentOrders = orders.slice(0, 5)
-  
+
   const getStatusColor = (s: string) => {
-    const colors: Record<string, string> = { 
-      delivered: 'bg-emerald-100 text-emerald-700', 
-      placed: 'bg-amber-100 text-amber-700', 
-      picked: 'bg-blue-100 text-blue-700', 
-      in_process: 'bg-blue-100 text-blue-700', 
-      ready: 'bg-purple-100 text-purple-700', 
-      out_for_delivery: 'bg-purple-100 text-purple-700', 
-      cancelled: 'bg-red-100 text-red-700' 
+    const colors: Record<string, string> = {
+      delivered: 'bg-emerald-100 text-emerald-700',
+      placed: 'bg-amber-100 text-amber-700',
+      picked: 'bg-blue-100 text-blue-700',
+      in_process: 'bg-blue-100 text-blue-700',
+      ready: 'bg-purple-100 text-purple-700',
+      out_for_delivery: 'bg-purple-100 text-purple-700',
+      cancelled: 'bg-red-100 text-red-700'
     }
     return colors[s] || 'bg-gray-100 text-gray-700'
   }
@@ -335,7 +335,9 @@ export default function TenantDashboard() {
 
   const handleLogout = () => {
     logout()
-    router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/dashboard`)}`)
+    // Use window.location.href to force a full reload and ensure middleware processing if needed
+    // This also clears client-side state more effectively
+    window.location.href = `/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/dashboard`)}`
   }
 
   if (!isAuthenticated) return null
@@ -390,7 +392,7 @@ export default function TenantDashboard() {
               <button className="lg:hidden p-2 hover:bg-gray-100 rounded-lg" onClick={() => setSidebarOpen(false)}>
                 <X className="w-5 h-5 text-gray-500" />
               </button>
-              <button 
+              <button
                 className="hidden lg:flex p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 onClick={toggleSidebarCollapse}
                 title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -431,11 +433,10 @@ export default function TenantDashboard() {
                   key={item.name}
                   href={item.href}
                   title={sidebarCollapsed ? item.name : undefined}
-                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 rounded-xl transition-all ${
-                    isActive 
-                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30' 
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 rounded-xl transition-all ${isActive
+                    ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30'
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`} />
@@ -447,16 +448,16 @@ export default function TenantDashboard() {
 
           {/* Sidebar Footer */}
           <div className={`${sidebarCollapsed ? 'p-2' : 'p-4'} border-t border-gray-100 space-y-2`}>
-            <Link 
-              href={`/${tenant}`} 
+            <Link
+              href={`/${tenant}`}
               title={sidebarCollapsed ? 'Back to Store' : undefined}
               className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 text-gray-600 hover:bg-gray-100 rounded-xl transition-all`}
             >
               <ArrowLeft className="w-5 h-5 text-gray-400 flex-shrink-0" />
               {!sidebarCollapsed && <span className="font-medium">Back to Store</span>}
             </Link>
-            <button 
-              onClick={handleLogout} 
+            <button
+              onClick={handleLogout}
               title={sidebarCollapsed ? 'Logout' : undefined}
               className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all`}
             >
@@ -481,7 +482,7 @@ export default function TenantDashboard() {
                 <p className="text-sm text-gray-500">Your orders at {tenantInfo?.name}</p>
               </div>
             </div>
-            <Button 
+            <Button
               className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-lg shadow-teal-500/30"
               onClick={handleBookNow}
             >
@@ -557,8 +558,8 @@ export default function TenantDashboard() {
                   <p className="text-sm text-gray-500">Your latest orders at {tenantInfo?.name}</p>
                 </div>
               </div>
-              <Link 
-                href={`/${tenant}/orders`} 
+              <Link
+                href={`/${tenant}/orders`}
                 className="flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium text-sm bg-teal-50 hover:bg-teal-100 px-4 py-2 rounded-xl transition-colors"
               >
                 View All <ArrowRight className="w-4 h-4" />
@@ -571,7 +572,7 @@ export default function TenantDashboard() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">No orders yet</h3>
                 <p className="text-gray-500 mb-6">Start your laundry journey with {tenantInfo?.name}!</p>
-                <Button 
+                <Button
                   className="bg-gradient-to-r from-teal-500 to-cyan-500"
                   onClick={handleBookNow}
                 >
@@ -646,7 +647,7 @@ export default function TenantDashboard() {
                     <p className="text-white/80">On your first order! Use code: FIRST20</p>
                   </div>
                 </div>
-                <Button 
+                <Button
                   className="bg-white text-orange-600 hover:bg-orange-50 font-semibold shadow-lg"
                   onClick={handleBookNow}
                 >

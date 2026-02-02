@@ -30,54 +30,79 @@ const RESERVED_ROUTES = [
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = request.headers.get('host') || ''
-  
+
+  // Get the first segment of the path
+  const pathSegments = pathname.split('/').filter(Boolean)
+  const firstSegment = pathSegments[0]
+
   // Extract subdomain from hostname
   const subdomain = extractSubdomain(hostname)
-  
+
   // Disable logging to prevent spam - only log for debugging
   if (process.env.NODE_ENV === 'development' && pathname !== '/login') {
     console.log('🌐 Middleware - Hostname:', hostname, 'Subdomain:', subdomain, 'Path:', pathname)
   }
-  
-  // If we have a valid subdomain (not reserved), handle tenant routing
+
+  // Determine tenant identifier (subdomain or first path segment)
+  let tenantIdentifier: string | null = null
+
   if (subdomain && !RESERVED_ROUTES.includes(subdomain)) {
-    console.log('🏢 Tenant subdomain detected:', subdomain)
-    
-    // Add subdomain to headers for the app to use
+    tenantIdentifier = subdomain
+  } else if (firstSegment && !RESERVED_ROUTES.includes(firstSegment)) {
+    tenantIdentifier = firstSegment
+  }
+
+  // If we have a tenant identifier, handle tenant routing/context
+  if (tenantIdentifier) {
+    console.log('🏢 Tenant detected:', tenantIdentifier)
+
+    // Check if the next segment is a reserved route (e.g., /dgsfg/admin)
+    const secondSegment = pathSegments[1]
+    if (secondSegment && RESERVED_ROUTES.includes(secondSegment)) {
+      // Rewrite to the global route but keep the tenant context
+      const newPathname = '/' + pathSegments.slice(1).join('/')
+      const url = request.nextUrl.clone()
+      url.pathname = newPathname
+
+      const response = NextResponse.rewrite(url)
+      response.headers.set('x-tenant-slug', tenantIdentifier)
+      response.cookies.set('tenant-slug', tenantIdentifier, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      })
+      return response
+    }
+
+    // Standard tenant route (e.g., /dgsfg or subdomain access)
     const response = NextResponse.next()
-    response.headers.set('x-tenant-subdomain', subdomain)
-    
-    // Store subdomain in cookie for client-side access
-    response.cookies.set('tenant-subdomain', subdomain, {
+    response.headers.set('x-tenant-slug', tenantIdentifier)
+    if (subdomain) {
+      response.headers.set('x-tenant-subdomain', subdomain)
+    }
+
+    // Store in cookie for client-side access
+    response.cookies.set('tenant-slug', tenantIdentifier, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax'
     })
-    
+
     return response
   }
-  
+
   // Public routes that don't require authentication
   const publicRoutes = ['/', '/auth/login', '/auth/register']
-  
+
   // Check if the current path is a public route
   const isPublicRoute = publicRoutes.some(route => pathname === route)
-  
-  // Get the first segment of the path
-  const firstSegment = pathname.split('/')[1]
-  
-  // Check if it's a tenant route (not reserved)
-  const isTenantRoute = firstSegment && 
-    !RESERVED_ROUTES.includes(firstSegment) && 
-    !firstSegment.startsWith('_')
-  
-  // If it's a public route or tenant route, allow access
-  if (isPublicRoute || isTenantRoute) {
+
+  // If it's a public route or matches reserved routes directly (no tenant prefix), allow access
+  if (isPublicRoute || RESERVED_ROUTES.includes(firstSegment)) {
     return NextResponse.next()
   }
-  
+
   // For protected routes, we'll handle authentication on the client side
-  // since Zustand stores data in localStorage which is not accessible in middleware
   return NextResponse.next()
 }
 
@@ -92,39 +117,39 @@ export function middleware(request: NextRequest) {
 function extractSubdomain(hostname: string): string | null {
   // Remove port if present
   const cleanHostname = hostname.split(':')[0]
-  
+
   // Skip localhost and IP addresses
   if (cleanHostname === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(cleanHostname)) {
     return null
   }
-  
+
   // Skip Vercel preview URLs
   if (cleanHostname.endsWith('.vercel.app')) {
     return null
   }
-  
+
   // Split hostname into parts
   const parts = cleanHostname.split('.')
-  
+
   // Need at least 3 parts for subdomain (subdomain.domain.com)
   if (parts.length < 3) {
     return null
   }
-  
+
   // Check if it's our main domain
   const domain = parts.slice(-2).join('.') // Get last 2 parts (domain.com)
   if (domain !== 'laundrylobby.com') {
     return null
   }
-  
+
   // Get subdomain (first part)
   const subdomain = parts[0]
-  
+
   // Skip reserved subdomains
   if (RESERVED_ROUTES.includes(subdomain)) {
     return null
   }
-  
+
   return subdomain
 }
 
