@@ -55,8 +55,24 @@ export default function LoginPage() {
       // The path might be /[tenant]/auth/login
       const pathTenant = pathSegments.length >= 3 && pathSegments[1] === 'auth' ? pathSegments[0] : null
 
-      // Determine which tenant to use - fallback to 'test' if none found
-      const identifiedSlug = subdomain || pathTenant || tenantParam || lastTenant || 'test'
+      // Determine which tenant to use - try multiple fallbacks
+      let identifiedSlug = subdomain || pathTenant || tenantParam || lastTenant
+      
+      // If no tenant detected, try to get from URL or use test as final fallback
+      if (!identifiedSlug) {
+        // Check if URL has any tenant-like patterns
+        const urlPath = window.location.pathname
+        const pathParts = urlPath.split('/').filter(Boolean)
+        
+        // Look for tenant in path (e.g., /dgsfg/auth/login)
+        if (pathParts.length > 0 && pathParts[0] !== 'auth' && pathParts[0] !== 'admin') {
+          identifiedSlug = pathParts[0]
+        } else {
+          // Final fallback to test tenant
+          identifiedSlug = 'test'
+        }
+      }
+      
       setTenantSlug(identifiedSlug)
 
       console.log('🔍 Login Page - Hostname:', hostname)
