@@ -78,9 +78,20 @@ export default function BaseLoginForm({
       if (user.role === 'customer') {
         // For customers, check if we have a redirect URL and tenant context
         if (redirectUrl && tenantSlug) {
-          // If redirect URL is provided and we're in tenant context, redirect to tenant-specific URL
-          redirectPath = `/${tenantSlug}${redirectUrl}`;
-          console.log(`🔄 Customer redirect with tenant context: ${redirectPath}`);
+          // Check if redirect URL already starts with tenant slug to avoid duplication
+          if (redirectUrl.startsWith(`/${tenantSlug}`)) {
+            // Redirect URL already contains tenant slug, use as-is
+            redirectPath = redirectUrl;
+            console.log(`🔄 Customer redirect (URL already has tenant): ${redirectPath}`);
+          } else if (redirectUrl.startsWith('/')) {
+            // Redirect URL is absolute but doesn't have tenant, prepend tenant slug
+            redirectPath = `/${tenantSlug}${redirectUrl}`;
+            console.log(`🔄 Customer redirect with tenant context: ${redirectPath}`);
+          } else {
+            // Redirect URL is relative, build full path
+            redirectPath = `/${tenantSlug}/${redirectUrl}`;
+            console.log(`🔄 Customer redirect with relative URL: ${redirectPath}`);
+          }
         } else if (tenantSlug) {
           // If no redirect URL but we have tenant context, go to tenant dashboard
           redirectPath = `/${tenantSlug}/dashboard`;
