@@ -49,8 +49,12 @@ interface UseSocketIONotificationsReturn {
 }
 
 const SOCKET_URL = typeof window !== 'undefined'
-  ? (process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : window.location.origin)
-  : 'http://localhost:5000'; // Fallback for SSR/SSG
+  ? (process.env.NEXT_PUBLIC_SOCKET_URL
+    ? new URL(process.env.NEXT_PUBLIC_SOCKET_URL).origin
+    : (process.env.NEXT_PUBLIC_API_URL
+      ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
+      : 'http://localhost:5000'))
+  : 'http://localhost:5000';
 
 export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -107,16 +111,6 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
       setStats(calculateStats(updated));
       return updated;
     });
-
-    // Toasts are now handled globally by NotificationContainer
-    // Only show toast if notification is not silent (P4)
-    // const showToast = () => { ... }
-
-    // Only show toast if notification is not silent (P4)
-    // Toast removed - handled by NotificationContainer
-    // if (notification.priority !== 'P4' && !existsAlready) {
-    //   showToast();
-    // }
 
     // Play notification sound for high priority
     if (['P0', 'P1'].includes(notification.priority)) {

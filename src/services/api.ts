@@ -314,23 +314,23 @@ export const analyticsApi = {
 // Notification APIs
 export const notificationApi = {
   async getNotifications() {
-    return apiClient.get('/admin/notifications')
+    return apiClient.get('/notifications')
   },
 
   async getUnreadCount() {
-    return apiClient.get('/admin/notifications/unread-count')
+    return apiClient.get('/notifications/unread-count')
   },
 
   async markAsRead(notificationIds: string[]) {
-    return apiClient.put('/admin/notifications/mark-read', { notificationIds })
+    return apiClient.put('/notifications/mark-read', { notificationIds })
   },
 
   async markAllAsRead() {
-    return apiClient.put('/admin/notifications/mark-all-read')
+    return apiClient.put('/notifications/read-all')
   },
 
   async clearAllNotifications() {
-    return apiClient.delete('/admin/notifications/all')
+    return apiClient.delete('/notifications/all')
   }
 }
 
