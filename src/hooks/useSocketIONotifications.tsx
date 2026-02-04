@@ -17,6 +17,9 @@ interface Notification {
   priority: 'P0' | 'P1' | 'P2' | 'P3' | 'P4';
   category: string;
   eventType: string;
+  icon?: string;
+  severity?: 'info' | 'success' | 'warning' | 'error';
+  isRead?: boolean;
   createdAt: string;
   metadata?: any;
   requiresAck?: boolean;
@@ -92,6 +95,16 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
     return stats;
   }, []);
 
+  // Acknowledge notification (for P0/P1)
+  const acknowledgeNotification = useCallback((notificationId: string) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('notification_ack', {
+        notificationId,
+        acknowledged: true
+      });
+    }
+  }, []);
+
   // Handle new notification
   const handleNewNotification = useCallback((notification: Notification) => {
     // Ensure priority exists
@@ -117,14 +130,43 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
       try {
         const audio = new Audio('/notification-sound.mp3');
         audio.volume = 0.5;
-        audio.play().catch(() => {
-          // Ignore audio play errors (user interaction required)
-        });
-      } catch (error) {
-        // Ignore audio errors
-      }
+        audio.play().catch(() => { });
+      } catch (error) { }
     }
-  }, [calculateStats]);
+
+    // Show toast notification
+    const isHighPriority = ['P0', 'P1'].includes(notification.priority);
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-1">
+          <div className="font-bold flex items-center gap-2">
+            {isHighPriority && <span className="text-red-500">🚨</span>}
+            {notification.title}
+          </div>
+          <div className="text-sm opacity-90">{notification.message}</div>
+          {notification.requiresAck && (
+            <button
+              onClick={() => {
+                acknowledgeNotification(notification.id);
+                toast.dismiss(t.id);
+              }}
+              className="mt-2 bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+            >
+              Acknowledge
+            </button>
+          )}
+        </div>
+      ),
+      {
+        duration: isHighPriority ? Infinity : 6000,
+        position: 'top-right',
+        style: {
+          borderLeft: isHighPriority ? '4px solid #ef4444' : '4px solid #3b82f6',
+          minWidth: '300px'
+        }
+      }
+    );
+  }, [calculateStats, acknowledgeNotification]);
 
   // Fetch initial notifications from API
   const fetchNotifications = useCallback(async () => {
@@ -176,7 +218,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
 
       // Connection events
       socket.on('connect', () => {
-        console.log('✅ Socket.IO connected:', socket.id);
+        console.log(`✅ Socket.IO connected: ${socket.id} for user: ${user?._id || 'unknown'}`);
         setIsConnected(true);
         setIsConnecting(false);
         setConnectionError(null);
@@ -427,22 +469,13 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
     setConnectionError(null);
   }, []);
 
-  // Acknowledge notification (for P0/P1)
-  const acknowledgeNotification = useCallback((notificationId: string) => {
-    if (socketRef.current?.connected) {
-      socketRef.current.emit('notification_ack', {
-        notificationId,
-        acknowledged: true
-      });
-    }
-  }, []);
 
   // Mark notification as read
   const markAsRead = useCallback((notificationId: string) => {
     setNotifications(prev => {
       const updated = prev.map(notif =>
         notif.id === notificationId
-          ? { ...notif, metadata: { ...notif.metadata, isRead: true } }
+          ? { ...notif, isRead: true, metadata: { ...notif.metadata, isRead: true } }
           : notif
       );
       setStats(calculateStats(updated));
@@ -460,6 +493,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
     setNotifications(prev => {
       const updated = prev.map(notif => ({
         ...notif,
+        isRead: true,
         metadata: { ...notif.metadata, isRead: true }
       }));
       setStats(calculateStats(updated));

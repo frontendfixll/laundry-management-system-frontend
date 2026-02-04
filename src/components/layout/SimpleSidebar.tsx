@@ -256,32 +256,49 @@ export function SimpleSidebar() {
       if (visibleSubItems.length === 0) return null
 
       return (
-        <div key={item.name}>
+        <div key={item.name} className="relative group/sidebar-item">
           {/* Parent Item */}
           <button
             onClick={() => toggleExpanded(item.name)}
             className={cn(
-              'group flex items-center w-full px-4 py-3 text-sm font-medium rounded-lg transition-colors text-left',
+              'group flex items-center w-full px-4 py-3 text-sm font-light rounded-lg transition-all duration-200 relative',
               isActive
-                ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
+                ? 'bg-blue-50 text-blue-700 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             )}
+            title={sidebarCollapsed ? item.name : undefined}
           >
-            <Icon className={`flex-shrink-0 w-4 h-4 mr-3 ${sidebarCollapsed ? 'lg:mx-auto lg:mr-0' : ''} ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
-            {/* Always show text on mobile, conditionally on desktop */}
-            <span className={`flex-1 text-left ${sidebarCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
+            {/* Active Indicator Bar */}
+            {isActive && sidebarCollapsed && (
+              <div className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-blue-600 rounded-r-full" />
+            )}
+
+            <Icon className={cn(
+              'flex-shrink-0 w-4 h-4 transition-transform duration-200',
+              sidebarCollapsed ? 'mx-auto' : 'mr-3',
+              isActive ? 'text-blue-600 scale-110' : 'text-gray-400 group-hover:text-gray-600 group-hover:scale-110'
+            )} />
+
+            {/* Smooth Text Transition */}
+            <span className={cn(
+              'text-left whitespace-nowrap transition-all duration-300 font-light',
+              sidebarCollapsed ? 'w-0 opacity-0 invisible overflow-hidden flex-none' : 'flex-1 w-auto opacity-100 visible'
+            )}>
+              {item.name}
+            </span>
+
             {!sidebarCollapsed && (
-              <span className="lg:block hidden">
+              <span className="lg:block hidden transition-transform duration-200">
                 {isExpanded ? (
-                  <ChevronUp className={`w-3 h-3 ml-2 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                  <ChevronUp className={cn('w-3 h-3 ml-2', isActive ? 'text-blue-600' : 'text-gray-400')} />
                 ) : (
-                  <ChevronDown className={`w-3 h-3 ml-2 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                  <ChevronDown className={cn('w-3 h-3 ml-2', isActive ? 'text-blue-600' : 'text-gray-400')} />
                 )}
               </span>
             )}
           </button>
 
-          {/* Sub Items */}
+          {/* Sub Items - Only show when expanded and NOT collapsed */}
           {!sidebarCollapsed && isExpanded && (
             <div className="ml-8 mt-1 space-y-0">
               {visibleSubItems.map((subItem: any) => {
@@ -296,40 +313,93 @@ export function SimpleSidebar() {
                     rel={subItem.external ? "noopener noreferrer" : undefined}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      'group flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors',
+                      'group flex items-center px-4 py-2 text-sm font-light rounded-md transition-colors',
                       isSubActive
                         ? 'text-blue-700 bg-blue-50 border-r-2 border-blue-600'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     )}
                   >
-                    <SubIcon className={`flex-shrink-0 w-3 h-3 mr-3 ${isSubActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                    <SubIcon className={cn('flex-shrink-0 w-3 h-3 mr-3', isSubActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600')} />
                     <span>{subItem.name}</span>
                   </Link>
                 )
               })}
             </div>
           )}
+
+          {/* Collapsed state: Show dropdown on hover */}
+          {sidebarCollapsed && (
+            <div className="lg:invisible lg:opacity-0 absolute left-full top-0 pl-2 z-[100] group-hover/sidebar-item:lg:visible group-hover/sidebar-item:lg:opacity-100 translate-x-2 group-hover/sidebar-item:translate-x-0 transition-all duration-300">
+              <div className="bg-white/95 backdrop-blur-sm border border-gray-100 rounded-xl shadow-2xl py-2 min-w-[200px] overflow-hidden">
+                <div className="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-50/50 border-b border-gray-50 mb-1">
+                  {item.name}
+                </div>
+                {/* Scrollable Sub-items */}
+                <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
+                  {visibleSubItems.map((subItem: any) => {
+                    const isSubActive = pathname === subItem.href
+                    const SubIcon = subItem.icon
+
+                    return (
+                      <Link
+                        key={subItem.name}
+                        href={subItem.href}
+                        target={subItem.external ? "_blank" : undefined}
+                        rel={subItem.external ? "noopener noreferrer" : undefined}
+                        onClick={() => setMobileOpen(false)}
+                        className={cn(
+                          'group/sub flex items-center px-4 py-2.5 text-sm transition-all duration-200',
+                          isSubActive
+                            ? 'text-blue-700 bg-blue-50/80 font-medium'
+                            : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50/30'
+                        )}
+                      >
+                        <SubIcon className={cn('flex-shrink-0 w-3.5 h-3.5 mr-3 transition-colors', isSubActive ? 'text-blue-600' : 'text-gray-400 group-hover/sub:text-blue-500')} />
+                        <span className="flex-1 font-light">{subItem.name}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )
     }
 
+    // Regular navigation item
     return (
       <Link
         key={item.name}
         href={item.href}
         target={item.external ? "_blank" : undefined}
         rel={item.external ? "noopener noreferrer" : undefined}
-        title={sidebarCollapsed ? item.name : undefined}
+        onClick={() => setMobileOpen(false)}
         className={cn(
-          'group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors',
+          'group flex items-center px-4 py-3 text-sm font-light rounded-lg transition-all duration-200 relative',
           isActive
-            ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-600'
+            ? 'bg-blue-50 text-blue-700 shadow-sm'
             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
         )}
+        title={sidebarCollapsed ? item.name : undefined}
       >
-        <Icon className={`flex-shrink-0 w-4 h-4 mr-3 ${sidebarCollapsed ? 'lg:mx-auto lg:mr-0' : ''} ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
-        {/* Always show text on mobile, conditionally on desktop */}
-        <span className={`flex-1 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>{item.name}</span>
+        {/* Active Indicator Bar */}
+        {isActive && sidebarCollapsed && (
+          <div className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-blue-600 rounded-r-full" />
+        )}
+
+        <Icon className={cn(
+          'flex-shrink-0 w-4 h-4 transition-transform duration-200',
+          sidebarCollapsed ? 'mx-auto' : 'mr-3',
+          isActive ? 'text-blue-600 scale-110' : 'text-gray-400 group-hover:text-gray-600 group-hover:scale-110'
+        )} />
+        {/* Smooth Text Transition */}
+        <span className={cn(
+          'whitespace-nowrap transition-all duration-300 font-light',
+          sidebarCollapsed ? 'w-0 opacity-0 invisible overflow-hidden flex-none' : 'flex-1 w-auto opacity-100 visible'
+        )}>
+          {item.name}
+        </span>
       </Link>
     )
   }
@@ -349,45 +419,45 @@ export function SimpleSidebar() {
 
       {/* Sidebar */}
       <div className={cn(
-        "admin-sidebar lg:relative fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 flex flex-col w-56",
+        "admin-sidebar lg:relative fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 flex flex-col w-56",
         sidebarWidth,
         mobileOpen ? "translate-x-0" : "-translate-x-full",
         "lg:translate-x-0",
         sidebarCollapsed ? "sidebar-collapsed" : ""
       )}>
         {/* Fixed Header */}
-        <div className="sidebar-header flex-shrink-0 flex items-center justify-between h-12 px-4 border-b border-gray-200 bg-white">
+        <div className="sidebar-header flex-shrink-0 flex items-center justify-between h-14 px-6 border-b border-gray-100 bg-white">
           {/* Logo - always show on mobile, conditionally on desktop */}
-          {!sidebarCollapsed && (
-            <div className="flex items-center space-x-3 transition-opacity duration-300 max-w-full overflow-hidden">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm"
-                style={{ background: branding?.branding?.theme?.primaryColor || '#2563eb' }}
-              >
-                {branding?.branding?.logo?.url ? (
-                  <img
-                    src={branding.branding.logo.url}
-                    alt={branding.branding.businessName || branding.name}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <span className="text-white font-bold text-sm">
-                    {(branding?.branding?.businessName || branding?.name || 'LaundryLobby').charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-sm font-semibold text-gray-900 truncate">
-                  {branding?.branding?.businessName || branding?.name || 'LaundryLobby'}
-                </h1>
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Admin Panel</p>
-              </div>
+          <div className={`flex items-center space-x-3 transition-all duration-300 overflow-hidden ${sidebarCollapsed ? 'lg:w-0 lg:opacity-0' : 'lg:w-auto lg:opacity-100'}`}>
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm shadow-blue-100/50"
+              style={{ background: branding?.branding?.theme?.primaryColor || '#2563eb' }}
+            >
+              {branding?.branding?.logo?.url ? (
+                <img
+                  src={branding.branding.logo.url}
+                  alt={branding.branding.businessName || branding.name}
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <span className="text-white font-bold text-sm">
+                  {(branding?.branding?.businessName || branding?.name || 'LaundryLobby').charAt(0).toUpperCase()}
+                </span>
+              )}
             </div>
-          )}
+            <div className="min-w-0">
+              <h1 className="text-sm font-semibold text-gray-900 truncate">
+                {branding?.branding?.businessName || branding?.name || 'LaundryLobby'}
+              </h1>
+              <p className="text-[10px] text-gray-400 uppercase tracking-wider font-light">Admin Panel</p>
+            </div>
+          </div>
+
+          {/* Collapsed Logo Icon */}
           {sidebarCollapsed && (
-            <div className="flex items-center justify-center flex-1 transition-opacity duration-300">
+            <div className="hidden lg:flex items-center justify-center w-full transition-all duration-300">
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shadow-sm"
+                className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden shadow-md shadow-blue-100/50"
                 style={{ background: branding?.branding?.theme?.primaryColor || '#2563eb' }}
               >
                 {branding?.branding?.logo?.url ? (
@@ -432,8 +502,11 @@ export function SimpleSidebar() {
 
         {/* Scrollable Content Area */}
         <div className="flex-1 flex flex-col min-h-0">
-          {/* Navigation - Scrollable with proper overflow handling */}
-          <nav className={`flex-1 px-0 py-6 space-y-0 ${sidebarCollapsed ? 'overflow-hidden lg:overflow-visible' : 'overflow-y-auto'}`}>
+          {/* Navigation - Conditional Scrollable to prevent clipping of popovers */}
+          <nav className={cn(
+            'flex-1 px-0 py-6 space-y-0',
+            sidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto custom-scrollbar'
+          )}>
             {dynamicNavigation
               .filter(item => {
                 const hasPermissionResult = hasPermissionCheck(item.permission)
@@ -455,20 +528,23 @@ export function SimpleSidebar() {
           {/* Fixed Footer Elements */}
           <div className="flex-shrink-0">
             {/* Quick Stats */}
-            <div className={`px-4 py-3 border-t border-gray-200 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Today's Overview</h3>
-                <div className="space-y-1 text-xs text-gray-600">
-                  <div className="flex justify-between">
-                    <span>New Orders</span>
+            <div className={cn(
+              'px-4 py-3 border-t border-gray-100 transition-all duration-300 overflow-hidden',
+              sidebarCollapsed ? 'lg:h-0 lg:p-0 lg:opacity-0' : 'lg:h-auto lg:opacity-100'
+            )}>
+              <div className="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 rounded-xl p-4 border border-blue-50/50">
+                <h3 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Today's Overview</h3>
+                <div className="space-y-2 text-xs text-gray-600">
+                  <div className="flex justify-between items-center">
+                    <span className="font-light">New Orders</span>
                     <span className="font-medium text-blue-600">12</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Pending</span>
+                  <div className="flex justify-between items-center">
+                    <span className="font-light">Pending</span>
                     <span className="font-medium text-orange-600">8</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Completed</span>
+                  <div className="flex justify-between items-center">
+                    <span className="font-light">Completed</span>
                     <span className="font-medium text-green-600">45</span>
                   </div>
                 </div>
@@ -476,30 +552,45 @@ export function SimpleSidebar() {
             </div>
 
             {/* Version Info */}
-            <div className={`px-6 py-3 border-t border-gray-200 ${sidebarCollapsed ? 'lg:hidden' : ''}`}>
-              <div className="text-xs text-gray-400 font-light">
-                v1.0.0
+            <div className={cn(
+              'px-6 py-3 border-t border-gray-50 transition-all duration-300 overflow-hidden',
+              sidebarCollapsed ? 'lg:h-0 lg:p-0 lg:opacity-0' : 'lg:h-auto lg:opacity-100'
+            )}>
+              <div className="text-[10px] text-gray-400 font-light tracking-widest uppercase">
+                v1.0.0 Stable
               </div>
             </div>
 
             {/* Logout */}
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-2 lg:p-4 border-t border-gray-50">
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className={`group flex items-center w-full px-4 py-3 text-sm font-medium text-gray-600 hover:text-red-600 transition-colors ${sidebarCollapsed ? 'lg:justify-center' : ''}`}
+                className={cn(
+                  'group flex items-center w-full px-4 py-3 text-sm font-light text-gray-600 hover:text-red-600 transition-all duration-200 rounded-lg hover:bg-red-50/50',
+                  sidebarCollapsed ? 'lg:justify-center' : ''
+                )}
+                title={sidebarCollapsed ? "Sign Out" : undefined}
               >
                 {isLoggingOut ? (
-                  <div className={`w-4 h-4 mr-3 ${sidebarCollapsed ? 'lg:mr-0' : ''} animate-spin`}>
+                  <div className={cn('w-4 h-4 animate-spin', !sidebarCollapsed && 'mr-3')}>
                     <svg className="w-4 h-4 text-red-600" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                   </div>
                 ) : (
-                  <LogOut className={`flex-shrink-0 w-4 h-4 mr-3 ${sidebarCollapsed ? 'lg:mr-0' : ''} text-gray-400 group-hover:text-red-500`} />
+                  <LogOut className={cn(
+                    'flex-shrink-0 w-4 h-4 transition-all duration-200 text-gray-400 group-hover:text-red-500 group-hover:scale-110',
+                    sidebarCollapsed ? 'lg:mr-0' : 'mr-3'
+                  )} />
                 )}
-                <span className={sidebarCollapsed ? 'lg:hidden' : ''}>{isLoggingOut ? 'Signing Out...' : 'Sign Out'}</span>
+                <span className={cn(
+                  'whitespace-nowrap transition-all duration-300',
+                  sidebarCollapsed ? 'w-0 opacity-0 invisible overflow-hidden' : 'w-auto opacity-100 visible'
+                )}>
+                  {isLoggingOut ? 'Signing Out...' : 'Sign Out'}
+                </span>
               </button>
             </div>
           </div>

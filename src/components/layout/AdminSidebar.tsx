@@ -112,6 +112,7 @@ const navigation: NavigationItem[] = [
   { name: 'Refunds', href: '/admin/refunds', icon: RefreshCw, permission: { module: 'orders', action: 'view' }, feature: 'refunds' as FeatureKey },
   { name: 'Payments', href: '/admin/payments', icon: CreditCard, permission: { module: 'orders', action: 'view' }, feature: 'payments' as FeatureKey },
   { name: 'Analytics', href: '/admin/analytics', icon: BarChart3, permission: { module: 'analytics', action: 'view' }, feature: 'advanced_analytics' as FeatureKey },
+  { name: 'Automation', href: '/admin/automation', icon: RefreshCw, permission: { module: 'settings', action: 'view' }, feature: null },
   {
     name: 'Marketplace',
     icon: ShoppingBag,

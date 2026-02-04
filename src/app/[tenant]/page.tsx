@@ -228,6 +228,8 @@ export default function TenantLandingPage() {
           <p className="text-xl text-gray-600 mb-2">Laundry not found</p>
           <p className="text-gray-500 mb-8">
             The laundry "<strong>{tenant}</strong>" doesn't exist or is not active.
+            <br />
+            <span className="text-xs text-red-400">Error: {error || 'None'} | API: {process.env.NEXT_PUBLIC_API_URL || 'Default: 5000'}</span>
           </p>
           <a
             href="/"

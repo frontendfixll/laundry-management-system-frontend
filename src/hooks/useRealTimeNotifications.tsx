@@ -299,7 +299,8 @@ export const useRealTimeNotifications = () => {
 
     try {
       const token = getAuthToken()
-      const response = await fetch(`${API_URL}/admin/notifications?limit=50&sort=createdAt:-1`, { // Increased limit and added sort
+      // Use universal notifications endpoint instead of role-specific one
+      const response = await fetch(`${API_URL}/notifications?limit=50`, {
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include'
       })
@@ -352,7 +353,7 @@ export const useRealTimeNotifications = () => {
   const fetchUnreadCount = async () => {
     try {
       const token = getAuthToken()
-      const response = await fetch(`${API_URL}/admin/notifications/unread-count`, {
+      const response = await fetch(`${API_URL}/notifications/unread-count`, {
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include'
       })
@@ -368,7 +369,7 @@ export const useRealTimeNotifications = () => {
   const markAsRead = async (notificationIds: string[]) => {
     try {
       const token = getAuthToken()
-      await fetch(`${API_URL}/admin/notifications/mark-read`, {
+      await fetch(`${API_URL}/notifications/mark-read`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -395,7 +396,7 @@ export const useRealTimeNotifications = () => {
   const markAllAsRead = async () => {
     try {
       const token = getAuthToken()
-      await fetch(`${API_URL}/admin/notifications/read-all`, {
+      await fetch(`${API_URL}/notifications/read-all`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
         credentials: 'include'

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useTenancyTheme } from '@/contexts/TenancyThemeContext'
+import NotificationBell from '@/components/NotificationBell'
 import {
   Bell,
   Plus,
@@ -215,86 +216,11 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
             </Button>
           </Link>
 
-          {/* Notifications */}
-          <div className="relative" ref={notifDropdownRef}>
-            <button
-              onClick={handleBellClick}
-              className="relative p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
-            >
-              <Bell className="w-5 h-5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white px-1">
-                  {unreadCount > 99 ? '99+' : unreadCount}
-                </span>
-              )}
-            </button>
-
-            {/* Notification Dropdown */}
-            {showNotifDropdown && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
-                {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                  <h3 className="font-semibold text-gray-800">Notifications</h3>
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-xs text-teal-600 hover:text-teal-700 font-medium"
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-
-                {/* Notifications List */}
-                <div className="max-h-80 overflow-y-auto">
-                  {loading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  ) : notifications.length === 0 ? (
-                    <div className="text-center py-8 px-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <Bell className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <p className="text-gray-500 text-sm">No notifications yet</p>
-                    </div>
-                  ) : (
-                    <div className="divide-y divide-gray-50">
-                      {notifications.map((notif) => (
-                        <div
-                          key={notif._id}
-                          onClick={() => !notif.isRead && markAsRead(notif._id)}
-                          className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${!notif.isRead ? 'bg-teal-50/50' : ''
-                            }`}
-                        >
-                          <div className="flex gap-3">
-                            <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                              {getNotificationIcon(notif.type)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-sm ${!notif.isRead ? 'font-semibold text-gray-800' : 'text-gray-700'}`}>
-                                {notif.title}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
-                                {notif.message}
-                              </p>
-                              <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {formatTime(notif.createdAt)}
-                              </p>
-                            </div>
-                            {!notif.isRead && (
-                              <div className="w-2 h-2 bg-teal-500 rounded-full flex-shrink-0 mt-2"></div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <NotificationBell />
           </div>
+
+          {/* New Order Button */}
 
           {/* User Avatar with Dropdown */}
           <div className="relative" ref={userDropdownRef}>

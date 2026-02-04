@@ -9,6 +9,7 @@ import {
   TrendingUp, ArrowLeft, Home, LogOut, Menu, X, Wallet, MessageSquare, Award
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import NotificationBell from '@/components/NotificationBell'
 import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
 
@@ -482,13 +483,17 @@ export default function TenantDashboard() {
                 <p className="text-sm text-gray-500">Your orders at {tenantInfo?.name}</p>
               </div>
             </div>
-            <Button
-              className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-lg shadow-teal-500/30"
-              onClick={handleBookNow}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">New Order</span>
-            </Button>
+
+            <div className="flex items-center gap-2 sm:gap-4">
+              <NotificationBell />
+              <Button
+                className="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white shadow-lg shadow-teal-500/30"
+                onClick={handleBookNow}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">New Order</span>
+              </Button>
+            </div>
           </div>
         </header>
 

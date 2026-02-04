@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { 
-  BellRing, 
-  CheckCircle, 
-  AlertTriangle, 
-  XCircle, 
-  Shield, 
-  Package, 
+import {
+  BellRing,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Shield,
+  Package,
   CreditCard,
   User,
   Settings,
@@ -21,67 +21,70 @@ import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
 
 interface Notification {
   id: string
+  _id?: string
   title: string
   message: string
   priority: 'P0' | 'P1' | 'P2' | 'P3' | 'P4'
   category: string
   eventType: string
+  icon?: string
+  severity?: 'info' | 'success' | 'warning' | 'error'
+  isRead?: boolean
   createdAt: string
   metadata?: any
   requiresAck?: boolean
 }
 
-const getNotificationIcon = (priority: string, category: string) => {
+const getNotificationIcon = (iconName: string, priority: string, severity: string) => {
   const iconProps = { className: "w-4 h-4" }
-  
+
   // Priority-based coloring
-  const getColorClass = (priority: string) => {
-    switch (priority) {
-      case 'P0': return 'text-red-600'
-      case 'P1': return 'text-orange-500'
-      case 'P2': return 'text-blue-500'
-      case 'P3': return 'text-gray-500'
-      case 'P4': return 'text-gray-400'
-      default: return 'text-blue-500'
+  const getColorClass = (p: string, s: string) => {
+    if (s === 'error' || p === 'P0') return 'text-red-600'
+    if (s === 'warning' || p === 'P1') return 'text-orange-500'
+    if (s === 'success') return 'text-green-500'
+    if (p === 'P2') return 'text-blue-500'
+    if (p === 'P4') return 'text-gray-400'
+    return 'text-blue-500' // Default info/P3
+  }
+
+  const colorClass = getColorClass(priority, severity)
+
+  // Icon mapping based on iconName (Lucide component)
+  const IconComponent = () => {
+    switch (iconName?.toLowerCase()) {
+      case 'bell': return <BellRing {...iconProps} className={`${colorClass}`} />
+      case 'shield-check':
+      case 'shield': return <Shield {...iconProps} className={`${colorClass}`} />
+      case 'package':
+      case 'shopping-bag': return <Package {...iconProps} className={`${colorClass}`} />
+      case 'credit-card': return <CreditCard {...iconProps} className={`${colorClass}`} />
+      case 'user':
+      case 'user-check':
+      case 'user-plus': return <User {...iconProps} className={`${colorClass}`} />
+      case 'settings': return <Settings {...iconProps} className={`${colorClass}`} />
+      case 'star': return <Star {...iconProps} className={`${colorClass}`} />
+      case 'trending-up': return <TrendingUp {...iconProps} className={`${colorClass}`} />
+      case 'check-circle': return <CheckCircle {...iconProps} className={`${colorClass}`} />
+      case 'alert-triangle': return <AlertTriangle {...iconProps} className={`${colorClass}`} />
+      case 'x-circle': return <XCircle {...iconProps} className={`${colorClass}`} />
+      default: return <BellRing {...iconProps} className={`${colorClass}`} />
     }
   }
-  
-  // Category-based icons
-  switch (category) {
-    case 'permissions':
-    case 'security':
-      return <Shield {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-    case 'orders':
-      return <Package {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-    case 'payments':
-      return <CreditCard {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-    case 'admin':
-      return <User {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-    case 'system':
-      return <Settings {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-    case 'rewards':
-      return <Star {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-    case 'marketing':
-      return <TrendingUp {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-    default:
-      return <BellRing {...iconProps} className={`w-4 h-4 ${getColorClass(priority)}`} />
-  }
+
+  return <IconComponent />
 }
 
-const getSeverityStyles = (priority: string) => {
+const getSeverityStyles = (priority: string, severity: string) => {
+  if (severity === 'error' || priority === 'P0') return 'bg-red-50 border-l-red-500'
+  if (severity === 'warning' || priority === 'P1') return 'bg-orange-50 border-l-orange-400'
+  if (severity === 'success') return 'bg-green-50 border-l-green-500'
+
   switch (priority) {
-    case 'P0':
-      return 'bg-red-50 border-l-red-500'
-    case 'P1':
-      return 'bg-orange-50 border-l-orange-400'
-    case 'P2':
-      return 'bg-blue-50 border-l-blue-400'
-    case 'P3':
-      return 'bg-gray-50 border-l-gray-400'
-    case 'P4':
-      return 'bg-gray-50 border-l-gray-300'
-    default:
-      return 'bg-blue-50 border-l-blue-400'
+    case 'P2': return 'bg-blue-50 border-l-blue-400'
+    case 'P3': return 'bg-gray-50 border-l-gray-400'
+    case 'P4': return 'bg-gray-50 border-l-gray-300'
+    default: return 'bg-blue-50 border-l-blue-400'
   }
 }
 
@@ -89,7 +92,7 @@ const formatTimeAgo = (dateString: string) => {
   const now = new Date()
   const date = new Date(dateString)
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
-  
+
   if (diffInSeconds < 60) return 'Just now'
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`
@@ -132,12 +135,12 @@ export default function NotificationBell() {
     if (!notification.metadata?.isRead) {
       markAsRead(notification.id)
     }
-    
+
     // Handle acknowledgment for P0/P1 notifications
     if (notification.requiresAck && ['P0', 'P1'].includes(notification.priority)) {
       acknowledgeNotification(notification.id)
     }
-    
+
     // Navigate to relevant page if link exists
     if (notification.metadata?.link) {
       window.location.href = notification.metadata.link
@@ -145,7 +148,7 @@ export default function NotificationBell() {
   }
 
   const handleSelectNotification = (notificationId: string) => {
-    setSelectedNotifications(prev => 
+    setSelectedNotifications(prev =>
       prev.includes(notificationId)
         ? prev.filter(id => id !== notificationId)
         : [...prev, notificationId]
@@ -167,14 +170,14 @@ export default function NotificationBell() {
         className="relative p-2 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500"
       >
         <BellRing className="w-6 h-6 text-yellow-500" />
-        
+
         {/* Unread Count Badge */}
         {stats.unread > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
             {stats.unread > 99 ? '99+' : stats.unread}
           </span>
         )}
-        
+
         {/* Connection Status Indicator */}
         {!isConnected && (
           <span className="absolute -bottom-1 -right-1 bg-yellow-500 text-white text-xs rounded-full h-3 w-3 flex items-center justify-center">
@@ -240,36 +243,34 @@ export default function NotificationBell() {
               <div className="divide-y divide-gray-100">
                 {notifications.map((notification) => (
                   <div
-                    key={notification._id}
-                    className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer border-l-4 ${
-                      getSeverityStyles(notification.severity)
-                    } ${!notification.isRead ? 'bg-blue-50/30' : ''}`}
+                    key={notification.id}
+                    className={`p-4 hover:bg-gray-50 transition-colors cursor-pointer border-l-4 ${getSeverityStyles(notification.priority || 'P3', notification.severity || 'info')
+                      } ${!notification.isRead ? 'bg-blue-50/5' : ''}`}
                     onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start gap-3">
                       {/* Selection Checkbox */}
                       <input
                         type="checkbox"
-                        checked={selectedNotifications.includes(notification._id)}
+                        checked={selectedNotifications.includes(notification.id)}
                         onChange={(e) => {
                           e.stopPropagation()
-                          handleSelectNotification(notification._id)
+                          handleSelectNotification(notification.id)
                         }}
                         className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
-                      
+
                       {/* Notification Icon */}
                       <div className="flex-shrink-0 mt-0.5">
-                        {getNotificationIcon(notification.icon, notification.severity)}
+                        {getNotificationIcon(notification.icon || 'bell', notification.priority, notification.severity || 'info')}
                       </div>
-                      
+
                       {/* Notification Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <p className={`text-sm font-medium ${
-                              !notification.isRead ? 'text-gray-900' : 'text-gray-700'
-                            }`}>
+                            <p className={`text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'
+                              }`}>
                               {notification.title}
                             </p>
                             <p className="text-sm text-gray-600 mt-1 line-clamp-2">
@@ -279,7 +280,7 @@ export default function NotificationBell() {
                               {formatTimeAgo(notification.createdAt)}
                             </p>
                           </div>
-                          
+
                           {/* Unread Indicator */}
                           {!notification.isRead && (
                             <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-2" />

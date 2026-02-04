@@ -5,7 +5,8 @@ import AdminHeader from '@/components/layout/AdminHeader'
 import NotificationContainer from '@/components/NotificationContainer'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import ModernToaster from '@/components/ModernToast'
-import { ThemedPageLoader } from '@/components/ui/ThemedSpinner'
+import ProgressLoader from '@/components/ui/ProgressLoader'
+import { useLoadingProgress } from '@/hooks/useLoadingProgress'
 import { useAuthStore } from '@/store/authStore'
 import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
 import { useRouter } from 'next/navigation'
@@ -96,11 +97,14 @@ export default function AdminLayout({
     setIsLoading(false);
   }, [isAuthenticated, user, router, _hasHydrated]);
 
-  if (!_hasHydrated || isLoading || !isAuthenticated || !user) {
+  const { progress, message, subMessage } = useLoadingProgress(_hasHydrated && !isLoading && isAuthenticated && !!user)
+
+  if (!_hasHydrated || isLoading || !isAuthenticated || !user || progress < 100) {
     return (
-      <ThemedPageLoader
-        text="Loading Dashboard"
-        variant="primary"
+      <ProgressLoader
+        progress={progress}
+        message={message}
+        subMessage={subMessage}
       />
     )
   }
