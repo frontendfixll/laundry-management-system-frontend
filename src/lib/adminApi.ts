@@ -20,14 +20,14 @@ class AdminAPI {
     if (!token) {
       token = localStorage.getItem('token')
     }
-    
+
     // Debug: Log token status (only first/last few chars for security)
     if (token) {
-      console.log('🔑 Token found:', token.substring(0, 20) + '...' + token.substring(token.length - 10))
+      // console.log('🔑 Token found:', token.substring(0, 20) + '...' + token.substring(token.length - 10))
     } else {
-      console.error('❌ No token found in localStorage!')
+      // console.error('❌ No token found in localStorage!')
     }
-    
+
     return {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` })
@@ -36,15 +36,15 @@ class AdminAPI {
 
   private async handleResponse(response: Response) {
     const contentType = response.headers.get('content-type')
-    
+
     if (!contentType || !contentType.includes('application/json')) {
       const text = await response.text()
       console.error('Non-JSON response received:', text)
       throw new Error(`Server returned non-JSON response. Status: ${response.status}`)
     }
-    
+
     const data = await response.json()
-    
+
     if (!response.ok) {
       // Log detailed error for debugging
       console.error('API Error:', {
@@ -54,7 +54,7 @@ class AdminAPI {
       })
       throw new Error(data.message || `API request failed with status ${response.status}`)
     }
-    
+
     return data
   }
 
@@ -63,7 +63,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -91,7 +91,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/orders?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -101,7 +101,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ branchId })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -111,7 +111,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ logisticsPartnerId, type })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -121,7 +121,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ status, notes })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -146,7 +146,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/customers?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -154,7 +154,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/customers/${customerId}/details`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -163,7 +163,7 @@ class AdminAPI {
       method: 'PUT',
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -173,7 +173,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ isVIP })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -200,7 +200,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/complaints?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -208,7 +208,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/complaints/${complaintId}`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -218,7 +218,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ agentId })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -228,7 +228,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ status, resolution })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -255,7 +255,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/refunds?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -263,7 +263,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/refunds/${refundId}`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -279,7 +279,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data)
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -289,7 +289,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ notes })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -299,7 +299,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ reason })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -309,7 +309,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ reason })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -319,7 +319,7 @@ class AdminAPI {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ transactionId })
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -328,7 +328,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/support-agents`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -337,7 +337,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/branches`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -346,7 +346,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/logistics-partners`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -371,7 +371,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/branches?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -399,7 +399,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/payments?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -409,7 +409,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/analytics?timeframe=${timeframe}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -435,7 +435,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/staff?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -444,7 +444,7 @@ class AdminAPI {
       method: 'PATCH',
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -453,7 +453,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/logistics-partners`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 
@@ -480,7 +480,7 @@ class AdminAPI {
       `${API_BASE_URL}/admin/payments?${searchParams}`,
       { headers: this.getAuthHeaders() }
     )
-    
+
     return this.handleResponse(response)
   }
 
@@ -488,7 +488,7 @@ class AdminAPI {
     const response = await fetch(`${API_BASE_URL}/admin/payments/stats`, {
       headers: this.getAuthHeaders()
     })
-    
+
     return this.handleResponse(response)
   }
 }

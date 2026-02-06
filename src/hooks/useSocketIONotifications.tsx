@@ -116,7 +116,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
       // DEDUPLICATION: Check if this notification already exists in the list
       const exists = prev.some(n => (n.id === notification.id) || (n._id === notification.id));
       if (exists) {
-        console.log(`♻️ Skipping duplicate notification: ${notification.id}`);
+        // console.log(`♻️ Skipping duplicate notification: ${notification.id}`);
         return prev;
       }
 
@@ -127,11 +127,11 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
 
     // Play notification sound for high priority
     if (['P0', 'P1'].includes(notification.priority)) {
-      try {
-        const audio = new Audio('/notification-sound.mp3');
-        audio.volume = 0.5;
-        audio.play().catch(() => { });
-      } catch (error) { }
+      // try {
+      //   const audio = new Audio('/notification-sound.mp3');
+      //   audio.volume = 0.5;
+      //   audio.play().catch(() => { });
+      // } catch (error) { }
     }
 
     // Show toast notification
@@ -173,7 +173,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
     if (!user || !token) return;
 
     try {
-      console.log('🔄 Fetching historical notifications...');
+      // console.log('🔄 Fetching historical notifications...');
       const data = await notificationApi.getNotifications() as any;
 
       if (data && data.notifications) {
@@ -185,12 +185,12 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
 
         setNotifications(mappedNotifications);
         setStats(calculateStats(mappedNotifications));
-        console.log(`✅ Loaded ${mappedNotifications.length} notifications from database`);
+        // console.log(`✅ Loaded ${mappedNotifications.length} notifications from database`);
       }
     } catch (error) {
       console.error('❌ Failed to fetch notifications:', error);
     }
-  }, [user, token, calculateStats]);
+  }, [user?._id, token, calculateStats]);
 
   // Connect to Socket.IO server
   const connect = useCallback(() => {
@@ -218,7 +218,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
 
       // Connection events
       socket.on('connect', () => {
-        console.log(`✅ Socket.IO connected: ${socket.id} for user: ${user?._id || 'unknown'}`);
+        // console.log(`✅ Socket.IO connected: ${socket.id} for user: ${user?._id || 'unknown'}`);
         setIsConnected(true);
         setIsConnecting(false);
         setConnectionError(null);
@@ -228,7 +228,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
       });
 
       socket.on('disconnect', (reason) => {
-        console.log('🔌 Socket.IO disconnected:', reason);
+        // console.log('🔌 Socket.IO disconnected:', reason);
         setIsConnected(false);
         setIsConnecting(false);
 
@@ -249,7 +249,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
 
       // Connection confirmation
       socket.on('connection_confirmed', (data) => {
-        console.log('✅ Socket.IO connection confirmed:', data);
+        // console.log('✅ Socket.IO connection confirmed:', data);
       });
 
       // Notification events
@@ -284,7 +284,42 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
           // Dispatch custom event for immediate UI reaction
           window.dispatchEvent(new CustomEvent('permissionsUpdated', { detail: data.data }));
 
-          console.log('✅ Permissions synced silently via permission_sync');
+          // Trigger visual notification (Green Flash/Slide)
+          if (typeof window !== 'undefined' && (window as any).__addSlideNotification) {
+            console.log('📢 Triggering Flash bridge for permission_sync');
+            (window as any).__addSlideNotification({
+              title: 'Permissions Updated',
+              message: 'Your access permissions have been updated',
+              type: 'permission_update',
+              duration: 0,
+              actionText: 'Refresh UI',
+              onAction: () => window.location.reload()
+            });
+          }
+
+          // SYNTHESIZE NOTIFICATION FOR LIST
+          // Ensure this event also appears in the notification bell list immediately
+          const synthesizedNotification: Notification = {
+            id: `perm_sync_${Date.now()}`,
+            title: 'Permissions Updated',
+            message: 'Your access permissions have been updated by an administrator',
+            priority: 'P1',
+            category: 'permissions',
+            eventType: 'permission_sync',
+            icon: 'shield-check',
+            severity: 'warning',
+            isRead: false,
+            createdAt: new Date().toISOString(),
+            metadata: {
+              ...data.data,
+              isHighPriority: true
+            },
+            requiresAck: true
+          };
+
+          handleNewNotification(synthesizedNotification);
+
+          console.log('✅ Permissions synced and notified via permission_sync');
         }
       });
 
@@ -533,7 +568,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
 
   // Initialize connection when user and token are available
   useEffect(() => {
-    if (user && token) {
+    if (user?._id && token) {
       connect();
     } else {
       disconnect();
@@ -542,7 +577,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
     return () => {
       disconnect();
     };
-  }, [user, token, connect, disconnect]);
+  }, [user?._id, token, connect, disconnect]);
 
   // Cleanup on unmount
   useEffect(() => {

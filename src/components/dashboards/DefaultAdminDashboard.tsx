@@ -125,12 +125,12 @@ const SimpleBarChart = ({ data, height = 200 }: { data: { week: string; revenue:
 
   const maxRevenue = Math.max(...safeData.map(d => d.revenue))
 
-  console.log('📊 SimpleBarChart Debug:', {
-    originalData: data,
-    safeData,
-    maxRevenue,
-    dataLength: safeData.length
-  })
+  // console.log('📊 SimpleBarChart Debug:', {
+  //   originalData: data,
+  //   safeData,
+  //   maxRevenue,
+  //   dataLength: safeData.length
+  // })
 
   // Always render the chart, never show empty state
   return (
@@ -174,32 +174,32 @@ export function DefaultAdminDashboard() {
 
   // Debug component lifecycle
   useEffect(() => {
-    console.log('🚀 DefaultAdminDashboard MOUNTED')
+    // console.log('🚀 DefaultAdminDashboard MOUNTED')
     return () => {
-      console.log('💀 DefaultAdminDashboard UNMOUNTED')
+      // console.log('💀 DefaultAdminDashboard UNMOUNTED')
     }
   }, [])
 
   useEffect(() => {
-    console.log('🔄 Data State Changed:', {
-      loading,
-      analyticsLoading,
-      hasMetrics: !!metrics,
-      hasRecentOrders: !!recentOrders?.length,
-      hasWeeklyOrders: !!weeklyOrders?.length,
-      hasOrderStatus: !!orderStatus?.length
-    })
+    // console.log('🔄 Data State Changed:', {
+    //   loading,
+    //   analyticsLoading,
+    //   hasMetrics: !!metrics,
+    //   hasRecentOrders: !!recentOrders?.length,
+    //   hasWeeklyOrders: !!weeklyOrders?.length,
+    //   hasOrderStatus: !!orderStatus?.length
+    // })
   }, [loading, analyticsLoading, metrics, recentOrders, weeklyOrders, orderStatus])
 
   // Enhanced chart data using REAL data from backend
   const enhancedChartData = useMemo(() => {
     // Debug: Log the data we're receiving
-    console.log('📊 Dashboard Data Debug:', {
-      weeklyOrders: weeklyOrders?.length || 0,
-      orderStatus: orderStatus?.length || 0,
-      recentOrders: recentOrders?.length || 0,
-      metrics: metrics ? 'Available' : 'Not Available'
-    })
+    // console.log('📊 Dashboard Data Debug:', {
+    //   weeklyOrders: weeklyOrders?.length || 0,
+    //   orderStatus: orderStatus?.length || 0,
+    //   recentOrders: recentOrders?.length || 0,
+    //   metrics: metrics ? 'Available' : 'Not Available'
+    // })
 
     // Order Status Distribution - use real data from analytics
     const ordersByStatus = orderStatus?.length > 0 ? orderStatus.map(item => ({
@@ -254,10 +254,10 @@ export function DefaultAdminDashboard() {
         { week: 'W5', revenue: 14000, orders: 38 }
       ]
 
-    console.log('📈 Revenue Chart Data:', {
-      source: weeklyOrders?.length > 0 ? 'Analytics API' : recentOrders?.length > 0 ? 'Recent Orders' : 'Sample Data',
-      data: revenueByWeek
-    })
+    // console.log('📈 Revenue Chart Data:', {
+    //   source: weeklyOrders?.length > 0 ? 'Analytics API' : recentOrders?.length > 0 ? 'Recent Orders' : 'Sample Data',
+    //   data: revenueByWeek
+    // })
 
     return {
       ordersByStatus,
@@ -266,7 +266,7 @@ export function DefaultAdminDashboard() {
   }, [metrics, orderStatus, weeklyOrders, recentOrders])
 
   if (loading) {
-    console.log('🔄 Dashboard Loading State: true')
+    // console.log('🔄 Dashboard Loading State: true')
     return (
       <ThemedInlineLoader
         size="md"
@@ -295,7 +295,7 @@ export function DefaultAdminDashboard() {
     )
   }
 
-  console.log('✅ Dashboard Render State:', { loading, analyticsLoading, error })
+  // console.log('✅ Dashboard Render State:', { loading, analyticsLoading, error })
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
 

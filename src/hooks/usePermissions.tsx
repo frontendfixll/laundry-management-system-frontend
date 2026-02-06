@@ -46,16 +46,16 @@ export function usePermissions() {
   const permissions = useMemo(() => {
     const userPermissions = user?.permissions;
 
-    console.log('🔍 Permissions debug:', {
-      userRole: user?.role,
-      hasPermissions: !!userPermissions,
-      permissionModules: userPermissions ? Object.keys(userPermissions) : [],
-      userPermissions
-    });
+    // console.log('🔍 Permissions debug:', {
+    //   userRole: user?.role,
+    //   hasPermissions: !!userPermissions,
+    //   permissionModules: userPermissions ? Object.keys(userPermissions) : [],
+    //   userPermissions
+    // });
 
     // If no permissions found, provide empty object
     if (!userPermissions || Object.keys(userPermissions).length === 0) {
-      console.log('🔐 No permissions found, using empty permissions');
+      // console.log('🔐 No permissions found, using empty permissions');
       return {};
     }
 
@@ -67,27 +67,27 @@ export function usePermissions() {
    */
   const hasPermission = (module: string, action: string): boolean => {
     // Enhanced debug logging
-    console.log(`🔐 hasPermission called: ${module}.${action}`);
-    console.log(`🔐 User role: ${user?.role}`);
-    console.log(`🔐 Is SuperAdmin: ${user?.role === 'superadmin'}`);
+    // console.log(`🔐 hasPermission called: ${module}.${action}`);
+    // console.log(`🔐 User role: ${user?.role}`);
+    // console.log(`🔐 Is SuperAdmin: ${user?.role === 'superadmin'}`);
 
     // SuperAdmin has all permissions
     if (user?.role === 'superadmin') {
-      console.log(`🔐 SuperAdmin bypass: ${module}.${action} = true (BYPASSED - SuperAdmin has all permissions)`);
+      // console.log(`🔐 SuperAdmin bypass: ${module}.${action} = true (BYPASSED - SuperAdmin has all permissions)`);
       return true;
     }
 
     // Check if user has the specific permission
     const modulePermissions = permissions[module] as PermissionModule;
     if (!modulePermissions) {
-      console.log(`🔐 Module '${module}' not found in permissions - available modules:`, Object.keys(permissions));
+      // console.log(`🔐 Module '${module}' not found in permissions - available modules:`, Object.keys(permissions));
       return false;
     }
 
     const hasAccess = modulePermissions[action as keyof PermissionModule] === true;
 
-    console.log(`🔐 Permission check result: ${module}.${action} = ${hasAccess}`);
-    console.log(`🔐 Module permissions for ${module}:`, modulePermissions);
+    // console.log(`🔐 Permission check result: ${module}.${action} = ${hasAccess}`);
+    // console.log(`🔐 Module permissions for ${module}:`, modulePermissions);
 
     return hasAccess;
   };

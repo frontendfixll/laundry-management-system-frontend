@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { 
-  Package, 
-  Search, 
+import {
+  Package,
+  Search,
   Filter,
   Eye,
   Clock,
@@ -65,7 +66,7 @@ export default function BranchOrdersPage() {
       const params: any = { page: pagination.page, limit: 20 }
       if (statusFilter !== 'all') params.status = statusFilter
       if (searchTerm) params.search = searchTerm
-      
+
       const response = await centerAdminApi.getOrders(params)
       if (response.success) {
         const ordersData = response.data.data || response.data.orders || []
@@ -75,7 +76,7 @@ export default function BranchOrdersPage() {
           totalPages: response.data.totalPages || 1,
           total: response.data.total || ordersData.length
         })
-        
+
         // Calculate stats from all orders
         const allOrdersRes = await centerAdminApi.getOrders({ limit: 1000 })
         if (allOrdersRes.success) {
@@ -110,6 +111,19 @@ export default function BranchOrdersPage() {
     fetchOrders()
     fetchStaff()
   }, [statusFilter, pagination.page])
+
+  // Deep linking support
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    const orderId = searchParams?.get('id')
+    if (orderId && orders.length > 0 && !showViewModal) {
+      const found = orders.find(o => o._id === orderId)
+      if (found) {
+        setSelectedOrder(found)
+        setShowViewModal(true)
+      }
+    }
+  }, [searchParams, orders, showViewModal])
 
   const handleSearch = () => {
     setPagination(prev => ({ ...prev, page: 1 }))
@@ -157,7 +171,7 @@ export default function BranchOrdersPage() {
       toast.error('Please select a staff member')
       return
     }
-    
+
     try {
       setActionLoading('assign')
       const response = await centerAdminApi.assignStaffToOrder(selectedOrder._id, selectedStaffId, `${estimatedTime} hours`)
@@ -201,7 +215,7 @@ export default function BranchOrdersPage() {
         new Date(order.createdAt).toLocaleDateString()
       ].join(','))
     ].join('\n')
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -252,7 +266,7 @@ export default function BranchOrdersPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
@@ -264,7 +278,7 @@ export default function BranchOrdersPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
@@ -276,7 +290,7 @@ export default function BranchOrdersPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all hover:-translate-y-1">
           <div className="flex items-center justify-between">
             <div>
@@ -332,7 +346,7 @@ export default function BranchOrdersPage() {
             Orders ({pagination.total || orders.length})
           </h2>
         </div>
-        
+
         {orders.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -364,7 +378,7 @@ export default function BranchOrdersPage() {
                           </span>
                         )}
                       </div>
-                      
+
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm text-gray-600 mb-2">
                         <div className="flex items-center">
                           <User className="w-4 h-4 mr-1" />
@@ -383,14 +397,14 @@ export default function BranchOrdersPage() {
                           {new Date(order.createdAt).toLocaleDateString()}
                         </div>
                       </div>
-                      
+
                       {order.processedBy && (
                         <div className="text-sm text-gray-500 mb-1">
                           👤 Assigned to: {order.processedBy.name}
                           {order.estimatedCompletionTime && ` • Est: ${order.estimatedCompletionTime}`}
                         </div>
                       )}
-                      
+
                       {order.specialInstructions && (
                         <div className="text-sm text-blue-600 bg-blue-50 p-2 rounded mt-2">
                           📝 {order.specialInstructions}
@@ -404,7 +418,7 @@ export default function BranchOrdersPage() {
                       <Eye className="w-4 h-4 mr-1" />
                       Details
                     </Button>
-                    
+
                     {/* Status Change Dropdown - like admin */}
                     {['placed', 'assigned_to_branch', 'picked', 'in_process', 'ready', 'out_for_delivery'].includes(order.status) && (
                       <select
@@ -435,10 +449,10 @@ export default function BranchOrdersPage() {
                         )}
                       </select>
                     )}
-                    
+
                     {['assigned_to_branch', 'picked'].includes(order.status) && (
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         className="bg-green-500 hover:bg-green-600 text-white"
                         onClick={() => handleAssignStaff(order)}
                         disabled={actionLoading === order._id}
@@ -496,7 +510,7 @@ export default function BranchOrdersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Staff Member
                 </label>
-                <select 
+                <select
                   value={selectedStaffId}
                   onChange={(e) => setSelectedStaffId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -513,7 +527,7 @@ export default function BranchOrdersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Estimated Completion Time
                 </label>
-                <select 
+                <select
                   value={estimatedTime}
                   onChange={(e) => setEstimatedTime(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -527,7 +541,7 @@ export default function BranchOrdersPage() {
                 </select>
               </div>
               <div className="flex gap-3">
-                <Button 
+                <Button
                   className="flex-1 bg-green-500 hover:bg-green-600 text-white"
                   onClick={confirmAssignStaff}
                   disabled={actionLoading === 'assign'}
@@ -535,8 +549,8 @@ export default function BranchOrdersPage() {
                   {actionLoading === 'assign' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                   Assign & Start
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex-1"
                   onClick={() => setShowAssignModal(false)}
                 >
@@ -558,7 +572,7 @@ export default function BranchOrdersPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <span className="text-xl font-bold">{selectedOrder.orderNumber}</span>
@@ -591,7 +605,7 @@ export default function BranchOrdersPage() {
                     selectedOrder.items.map((item, idx) => (
                       <div key={idx} className="flex justify-between text-sm">
                         <span className="capitalize">
-                          {item.name || item.serviceType || 'Item'} 
+                          {item.name || item.serviceType || 'Item'}
                           {item.category && ` (${item.category})`}
                           {item.quantity > 1 && ` x${item.quantity}`}
                         </span>

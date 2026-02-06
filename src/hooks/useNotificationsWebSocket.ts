@@ -30,22 +30,22 @@ interface NotificationSound {
   [key: string]: string;
 }
 
-const NOTIFICATION_SOUNDS: NotificationSound = {
+/* const NOTIFICATION_SOUNDS: NotificationSound = {
   success: '/sounds/success.mp3',
   error: '/sounds/error.mp3',
   info: '/sounds/notification.mp3',
   warning: '/sounds/warning.mp3',
-};
+}; */
 
 export const useNotificationsWebSocket = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const socketRef = useRef<Socket | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  
+
   // Get auth store methods
   const { updateUser } = useAuthStore();
 
@@ -72,11 +72,11 @@ export const useNotificationsWebSocket = () => {
   // Play notification sound
   const playSound = useCallback((severity: string) => {
     try {
-      const soundUrl = NOTIFICATION_SOUNDS[severity] || NOTIFICATION_SOUNDS.info;
-      if (audioRef.current) {
-        audioRef.current.src = soundUrl;
-        audioRef.current.play().catch(err => console.log('Sound play failed:', err));
-      }
+      // const soundUrl = NOTIFICATION_SOUNDS[severity] || NOTIFICATION_SOUNDS.info;
+      // if (audioRef.current) {
+      //   audioRef.current.src = soundUrl;
+      //   audioRef.current.play().catch(err => { /* console.log('Sound play failed:', err) */ });
+      // }
     } catch (error) {
       console.error('Error playing sound:', error);
     }
@@ -95,7 +95,7 @@ export const useNotificationsWebSocket = () => {
 
       browserNotif.onclick = () => {
         window.focus();
-        
+
         // Handle different notification types
         if (notification.type === 'permission_update') {
           // For permission updates, just refresh the current page
@@ -129,7 +129,7 @@ export const useNotificationsWebSocket = () => {
       return;
     }
 
-    console.log('🔌 Connecting to WebSocket:', SOCKET_URL);
+    // console.log('🔌 Connecting to WebSocket:', SOCKET_URL);
 
     const socket = io(SOCKET_URL, {
       auth: { token },
@@ -141,15 +141,15 @@ export const useNotificationsWebSocket = () => {
     });
 
     socket.on('connect', () => {
-      console.log('✅ WebSocket connected successfully!');
+      // console.log('✅ WebSocket connected successfully!');
       setIsConnected(true);
-      
+
       // Expose socket globally for permission sync
       if (typeof window !== 'undefined') {
         (window as any).__notificationSocket = socket;
-        console.log('🌐 Socket exposed for permission sync');
+        // console.log('🌐 Socket exposed for permission sync');
       }
-      
+
       // Request unread count on connect
       socket.emit('getUnreadCount');
     });
@@ -169,24 +169,24 @@ export const useNotificationsWebSocket = () => {
 
     socket.on('notification', (notification: Notification) => {
       // console.log('📬 New notification:', notification);
-      
+
       // Add to notifications list
       setNotifications(prev => [notification, ...prev]);
-      
+
       // Update unread count
       if (!notification.isRead) {
         setUnreadCount(prev => prev + 1);
       }
-      
+
       // Show slide notification for important notifications
       if (typeof window !== 'undefined' && (window as any).__addSlideNotification) {
-        console.log('📢 Admin: Calling __addSlideNotification for regular notification:', notification.title);
-        
+        // console.log('📢 Admin: Calling __addSlideNotification for regular notification:', notification.title);
+
         // Map notification severity to slide notification type
         const slideType = notification.severity === 'error' ? 'error' :
-                         notification.severity === 'warning' ? 'warning' :
-                         notification.severity === 'success' ? 'success' : 'info';
-        
+          notification.severity === 'warning' ? 'warning' :
+            notification.severity === 'success' ? 'success' : 'info';
+
         (window as any).__addSlideNotification({
           title: notification.title,
           message: notification.message,
@@ -197,18 +197,18 @@ export const useNotificationsWebSocket = () => {
             window.location.href = notification.data.link;
           } : undefined
         });
-        
-        console.log('✅ Admin: Slide notification sent successfully');
+
+        // console.log('✅ Admin: Slide notification sent successfully');
       } else {
         console.log('⚠️ Admin: __addSlideNotification not available for regular notification');
       }
-      
+
       // Play sound
       playSound(notification.severity);
-      
+
       // Show browser notification
       showBrowserNotification(notification);
-      
+
       // Vibrate on mobile
       if ('vibrate' in navigator) {
         navigator.vibrate([200, 100, 200]);
@@ -240,22 +240,22 @@ export const useNotificationsWebSocket = () => {
     // Permission sync events
     socket.on('permissionsUpdated', (data) => {
       console.log('🔄 Admin: Permissions updated via WebSocket:', data);
-      
+
       // Prevent duplicate notifications
-      const existingPermissionNotification = notifications.find(n => 
-        n.type === 'permission_update' && 
+      const existingPermissionNotification = notifications.find(n =>
+        n.type === 'permission_update' &&
         Date.now() - new Date(n.createdAt).getTime() < 5000 // Within last 5 seconds
       );
-      
+
       if (existingPermissionNotification) {
         console.log('⚠️ Admin: Duplicate permission notification prevented');
         return;
       }
-      
+
       // Show slide notification instead of toast
       if (typeof window !== 'undefined' && (window as any).__addSlideNotification) {
         console.log('📢 Admin: Calling __addSlideNotification for permission update');
-        
+
         (window as any).__addSlideNotification({
           title: 'Permissions Updated',
           message: 'Your access has been updated by an administrator',
@@ -267,12 +267,12 @@ export const useNotificationsWebSocket = () => {
             window.location.reload();
           }
         });
-        
+
         console.log('✅ Admin: Permission slide notification sent successfully');
       } else {
         console.log('⚠️ Admin: __addSlideNotification not available for permission update');
       }
-      
+
       // Show notification to user (for notification center)
       const permissionNotification: Notification = {
         _id: `perm-${Date.now()}`,
@@ -284,14 +284,14 @@ export const useNotificationsWebSocket = () => {
         createdAt: new Date().toISOString(),
         data: data
       };
-      
+
       // Add to notifications list
       setNotifications(prev => [permissionNotification, ...prev]);
       setUnreadCount(prev => prev + 1);
-      
+
       // Show browser notification
       showBrowserNotification(permissionNotification);
-      
+
       // Handle permission refresh (prevent multiple refreshes)
       if (typeof window !== 'undefined') {
         // Check if refresh is already in progress
@@ -299,37 +299,37 @@ export const useNotificationsWebSocket = () => {
           console.log('⚠️ Permission refresh already in progress, skipping');
           return;
         }
-        
+
         // Mark refresh as in progress
         (window as any).__permissionRefreshInProgress = true;
-        
+
         // Emit custom event for permission refresh
         window.dispatchEvent(new CustomEvent('permissionsUpdated', { detail: data }));
-        
+
         // Try to refresh permissions without page reload first
         const refreshPermissions = async () => {
           try {
             console.log('🔄 Attempting to refresh permissions without page reload...');
-            
+
             const response = await fetch('/api/auth/profile', {
               credentials: 'include',
               headers: {
                 'Content-Type': 'application/json'
               }
             });
-            
+
             if (response.ok) {
               const profileData = await response.json();
               if (profileData.success && profileData.data) {
                 console.log('✅ Successfully refreshed permissions from server');
-                
+
                 // Update Zustand store
                 updateUser({
                   permissions: profileData.data.permissions,
                   features: profileData.data.features,
                   tenancy: profileData.data.tenancy
                 });
-                
+
                 // Also update localStorage directly
                 const authData = localStorage.getItem('laundry-auth');
                 if (authData) {
@@ -342,22 +342,22 @@ export const useNotificationsWebSocket = () => {
                     console.log('📦 Updated localStorage with fresh permissions');
                   }
                 }
-                
+
                 // Force re-render by dispatching storage event
                 window.dispatchEvent(new Event('storage'));
-                
+
                 console.log('✅ Permissions updated successfully - sidebar will re-render');
-                
+
                 // Clear the refresh flag
                 (window as any).__permissionRefreshInProgress = false;
                 return;
               }
             }
-            
+
             throw new Error(`Profile API failed with status: ${response.status}`);
           } catch (error) {
             console.log('⚠️ Permission refresh failed, falling back to page reload:', error);
-            
+
             // Fallback to page refresh after 3 seconds
             setTimeout(() => {
               console.log('🔄 Auto-refreshing page for permission updates...');
@@ -365,10 +365,10 @@ export const useNotificationsWebSocket = () => {
             }, 3000);
           }
         };
-        
+
         // Call the refresh function
         refreshPermissions();
-        
+
         // Clear the flag after timeout as backup
         setTimeout(() => {
           (window as any).__permissionRefreshInProgress = false;
@@ -379,11 +379,11 @@ export const useNotificationsWebSocket = () => {
     // Tenancy update events for real-time updates
     socket.on('tenancyFeaturesUpdated', (data) => {
       console.log('🔄 Admin: Tenancy features updated via WebSocket:', data);
-      
+
       // Show slide notification
       if (typeof window !== 'undefined' && (window as any).__addSlideNotification) {
         console.log('📢 Admin: Calling __addSlideNotification for tenancy features');
-        
+
         (window as any).__addSlideNotification({
           title: 'Features Updated',
           message: `Your tenancy features have been updated`,
@@ -394,26 +394,26 @@ export const useNotificationsWebSocket = () => {
             console.log('✅ Admin: User acknowledged feature update');
           }
         });
-        
+
         console.log('✅ Admin: Tenancy features slide notification sent successfully');
       } else {
         console.log('⚠️ Admin: __addSlideNotification not available for tenancy features');
       }
-      
+
       // Auto-refresh user data to get updated features
       if (typeof window !== 'undefined') {
         console.log('🔄 Admin: Auto-refreshing user data for updated features...');
-        
+
         // Dispatch custom event for components to refresh
         window.dispatchEvent(new CustomEvent('tenancyFeaturesUpdated', { detail: data }));
-        
+
         // Try to refresh user data without page reload first
         const refreshUserData = async () => {
           try {
             const response = await fetch('/api/auth/profile', {
               credentials: 'include'
             });
-            
+
             if (response.ok) {
               const profileData = await response.json();
               if (profileData.success) {
@@ -423,7 +423,7 @@ export const useNotificationsWebSocket = () => {
                   features: Object.keys(profileData.data.features || {}),
                   tenancyId: profileData.data.tenancy?._id
                 });
-                
+
                 // Update Zustand store with new data (this will trigger re-renders)
                 const { updateUser } = useAuthStore.getState();
                 updateUser({
@@ -431,7 +431,7 @@ export const useNotificationsWebSocket = () => {
                   permissions: profileData.data.permissions,
                   tenancy: profileData.data.tenancy
                 });
-                
+
                 // Also update localStorage directly for immediate access
                 const authData = localStorage.getItem('laundry-auth');
                 if (authData) {
@@ -444,10 +444,10 @@ export const useNotificationsWebSocket = () => {
                     console.log('✅ Admin: Updated localStorage with new data');
                   }
                 }
-                
+
                 // Force re-render by dispatching storage event
                 window.dispatchEvent(new Event('storage'));
-                
+
                 console.log('✅ Admin: Updated Zustand store with new data - sidebar will re-render automatically');
               } else {
                 console.log('⚠️ Admin: Profile refresh failed, will auto-refresh page');
@@ -474,11 +474,11 @@ export const useNotificationsWebSocket = () => {
             }, 3000);
           }
         };
-        
+
         // Call the async function
         refreshUserData();
       }
-      
+
       // Also add to notification center
       const tenancyNotification: Notification = {
         _id: `tenancy-features-${Date.now()}`,
@@ -490,7 +490,7 @@ export const useNotificationsWebSocket = () => {
         createdAt: new Date().toISOString(),
         data: data
       };
-      
+
       setNotifications(prev => [tenancyNotification, ...prev]);
       setUnreadCount(prev => prev + 1);
       showBrowserNotification(tenancyNotification);
@@ -498,11 +498,11 @@ export const useNotificationsWebSocket = () => {
 
     socket.on('tenancyPermissionsUpdated', (data) => {
       console.log('🔄 Admin: Tenancy permissions updated via WebSocket:', data);
-      
+
       // Show slide notification
       if (typeof window !== 'undefined' && (window as any).__addSlideNotification) {
         console.log('📢 Admin: Calling __addSlideNotification for tenancy permissions');
-        
+
         (window as any).__addSlideNotification({
           title: 'Permissions Updated',
           message: `Your access permissions have been updated`,
@@ -514,30 +514,30 @@ export const useNotificationsWebSocket = () => {
             window.location.reload();
           }
         });
-        
+
         console.log('✅ Admin: Tenancy permissions slide notification sent successfully');
       } else {
         console.log('⚠️ Admin: __addSlideNotification not available for tenancy permissions');
       }
-      
+
       // Try to refresh user data without page reload first
       if (typeof window !== 'undefined') {
         console.log('🔄 Admin: Auto-refreshing user data for updated permissions...');
-        
+
         // Dispatch custom event for components to refresh
         window.dispatchEvent(new CustomEvent('tenancyPermissionsUpdated', { detail: data }));
-        
+
         const refreshUserData = async () => {
           try {
             console.log('🔄 Attempting to refresh tenancy permissions from server...');
-            
+
             const response = await fetch('/api/auth/profile', {
               credentials: 'include',
               headers: {
                 'Content-Type': 'application/json'
               }
             });
-            
+
             if (response.ok) {
               const profileData = await response.json();
               if (profileData.success) {
@@ -547,14 +547,14 @@ export const useNotificationsWebSocket = () => {
                   features: Object.keys(profileData.data.features || {}),
                   tenancyId: profileData.data.tenancy?._id
                 });
-                
+
                 // Update Zustand store with new data (this will trigger re-renders)
                 updateUser({
                   permissions: profileData.data.permissions,
                   features: profileData.data.features,
                   tenancy: profileData.data.tenancy
                 });
-                
+
                 // Also update localStorage directly for immediate access
                 const authData = localStorage.getItem('laundry-auth');
                 if (authData) {
@@ -567,10 +567,10 @@ export const useNotificationsWebSocket = () => {
                     console.log('✅ Admin: Updated localStorage with new permissions and features');
                   }
                 }
-                
+
                 // Force re-render by dispatching storage event
                 window.dispatchEvent(new Event('storage'));
-                
+
                 console.log('✅ Admin: Updated Zustand store with new permissions - sidebar will re-render automatically');
               } else {
                 throw new Error('Profile API returned success: false');
@@ -587,11 +587,11 @@ export const useNotificationsWebSocket = () => {
             }, 3000);
           }
         };
-        
+
         // Call the async function
         refreshUserData();
       }
-      
+
       // Also add to notification center
       const permissionNotification: Notification = {
         _id: `tenancy-permissions-${Date.now()}`,
@@ -603,7 +603,7 @@ export const useNotificationsWebSocket = () => {
         createdAt: new Date().toISOString(),
         data: data
       };
-      
+
       setNotifications(prev => [permissionNotification, ...prev]);
       setUnreadCount(prev => prev + 1);
       showBrowserNotification(permissionNotification);
@@ -687,22 +687,22 @@ export const useNotificationsWebSocket = () => {
   // Initialize
   useEffect(() => {
     const token = getToken();
-    
+
     // Only initialize if token exists
     if (!token) {
       console.log('⏭️ No token, skipping WebSocket initialization');
       return;
     }
-    
+
     // Create audio element
     audioRef.current = new Audio();
-    
+
     // Request notification permission
     requestNotificationPermission();
-    
+
     // Connect to WebSocket
     connect();
-    
+
     // Fetch initial notifications
     fetchNotifications();
 
