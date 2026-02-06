@@ -17,10 +17,20 @@ import {
   ArrowRight,
   Calendar,
   Building2,
-  Users
+  Users,
+  PieChart
 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts'
 
 interface FinanceMetrics {
   totalRevenue: number
@@ -95,17 +105,33 @@ export function PlatformFinanceDashboard() {
               setRevenueData(transformedRevenue)
             }
 
-            // Mock payout requests for now - TODO: implement real payout API
-            setPayoutRequests([
-              {
-                id: 'PO-001',
-                tenantName: 'CleanCo Laundry',
-                amount: 12450.00,
-                requestDate: '2024-01-20',
-                status: 'pending',
-                dueDate: '2024-01-25'
+            // Fetch payout/settlement requests
+            const settlementsResponse = await fetch('/api/superadmin/financial/settlements?status=pending_approval&limit=5', {
+              headers: {
+                'Authorization': `Bearer ${(() => {
+                  const authStorage = localStorage.getItem('auth-storage');
+                  return authStorage ? JSON.parse(authStorage).state?.token || '' : '';
+                })()}`
               }
-            ])
+            })
+
+            let fetchedPayouts = []
+            if (settlementsResponse.ok) {
+              const settlementsData = await settlementsResponse.json()
+              if (settlementsData.success) {
+                fetchedPayouts = settlementsData.data.settlements.map((s: any) => ({
+                  id: s.settlementId,
+                  tenantName: s.recipientName,
+                  amount: s.netAmount,
+                  requestDate: new Date(s.createdAt).toISOString().split('T')[0],
+                  status: s.status === 'pending_approval' ? 'pending' : s.status,
+                  dueDate: new Date(new Date(s.createdAt).setDate(new Date(s.createdAt).getDate() + 5)).toISOString().split('T')[0] // estimate due date
+                }))
+              }
+            }
+
+            setPayoutRequests(fetchedPayouts)
+
 
             setLoading(false)
             return
@@ -357,30 +383,57 @@ export function PlatformFinanceDashboard() {
                   </Button>
                 </Link>
               </div>
-              <div className="space-y-4">
-                {revenueData.map((data, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Calendar className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{data.month} 2024</p>
-                        <p className="text-xs text-gray-600">${data.revenue.toLocaleString()}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className={`text-sm font-semibold ${data.growth >= 0 ? 'text-green-600' : 'text-red-600'
-                        }`}>
-                        {data.growth >= 0 ? '+' : ''}{data.growth}%
-                      </span>
-                      <div className="flex items-center mt-1">
-                        <TrendingUp className={`w-4 h-4 ${data.growth >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={revenueData}
+                    margin={{
+                      top: 10,
+                      right: 10,
+                      left: 0,
+                      bottom: 0,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis
+                      dataKey="month"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#6B7280' }}
+                      dy={10}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#6B7280' }}
+                      tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#fff',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      itemStyle={{ color: '#059669', fontWeight: 600 }}
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Revenue']}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#059669"
+                      strokeWidth={2}
+                      fill="url(#colorRevenue)"
+                      fillOpacity={0.1}
+                    />
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#059669" stopOpacity={0.2} />
+                        <stop offset="95%" stopColor="#059669" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </PermissionGate>

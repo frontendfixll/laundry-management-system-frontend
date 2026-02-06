@@ -312,6 +312,8 @@ export function AdminSidebarProvider({
   )
 }
 
+import { APP_VERSION } from '@/lib/version'
+
 export function AdminSidebar() {
   // CACHE BUSTER - Force new version load
   console.log('🚀 AdminSidebar Component Loading - CACHE BUSTER v3.0 - Timestamp:', new Date().toISOString());
@@ -805,7 +807,7 @@ export function AdminSidebar() {
               <div className="flex items-center justify-between w-full">
                 <span>Sign Out</span>
                 <div className="text-xs text-gray-400 text-center">
-                  v1.0.0
+                  v{APP_VERSION}
                 </div>
               </div>
             )}

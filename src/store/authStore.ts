@@ -296,20 +296,20 @@ export const useAuthStore = create<AuthState>()(
       name: 'laundry-auth',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
-        console.log('🔥 Auth store rehydrated with state:', {
-          hasUser: !!state?.user,
-          userEmail: state?.user?.email,
-          supportPermissions: state?.user?.permissions?.support
-        })
+        // console.log('🔥 Auth store rehydrated with state:', {
+        //   hasUser: !!state?.user,
+        //   userEmail: state?.user?.email,
+        //   supportPermissions: state?.user?.permissions?.support
+        // })
         state?.setHasHydrated(true)
 
         // Expose updateUser function globally for WebSocket access
         if (typeof window !== 'undefined') {
           (window as any).__updateAuthStore = (userData: Partial<User>) => {
-            console.log('🔥 Global auth store update called with:', userData);
+            // console.log('🔥 Global auth store update called with:', userData);
             state?.updateUser(userData);
           };
-          console.log('🌐 Exposed __updateAuthStore globally');
+          // console.log('🌐 Exposed __updateAuthStore globally');
         }
       }
     }

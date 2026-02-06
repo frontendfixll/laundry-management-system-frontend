@@ -85,7 +85,7 @@ export function useFeatures() {
 
     // If no features found or empty object, provide default basic features
     if (!result || Object.keys(result).length === 0) {
-      console.log('🎯 No features found, using defaults');
+      // console.log('🎯 No features found, using defaults');
       result = {
         // Core Laundry Services
         wash_fold: true,
@@ -138,14 +138,14 @@ export function useFeatures() {
     }
 
     // Debug log to see what features are loaded
-    console.log('🎯 Features recomputed:', {
-      enabledFeatures: Object.keys(result).filter(k => result[k]),
-      totalFeatures: Object.keys(result).length,
-      source: directFeatures ? 'user.features' : tenancyFeatures ? 'tenancy.subscription.features' : userFeatures ? 'subscription.features' : 'default',
-      userHasFeatures: !!directFeatures,
-      tenancyHasFeatures: !!tenancyFeatures,
-      userHasSubscription: !!userFeatures
-    });
+    // console.log('🎯 Features recomputed:', {
+    //   enabledFeatures: Object.keys(result).filter(k => result[k]),
+    //   totalFeatures: Object.keys(result).length,
+    //   source: directFeatures ? 'user.features' : tenancyFeatures ? 'tenancy.subscription.features' : userFeatures ? 'subscription.features' : 'default',
+    //   userHasFeatures: !!directFeatures,
+    //   tenancyHasFeatures: !!tenancyFeatures,
+    //   userHasSubscription: !!userFeatures
+    // });
 
     return result;
   }, [user, user?.features, user?.tenancy?.subscription?.features, user?.subscription?.features]); // Add all dependencies

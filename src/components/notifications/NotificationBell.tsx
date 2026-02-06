@@ -93,7 +93,8 @@ export function NotificationBell() {
   const handleNotificationClick = useCallback((notification: Notification) => {
     markAsRead(notification.id)
     setIsOpen(false)
-    router.push(`/admin/notifications/${notification.id}`)
+    // Navigate to the main notifications page with the ID as a query param
+    router.push(`/admin/notifications?id=${notification.id}`)
   }, [markAsRead, router])
 
   const handleMarkAllRead = useCallback(() => {

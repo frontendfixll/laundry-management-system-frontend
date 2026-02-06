@@ -44,6 +44,7 @@ import { useFeatures, FeatureKey } from '@/hooks/useFeatures'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useState, useEffect } from 'react'
 import { useBranding } from '@/hooks/useBranding'
+import { APP_VERSION } from '@/lib/version'
 
 interface NavigationItem {
   name: string;
@@ -128,39 +129,39 @@ const enhancedNavigation: NavigationItem[] = [
 
 export function SimpleSidebar() {
   // Debug: Confirm SimpleSidebar is loading
-  console.log('🚀 SimpleSidebar Component Loading - LIVE CHAT ADDED v3.0!', new Date().toISOString());
-  console.log('📋 SimpleSidebar Navigation Items:', enhancedNavigation.map(item => ({
-    name: item.name,
-    hasSubItems: !!item.subItems,
-    subItemCount: item.subItems?.length || 0
-  })));
+  // console.log('🚀 SimpleSidebar Component Loading - LIVE CHAT ADDED v3.0!', new Date().toISOString());
+  // console.log('📋 SimpleSidebar Navigation Items:', enhancedNavigation.map(item => ({
+  //   name: item.name,
+  //   hasSubItems: !!item.subItems,
+  //   subItemCount: item.subItems?.length || 0
+  // })));
 
   // Special debug for Platform Support
-  const platformSupport = enhancedNavigation.find(item => item.name === 'Platform Support');
-  if (platformSupport) {
-    console.log('🎯 Platform Support Details - LIVE CHAT ADDED v3.0:', {
-      name: platformSupport.name,
-      subItemCount: platformSupport.subItems?.length || 0,
-      subItems: platformSupport.subItems?.map(sub => sub.name) || [],
-      hasLiveChat: platformSupport.subItems?.some(sub => sub.name === 'Live Chat') ? 'YES ✅' : 'NO ❌'
-    });
-  }
+  // const platformSupport = enhancedNavigation.find(item => item.name === 'Platform Support');
+  // if (platformSupport) {
+  //   // console.log('🎯 Platform Support Details - LIVE CHAT ADDED v3.0:', {
+  //   //   name: platformSupport.name,
+  //   //   subItemCount: platformSupport.subItems?.length || 0,
+  //   //   subItems: platformSupport.subItems?.map(sub => sub.name) || [],
+  //   //   hasLiveChat: platformSupport.subItems?.some(sub => sub.name === 'Live Chat') ? 'YES ✅' : 'NO ❌'
+  //   // });
+  // }
 
   const pathname = usePathname()
   const { user, logout, sidebarCollapsed, setSidebarCollapsed } = useAuthStore()
   const { branding } = useBranding()
 
   // Debug log for branding
-  useEffect(() => {
-    if (branding && process.env.NODE_ENV === 'development') {
-      console.log('💎 SimpleSidebar - Branding loaded:', {
-        name: branding.name,
-        slug: branding.slug,
-        businessName: branding.branding?.businessName,
-        logoUrl: branding.branding?.logo?.url
-      });
-    }
-  }, [branding]);
+  // useEffect(() => {
+  //   if (branding && process.env.NODE_ENV === 'development') {
+  //     console.log('💎 SimpleSidebar - Branding loaded:', {
+  //       name: branding.name,
+  //       slug: branding.slug,
+  //       businessName: branding.branding?.businessName,
+  //       logoUrl: branding.branding?.logo?.url
+  //     });
+  //   }
+  // }, [branding]);
   const { hasFeature } = useFeatures()
   const { hasPermission: checkUserPermission, isSuperAdmin } = usePermissions()
 
@@ -557,7 +558,7 @@ export function SimpleSidebar() {
               sidebarCollapsed ? 'lg:h-0 lg:p-0 lg:opacity-0' : 'lg:h-auto lg:opacity-100'
             )}>
               <div className="text-[10px] text-gray-400 font-light tracking-widest uppercase">
-                v1.0.0 Stable
+                v{APP_VERSION} Stable
               </div>
             </div>
 
