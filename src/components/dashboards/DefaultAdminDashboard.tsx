@@ -4,6 +4,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useAdminTheme } from '@/hooks/useAdminTheme'
 import { ThemedInlineLoader, ThemedSpinner } from '@/components/ui/ThemedSpinner'
 import {
   ShoppingBag,
@@ -166,6 +167,7 @@ const SimpleBarChart = ({ data, height = 200 }: { data: { week: string; revenue:
 export function DefaultAdminDashboard() {
   const { user } = useAuthStore()
   const { hasPermission } = usePermissions()
+  const { theme } = useAdminTheme()
   const canViewReports = hasPermission('reports', 'view')
 
   const { metrics, recentOrders, loading, error } = useAdminDashboard()
@@ -206,15 +208,15 @@ export function DefaultAdminDashboard() {
       name: item.name || item.status,
       value: item.value,
       color: item.color || (
-        item.name === 'completed' || item.status === 'completed' ? '#10b981' :
+        item.name === 'completed' || item.status === 'completed' ? theme.primaryColor :
           item.name === 'pending' || item.status === 'pending' ? '#f59e0b' :
-            item.name === 'processing' || item.status === 'processing' ? '#3b82f6' :
+            item.name === 'processing' || item.status === 'processing' ? theme.accentColor :
               item.name === 'cancelled' || item.status === 'cancelled' ? '#ef4444' : '#6b7280'
       )
     })) : [
-      { name: 'Completed', value: metrics?.completedTodayOrders || 0, color: '#10b981' },
+      { name: 'Completed', value: metrics?.completedTodayOrders || 0, color: theme.primaryColor },
       { name: 'Pending', value: metrics?.pendingOrders || 0, color: '#f59e0b' },
-      { name: 'Processing', value: Math.max(0, (metrics?.totalOrders || 0) - (metrics?.completedTodayOrders || 0) - (metrics?.pendingOrders || 0)), color: '#3b82f6' }
+      { name: 'Processing', value: Math.max(0, (metrics?.totalOrders || 0) - (metrics?.completedTodayOrders || 0) - (metrics?.pendingOrders || 0)), color: theme.accentColor }
     ]
 
     // Revenue by Week - use real data from analytics or generate from recent orders
@@ -297,7 +299,7 @@ export function DefaultAdminDashboard() {
 
   console.log('✅ Dashboard Render State:', { loading, analyticsLoading, error })
 
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6']
+  const COLORS = [theme.primaryColor, theme.secondaryColor, '#F59E0B', '#EF4444', theme.accentColor]
 
   return (
     <div className="space-y-4">
@@ -452,10 +454,10 @@ export function DefaultAdminDashboard() {
                   <Line
                     type="monotone"
                     dataKey="orders"
-                    stroke="#3B82F6"
+                    stroke={theme.primaryColor}
                     strokeWidth={3}
-                    dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
+                    dot={{ fill: theme.primaryColor, strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6, stroke: theme.primaryColor, strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>

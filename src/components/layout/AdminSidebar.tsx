@@ -46,6 +46,7 @@ import { useFeatures, FeatureKey } from '@/hooks/useFeatures'
 import { usePermissions } from '@/hooks/usePermissions'
 import SidebarChatbox from '@/components/support/SidebarChatbox'
 import { useBranding } from '@/hooks/useBranding'
+import { APP_VERSION } from '@/lib/version'
 
 interface NavigationItem {
   name: string;
@@ -805,7 +806,7 @@ export function AdminSidebar() {
               <div className="flex items-center justify-between w-full">
                 <span>Sign Out</span>
                 <div className="text-xs text-gray-400 text-center">
-                  v1.0.0
+                  v{APP_VERSION}
                 </div>
               </div>
             )}

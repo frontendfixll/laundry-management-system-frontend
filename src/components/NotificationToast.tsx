@@ -72,22 +72,29 @@ export default function NotificationToast({
   }, [duration, onClose]);
 
   const handleClick = () => {
+    // Priority: 
+    // 1. notification.data.link
+    // 2. /admin/notifications
+    const targetLink = notification.data?.link || '/admin/notifications';
+
     console.log('🔗 Notification clicked:', {
       type: notification.type,
       data: notification.data,
-      link: notification.data?.link
+      link: notification.data?.link,
+      target: targetLink
     });
-    if (notification.data?.link) {
-      console.log('🔗 Navigating to:', notification.data.link);
-      router.push(notification.data.link);
+
+    if (targetLink) {
+      console.log('🔗 Navigating to:', targetLink);
+      router.push(targetLink);
       onClose();
     } else {
-      console.log('⚠️ No link in notification data');
+      console.log('⚠️ No link available for redirection');
     }
   };
 
   const getActions = () => {
-    const actions = [];
+    const actions: { label: string; onClick: () => void }[] = [];
 
     // Order-related actions
     if (notification.type === 'order_placed' || notification.type === 'order_ready') {
@@ -147,11 +154,11 @@ export default function NotificationToast({
         <div className={`${config.iconColor} flex-shrink-0 mt-0.5`}>
           <Icon size={20} />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <h4 className="font-semibold text-sm mb-1">{notification.title}</h4>
           <p className="text-sm opacity-90">{notification.message}</p>
-          
+
           {actions.length > 0 && (
             <div className="flex gap-2 mt-3">
               {actions.map((action, index) => (
@@ -173,7 +180,7 @@ export default function NotificationToast({
             </div>
           )}
         </div>
-        
+
         <button
           onClick={(e) => {
             e.stopPropagation();

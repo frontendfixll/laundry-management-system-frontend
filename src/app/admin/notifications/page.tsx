@@ -42,7 +42,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { formatDistanceToNow } from 'date-fns'
-import { Tag, FileText, ArrowRight, ExternalLink } from 'lucide-react'
+import { Tag, FileText, ArrowRight, ExternalLink, ShieldAlert, AlertCircle } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 interface AppNotification {
   id: string
@@ -96,6 +97,10 @@ const getNotificationIcon = (iconName: string, severity: string) => {
       return <AlertTriangle {...iconProps} className="w-5 h-5 text-yellow-500" />
     case 'x-circle':
       return <XCircle {...iconProps} className="w-5 h-5 text-red-500" />
+    case 'shield-alert':
+      return <ShieldAlert {...iconProps} className="w-5 h-5 text-red-500" />
+    case 'alert-circle':
+      return <AlertCircle {...iconProps} className="w-5 h-5 text-orange-500" />
     default:
       return <Bell {...iconProps} className="w-5 h-5 text-blue-500" />
   }
@@ -179,6 +184,7 @@ export default function NotificationsPage() {
   const [showFilters, setShowFilters] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(20)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   const [filters, setFilters] = useState<NotificationFilter>({
     type: [],
@@ -301,447 +307,465 @@ export default function NotificationsPage() {
     }
   }
 
+  const handleDeleteNotification = () => {
+    toast.success('Notification deleted successfully', {
+      duration: 3000,
+      position: 'top-center',
+      icon: '🗑️',
+    });
+    refresh();
+    setSelectedNotification(null);
+    setShowDeleteModal(false);
+  }
+
   const unreadCount = stats.unread
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        {/* Page Heading */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">All Notifications</h1>
-
-        {/* Filters and Search - Compact Design */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-4 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {/* Search */}
-            <div className="flex-1 max-w-lg">
-              <div className="relative group">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 transition-colors group-focus-within:text-blue-500" />
-                <Input
-                  placeholder="Search notifications..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-10 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all text-sm"
-                />
-              </div>
-            </div>
-
-            {/* Actions */}
+    <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-gray-50/50">
+      {/* Sidebar: List of Notifications */}
+      <div className="w-full md:w-[400px] lg:w-[450px] flex flex-col border-r border-gray-200 bg-white shadow-sm z-10">
+        {/* List Header */}
+        <div className="p-6 border-b border-gray-100 space-y-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-black text-gray-900 tracking-tight">Notifications</h1>
             <div className="flex items-center gap-2">
-              <Button
-                onClick={() => setShowFilters(!showFilters)}
-                variant={showFilters ? 'secondary' : 'outline'}
-                size="sm"
-                className={cn(
-                  "rounded-xl border-gray-200 h-10 px-4 font-medium",
-                  showFilters && "bg-blue-50 text-blue-700 border-blue-200"
-                )}
+              <button
+                onClick={() => refresh()}
+                className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all"
+                title="Refresh"
               >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-                <ChevronDown className={cn(
-                  "w-3 h-3 ml-2 transition-transform duration-300",
-                  showFilters && "rotate-180"
-                )} />
-              </Button>
-
-              {selectedNotifications.size > 0 && (
-                <Button
-                  onClick={handleBulkMarkAsRead}
-                  size="sm"
-                  className="bg-gray-900 hover:bg-black text-white rounded-xl h-10 px-4 shadow-sm"
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllAsRead}
+                  className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-3 py-1.5 rounded-full transition-all"
                 >
-                  Mark {selectedNotifications.size} Read
-                </Button>
+                  Mark all read
+                </button>
               )}
             </div>
           </div>
 
-          {/* Filter Options */}
+          {/* Search */}
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5 transition-colors group-focus-within:text-blue-500" />
+            <Input
+              placeholder="Filter by title, message..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-10 bg-gray-50/50 border-gray-100 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all text-xs font-medium"
+            />
+          </div>
+
+          {/* Quick Filters */}
+          <div className="flex flex-wrap gap-2 pt-2">
+            <button
+              onClick={() => { setFilters(prev => ({ ...prev, readStatus: 'all' })); setCurrentPage(1); }}
+              className={cn(
+                "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all",
+                filters.readStatus === 'all'
+                  ? 'bg-gray-900 text-white shadow-lg shadow-gray-200'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              )}
+            >
+              All
+            </button>
+            <button
+              onClick={() => { setFilters(prev => ({ ...prev, readStatus: 'unread' })); setCurrentPage(1); }}
+              className={cn(
+                "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all",
+                filters.readStatus === 'unread'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
+                  : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+              )}
+            >
+              Unread ({unreadCount})
+            </button>
+            <div className="w-px h-6 bg-gray-100 mx-1" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                "h-7 px-2 text-[10px] font-black uppercase tracking-widest rounded-full",
+                showFilters ? "bg-blue-50 text-blue-600" : "text-gray-400 hover:text-gray-900"
+              )}
+            >
+              <Filter className="w-3 h-3 mr-1" />
+              More
+            </Button>
+          </div>
+
+          {/* Extended Filters */}
           {showFilters && (
-            <div className="mt-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {/* Category Filter */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</h4>
-                  <div className="space-y-1">
-                    {availableCategories.map((category: string) => (
-                      <label key={category} className="flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.type.includes(category)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFilters(prev => ({ ...prev, type: [...prev.type, category] }))
-                            } else {
-                              setFilters(prev => ({ ...prev, type: prev.type.filter(t => t !== category) }))
-                            }
-                          }}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-100"
-                        />
-                        <span className="ml-2 text-sm text-gray-600">{category}</span>
-                      </label>
-                    ))}
-                  </div>
+            <div className="pt-4 border-t border-gray-50 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="space-y-2">
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Time Range</p>
+                <div className="flex flex-wrap gap-1">
+                  {(['today', 'week', 'all'] as const).map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => setFilters(prev => ({ ...prev, dateRange: range }))}
+                      className={cn(
+                        "px-2 py-1 rounded-md text-[9px] font-bold uppercase transition-all",
+                        filters.dateRange === range ? "bg-blue-100 text-blue-700" : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                      )}
+                    >
+                      {range}
+                    </button>
+                  ))}
                 </div>
-
-                {/* Status Filter */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {(['all', 'unread', 'read'] as const).map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => setFilters(prev => ({ ...prev, readStatus: status }))}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-                          filters.readStatus === status
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        )}
-                      >
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Date Filter */}
-                <div className="space-y-2">
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Time</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {(['all', 'today', 'week', 'month'] as const).map((range) => (
-                      <button
-                        key={range}
-                        onClick={() => setFilters(prev => ({ ...prev, dateRange: range }))}
-                        className={cn(
-                          "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-                          filters.dateRange === range
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        )}
-                      >
-                        {range === 'all' ? 'All' : range === 'week' ? '7 Days' : range === 'month' ? '30 Days' : 'Today'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Reset */}
-                <div className="flex items-end justify-start">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-blue-600 hover:text-blue-800 p-0 h-auto"
-                    onClick={() => setFilters({ type: [], severity: [], dateRange: 'all', readStatus: 'all' })}
-                  >
-                    Reset Filters
-                  </Button>
-                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Select Category</p>
+                <select
+                  className="w-full bg-gray-50 border-none text-[10px] font-bold rounded-lg p-1 px-2 focus:ring-1 focus:ring-blue-200"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFilters(prev => ({ ...prev, type: val === 'all' ? [] : [val] }));
+                  }}
+                >
+                  <option value="all">Everywhere</option>
+                  {availableCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
         </div>
 
-        {/* Notifications Table - Compact Design */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          {paginatedNotifications.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="mx-auto w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                <Bell className="w-6 h-6 text-gray-300" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">No notifications found</h3>
-              <p className="text-gray-500 mt-1">Try adjusting your filters or search query.</p>
+        {/* Scrollable List */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar bg-gray-50/30">
+          {paginatedNotifications.length > 0 ? (
+            <div className="divide-y divide-gray-50">
+              {paginatedNotifications.map((notif) => {
+                const id = notif.id || notif._id!;
+                const isActive = selectedNotification?.id === id || selectedNotification?._id === id;
+                const isRead = !!notif.metadata?.isRead || !!notif.isRead;
+                const category = getNotificationCategory(notif.eventType || notif.type || '');
+
+                return (
+                  <button
+                    key={id}
+                    onClick={() => {
+                      setSelectedNotification(notif);
+                      if (!isRead) markAsRead(id);
+                    }}
+                    className={cn(
+                      "w-full text-left p-5 transition-all hover:bg-white group relative border-l-4",
+                      isActive ? "bg-white border-blue-500 shadow-sm z-20" : isRead ? "bg-transparent border-transparent" : "bg-blue-50/30 border-blue-200"
+                    )}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center shadow-sm transition-transform group-hover:scale-110 shrink-0",
+                        isActive ? "bg-blue-600 text-white shadow-blue-100" : "bg-white border border-gray-100 text-gray-400"
+                      )}>
+                        {getNotificationIcon(notif.icon || 'bell', notif.severity || 'info')}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={cn(
+                            "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border",
+                            notif.priority === 'P0' ? "bg-red-50 text-red-600 border-red-100" :
+                              notif.priority === 'P1' ? "bg-orange-50 text-orange-600 border-orange-100" :
+                                notif.priority === 'P2' ? "bg-blue-50 text-blue-600 border-blue-100" :
+                                  "bg-gray-50 text-gray-500 border-gray-100"
+                          )}>
+                            {notif.priority === 'P0' ? 'Critical' :
+                              notif.priority === 'P1' ? 'High' :
+                                notif.priority === 'P2' ? 'Medium' :
+                                  'Normal'}
+                          </span>
+                          <span className="text-[9px] text-gray-400 font-bold whitespace-nowrap">
+                            {formatTimeAgo(notif.createdAt)}
+                          </span>
+                        </div>
+                        <h4 className={cn(
+                          "text-sm leading-tight truncate",
+                          isActive ? "font-black text-gray-900" : isRead ? "font-bold text-gray-600" : "font-black text-gray-900"
+                        )}>
+                          {cleanNotificationTitle(notif.title)}
+                        </h4>
+                        <p className="text-xs text-gray-400 mt-1 line-clamp-1 font-medium italic">
+                          {notif.message}
+                        </p>
+                      </div>
+
+                      <ChevronRight className={cn(
+                        "w-4 h-4 text-gray-200 mt-4 transition-transform",
+                        isActive && "translate-x-1 text-blue-500"
+                      )} />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-                  <TableHead className="w-[50px] text-center">
-                    {/* Header Checkbox could go here */}
-                  </TableHead>
-                  <TableHead className="w-[180px]">Category</TableHead>
-                  <TableHead>Message</TableHead>
-                  <TableHead className="w-[100px]">Priority</TableHead>
-                  <TableHead className="w-[150px]">Date</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedNotifications.map((notification) => {
-                  const category = getNotificationCategory(notification.eventType || notification.type || '')
-                  const id = notification.id || notification._id!
-                  const isSelected = selectedNotifications.has(id)
-                  const isRead = !!notification.metadata?.isRead || !!notification.isRead
-
-                  return (
-                    <TableRow
-                      key={id}
-                      className={cn(
-                        "cursor-pointer transition-colors hover:bg-blue-50/30 group",
-                        !isRead && "bg-blue-50/10"
-                      )}
-                      onClick={() => {
-                        setSelectedNotification(notification);
-                        if (!isRead) markAsRead(id);
-                      }}
-                    >
-                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleNotificationSelection(id)}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-100 cursor-pointer"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{category.icon}</span>
-                          <span className="text-sm font-medium text-gray-700">{category.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-0.5 max-w-2xl">
-                          <div className="flex items-center gap-2">
-                            <span className={cn(
-                              "text-sm font-semibold truncate",
-                              !isRead ? "text-gray-900" : "text-gray-600"
-                            )}>
-                              {cleanNotificationTitle(notification.title)}
-                            </span>
-                            {!isRead && (
-                              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                            )}
-                          </div>
-                          <p className="text-sm text-gray-500 truncate">{notification.message}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={cn(
-                          "uppercase text-[10px] font-bold tracking-wider border-none min-w-[2.5rem] justify-center",
-                          notification.priority === 'P0' ? "bg-red-100 text-red-700" :
-                            notification.priority === 'P1' ? "bg-orange-100 text-orange-700" :
-                              notification.priority === 'P2' ? "bg-blue-100 text-blue-700" :
-                                "bg-gray-100 text-gray-600"
-                        )}>
-                          {notification.priority || 'Norm'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-xs text-gray-500 whitespace-nowrap">
-                          {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-gray-500 transition-colors" />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+            <div className="flex flex-col items-center justify-center h-full text-gray-400 p-8 text-center bg-white">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+                <Bell className="w-8 h-8 text-gray-200" />
+              </div>
+              <p className="font-black text-[10px] uppercase tracking-widest text-gray-500">Silence is Golden</p>
+              <p className="text-xs mt-2 font-medium text-gray-400">No notifications match your current filters.</p>
+            </div>
           )}
         </div>
 
-        {/* Compact Pagination */}
+        {/* List Pagination */}
         {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <div className="text-xs text-gray-500">
-              Page {currentPage} of {totalPages}
-            </div>
-            <div className="flex items-center gap-2">
+          <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-white">
+            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+              Page {currentPage} / {totalPages}
+            </p>
+            <div className="flex gap-2">
               <Button
+                disabled={currentPage === 1}
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="h-8 text-xs"
+                onClick={() => setCurrentPage(p => p - 1)}
+                className="h-8 w-8 p-0 rounded-lg border-gray-100"
               >
-                Previous
+                <ChevronRight className="w-4 h-4 rotate-180" />
               </Button>
               <Button
+                disabled={currentPage === totalPages}
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="h-8 text-xs"
+                onClick={() => setCurrentPage(p => p + 1)}
+                className="h-8 w-8 p-0 rounded-lg border-gray-100 font-black"
               >
-                Next
+                <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
           </div>
         )}
+      </div>
 
-        {/* Detail Modal */}
-        <Dialog open={!!selectedNotification} onOpenChange={(open) => !open && setSelectedNotification(null)}>
-          <DialogContent className="max-w-xl p-0 overflow-hidden bg-[#F8FAFC] max-h-[90vh] flex flex-col h-fit">
-            {selectedNotification && (() => {
-              // Helper data preparation for the modal
-              const notification = selectedNotification;
-              const priorityConfig = notification.priority === 'P0' ? { label: 'Critical', color: 'bg-red-500', textColor: 'text-red-700', bgLight: 'bg-red-50' } :
-                notification.priority === 'P1' ? { label: 'High', color: 'bg-orange-500', textColor: 'text-orange-700', bgLight: 'bg-orange-50' } :
-                  notification.priority === 'P2' ? { label: 'Medium', color: 'bg-blue-500', textColor: 'text-blue-700', bgLight: 'bg-blue-50' } :
-                    { label: 'Normal', color: 'bg-gray-500', textColor: 'text-gray-700', bgLight: 'bg-gray-50' };
+      {/* Main Content: Detailed View */}
+      <div className="flex-1 overflow-y-auto bg-gray-50/50 p-6 md:p-10">
+        {selectedNotification ? (
+          <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-right-4 duration-300">
+            <div className="bg-white rounded-[24px] shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
+              {(() => {
+                const notification = selectedNotification;
+                const isRead = (notification as any).isRead || notification.metadata?.isRead;
+                const priorityConfig = notification.priority === 'P0' ? { label: 'Critical', color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-500', icon: ShieldAlert } :
+                  notification.priority === 'P1' ? { label: 'High', color: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-500', icon: AlertCircle } :
+                    notification.priority === 'P2' ? { label: 'Medium', color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-500', icon: Info } :
+                      { label: 'Normal', color: 'text-gray-700', bg: 'bg-gray-50', border: 'border-gray-300', icon: Bell };
 
-              const severityConfig = notification.severity === 'success' ? { label: 'Success', icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-50' } :
-                notification.severity === 'warning' ? { label: 'Warning', icon: AlertTriangle, color: 'text-yellow-600', bg: 'bg-yellow-50' } :
-                  notification.severity === 'error' ? { label: 'Error', icon: XCircle, color: 'text-red-600', bg: 'bg-red-50' } :
-                    { label: 'Info', icon: Info, color: 'text-blue-600', bg: 'bg-blue-50' };
+                const category = getNotificationCategory(notification.eventType || notification.type || '');
+                const IconComponent = priorityConfig.icon;
 
-              const category = getNotificationCategory(notification.eventType || notification.type || '');
+                return (
+                  <>
+                    {/* Top Priority Accent Bar */}
+                    <div className={cn("h-3 w-full shrink-0", priorityConfig.border.replace('border-', 'bg-'))} />
 
-              return (
-                <>
-                  {/* Modal Header */}
-                  <div className={cn("p-4 border-b border-gray-100", priorityConfig.bgLight)}>
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center space-x-3">
-                        <div className={cn("p-1.5 rounded-lg", severityConfig.bg)}>
-                          {getNotificationIcon(notification.icon || 'bell', notification.severity || 'info')}
+                    <div className="p-10 flex-1 overflow-y-auto">
+                      {/* Header: Icon & Badges */}
+                      <div className="flex items-start justify-between mb-8">
+                        <div className={cn(
+                          "w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl shadow-gray-100 transition-transform hover:scale-105",
+                          priorityConfig.bg
+                        )}>
+                          <IconComponent className={cn("w-8 h-8", priorityConfig.color)} />
                         </div>
-                        <div>
-                          <div className="flex items-center space-x-2 mb-0.5">
-                            <Badge className={cn("font-bold text-[10px]", priorityConfig.color, "text-white")}>
-                              {notification.priority || 'NORMAL'}
-                            </Badge>
-                            <Badge className={cn("text-[10px]", category.color)}>
-                              {category.name}
-                            </Badge>
+                        <div className="text-right flex flex-col items-end gap-3">
+                          <span className={cn(
+                            "text-[10px] font-black uppercase tracking-[0.2em] border-2 px-3 py-1 rounded-full flex items-center gap-2",
+                            priorityConfig.bg, priorityConfig.color, priorityConfig.border.replace('border-', 'border-').replace('500', '100')
+                          )}>
+                            <div className={cn("w-1.2 h-1.2 rounded-full animate-ping", priorityConfig.border.replace('border-', 'bg-'))} />
+                            {priorityConfig.label}
+                          </span>
+                          <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 tracking-widest uppercase">
+                            <Clock className="w-3.5 h-3.5" />
+                            Registered {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                           </div>
-                          <h2 className="text-lg font-bold text-gray-900 leading-tight">
+                        </div>
+                      </div>
+
+                      {/* Content Section */}
+                      <div className="space-y-8">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl">{category.icon}</span>
+                            <p className={cn("text-xs font-black uppercase tracking-[0.3em]", category.color)}>
+                              {category.name}
+                            </p>
+                          </div>
+                          <h2 className="text-2xl font-black text-gray-900 leading-tight tracking-tight max-w-xl">
                             {cleanNotificationTitle(notification.title)}
                           </h2>
                         </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4 text-[10px] text-gray-500 pl-11">
-                      <span className="flex items-center">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                      </span>
-                      <span className="flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" />
-                        {new Date(notification.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
 
-                  {/* Modal Scrollable Content */}
-                  <div className="overflow-y-auto p-4">
-                    {/* Message */}
-                    <div className="mb-4">
-                      <h3 className="text-xs font-bold text-gray-900 mb-1.5 flex items-center">
-                        <FileText className="w-3.5 h-3.5 mr-1.5 text-gray-500" />
-                        Message
-                      </h3>
-                      <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap bg-white border border-gray-100 p-3 rounded-lg shadow-sm">
-                        {notification.message}
-                      </p>
-                    </div>
-
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                      <div className="p-2.5 bg-white border border-gray-100 rounded-lg shadow-sm">
-                        <p className="text-[10px] text-gray-500 mb-0.5">Status</p>
-                        <Badge variant="outline" className={cn("bg-gray-50 text-[10px]", notification.isRead || notification.metadata?.isRead ? "text-green-600 border-green-200" : "text-blue-600 border-blue-200")}>
-                          {notification.isRead || notification.metadata?.isRead ? 'Read' : 'Unread'}
-                        </Badge>
-                      </div>
-                      <div className="p-2.5 bg-white border border-gray-100 rounded-lg shadow-sm">
-                        <p className="text-[10px] text-gray-500 mb-0.5">Severity</p>
-                        <div className="flex items-center gap-1.5 text-xs font-medium">
-                          <severityConfig.icon className={cn("w-3 h-3", severityConfig.color)} />
-                          <span className={severityConfig.color}>{severityConfig.label}</span>
+                        <div className="bg-gray-50/70 p-6 rounded-[20px] border border-gray-100/50 shadow-inner group">
+                          <p className="text-base text-gray-800 leading-relaxed font-semibold tracking-tight">
+                            {notification.message}
+                          </p>
                         </div>
-                      </div>
-                    </div>
 
-                    {/* Metadata / Additional Info - Human Readable */}
-                    {(notification.data || notification.metadata) && (
-                      <div className="border-t border-gray-100 pt-6">
-                        <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center">
-                          <Tag className="w-4 h-4 mr-2 text-gray-500" />
-                          Details
-                        </h3>
+                        {/* Meta Information / Metadata */}
+                        <div className="space-y-6 pt-6">
+                          <div className="flex items-center gap-3">
+                            <div className="h-px bg-gray-100 flex-1"></div>
+                            <h5 className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400 shrink-0 px-2">Data Integrity Report</h5>
+                            <div className="h-px bg-gray-100 flex-1"></div>
+                          </div>
 
-                        <div className="space-y-4">
-                          {/* Smart Rendering of Known Fields */}
+                          <div className="grid grid-cols-1 gap-4">
+                            <div className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-gray-200/20 transition-all duration-300">
+                              <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1.5">Official Timeline</p>
+                              <div className="flex items-center gap-3">
+                                <Calendar className="w-5 h-5 text-gray-400" />
+                                <p className="text-sm font-black text-gray-700 tracking-tight">
+                                  {new Date(notification.createdAt).toLocaleDateString()} at {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Extended Metadata Display */}
                           {(() => {
                             const data = { ...notification.metadata, ...notification.data };
+                            const entries = Object.entries(data).filter(([key, value]) =>
+                              !['link', 'permissions', 'isRead', 'isActioned', 'isSystem', 'isPersistent', 'icon', 'type', 'severity', 'priority', 'id', '_id', 'createdAt', 'updatedAt', '__v'].includes(key) &&
+                              typeof value !== 'object'
+                            );
 
-                            // 1. Actions / Links
-                            if (data.link) {
+                            if (entries.length > 0) {
                               return (
-                                <div className="flex items-center justify-between bg-blue-50 p-4 rounded-xl border border-blue-100">
-                                  <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                                      <ExternalLink className="w-4 h-4" />
+                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                                  {entries.map(([key, value]) => (
+                                    <div key={key} className="p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50 group/item hover:bg-white hover:shadow-md transition-all">
+                                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 truncate">
+                                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                                      </p>
+                                      <p className="text-xs font-black text-gray-900 truncate" title={String(value)}>{String(value)}</p>
                                     </div>
-                                    <div>
-                                      <p className="text-sm font-bold text-gray-900">Action Required</p>
-                                      <p className="text-xs text-gray-500">Navigate to the related page</p>
-                                    </div>
-                                  </div>
-                                  <Button size="sm" onClick={() => router.push(data.link)} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-                                    View
-                                    <ArrowRight className="w-3 h-3 ml-2" />
-                                  </Button>
+                                  ))}
                                 </div>
                               );
                             }
-
-                            // 2. Generic Key-Value Pairs (excluding complex objects for now unless specific)
-                            return (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {Object.entries(data).map(([key, value]) => {
-                                  if (key === 'link' || key === 'permissions' || typeof value === 'object') return null;
-
-                                  // Format label text (camelCase to Title Case)
-                                  const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-
-                                  return (
-                                    <div key={key} className="p-3 bg-gray-50 rounded-xl border border-gray-100">
-                                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">{label}</p>
-                                      <p className="text-sm font-semibold text-gray-900 truncate" title={String(value)}>{String(value)}</p>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            );
+                            return null;
                           })()}
                         </div>
                       </div>
-                    )}
-                  </div>
+                    </div>
 
-                  {/* Modal Footer Actions */}
-                  <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setSelectedNotification(null)}
-                    >
-                      Close
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => {
-                        if (confirm('Delete this notification?')) {
-                          clearNotifications(); // Note: clearNotifications usually clears all, might need specific delete
-                          setSelectedNotification(null);
+                    {/* Footer Action */}
+                    <div className="p-10 border-t border-gray-50 bg-gray-50/30 flex flex-col gap-4 sticky bottom-0 z-20">
+                      {(() => {
+                        const data = { ...notification.metadata, ...notification.data };
+                        if (data.link) {
+                          return (
+                            <button
+                              onClick={() => {
+                                router.push(data.link);
+                              }}
+                              className="flex items-center justify-center gap-2 w-full py-4 bg-gray-900 text-white rounded-[16px] font-black uppercase tracking-widest text-xs hover:bg-black transition-all shadow-xl shadow-black/10 active:scale-[0.98]"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              Take Action / View Details
+                            </button>
+                          );
                         }
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete
-                    </Button>
-                  </div >
-                </>
-              );
-            })()}
-          </DialogContent>
-        </Dialog>
+                        return null;
+                      })()}
 
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowDeleteModal(true)}
+                        className="w-full h-12 rounded-[16px] flex items-center justify-center gap-2 shadow-lg shadow-red-100/50 hover:shadow-xl hover:shadow-red-200/50 hover:-translate-y-0.5 transition-all active:scale-[0.98]"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                        <span className="text-xs font-black uppercase tracking-widest">Delete</span>
+                      </Button>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            <div className="mt-8 text-center">
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-300">End of Record</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full text-center space-y-8 animate-in fade-in zoom-in duration-500">
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-500/10 blur-[60px] rounded-full scale-125"></div>
+              <div className="relative w-32 h-32 bg-white rounded-[32px] flex items-center justify-center shadow-2xl shadow-blue-500/10 border border-blue-50">
+                <Bell className="w-12 h-12 text-blue-100 animate-pulse" />
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gray-900 text-white rounded-xl flex items-center justify-center shadow-xl">
+                <Search className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-2xl font-black text-gray-900 tracking-tight">Intelligence Briefing</h3>
+              <p className="text-gray-400 text-xs max-w-[280px] mx-auto font-medium leading-relaxed">
+                Select a transmission from the left telemetry feed to analyze its metadata and execute required protocols.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 pt-4">
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="w-3 h-3 rounded-full bg-blue-100 border-2 border-gray-50"></div>
+                ))}
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-300">Monitoring real-time uplink</p>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent className="sm:max-w-[425px] rounded-[24px] p-0 overflow-hidden border-0 shadow-2xl">
+          <div className="bg-gradient-to-br from-red-50 to-orange-50 p-8">
+            <div className="flex flex-col items-center text-center space-y-6">
+              {/* Icon */}
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center shadow-lg shadow-red-200/50">
+                <Trash2 className="w-10 h-10 text-red-600" />
+              </div>
+
+              {/* Content */}
+              <div className="space-y-3">
+                <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                  Delete Notification?
+                </h3>
+                <p className="text-sm text-gray-600 font-medium leading-relaxed max-w-sm">
+                  Are you sure you want to delete this notification? This action cannot be undone.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 w-full pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteModal(false)}
+                  className="flex-1 h-12 rounded-[16px] font-black uppercase tracking-widest text-xs border-2 hover:bg-gray-50"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDeleteNotification}
+                  className="flex-1 h-12 rounded-[16px] font-black uppercase tracking-widest text-xs shadow-lg shadow-red-200/50 hover:shadow-xl"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div >
 
   )

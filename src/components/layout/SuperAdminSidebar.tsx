@@ -25,6 +25,7 @@ import {
   Sparkles,
   X
 } from 'lucide-react'
+import { APP_VERSION } from '@/lib/version'
 
 const navigation = [
   { name: 'Dashboard', href: '/superadmin/dashboard', icon: LayoutDashboard, permission: 'analytics' },
@@ -130,8 +131,8 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
                 href={item.href}
                 onClick={onMobileClose}
                 className={`group flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-colors ${isActive
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                    : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                  : 'text-gray-700 hover:bg-gray-100'
                   }`}
               >
                 <Icon className={`flex-shrink-0 w-5 h-5 mr-3 ${sidebarCollapsed ? 'lg:mx-auto lg:mr-0' : ''} ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'}`} />
@@ -151,7 +152,7 @@ export default function SuperAdminSidebar({ mobileOpen = false, onMobileClose }:
             <LogOut className={`flex-shrink-0 w-5 h-5 mr-3 ${sidebarCollapsed ? 'lg:mr-0' : ''} text-gray-400 group-hover:text-red-500`} />
             <div className={`${sidebarCollapsed ? 'lg:hidden' : ''} flex items-center justify-between w-full`}>
               <span>Sign Out</span>
-              <span className="text-xs text-gray-400">v1.0.0</span>
+              <span className="text-xs text-gray-400">v{APP_VERSION}</span>
             </div>
           </button>
         </div>

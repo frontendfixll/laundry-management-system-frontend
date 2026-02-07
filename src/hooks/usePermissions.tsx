@@ -36,26 +36,15 @@ export interface PermissionModule {
  * Hook to check user permissions for RBAC
  * Permissions control what actions a user can perform within available features
  */
-export function usePermissions() {
+export function usePermissions(module?: string) {
   const { user, updateUser } = useAuthStore();
-
-  // Permissions are now synced globally by useSocketIONotifications
-  // which updates the auth store directly when permission_sync events occur.
 
   // Get permissions from user
   const permissions = useMemo(() => {
     const userPermissions = user?.permissions;
 
-    console.log('🔍 Permissions debug:', {
-      userRole: user?.role,
-      hasPermissions: !!userPermissions,
-      permissionModules: userPermissions ? Object.keys(userPermissions) : [],
-      userPermissions
-    });
-
     // If no permissions found, provide empty object
     if (!userPermissions || Object.keys(userPermissions).length === 0) {
-      console.log('🔐 No permissions found, using empty permissions');
       return {};
     }
 
@@ -65,31 +54,19 @@ export function usePermissions() {
   /**
    * Check if user has a specific permission
    */
-  const hasPermission = (module: string, action: string): boolean => {
-    // Enhanced debug logging
-    console.log(`🔐 hasPermission called: ${module}.${action}`);
-    console.log(`🔐 User role: ${user?.role}`);
-    console.log(`🔐 Is SuperAdmin: ${user?.role === 'superadmin'}`);
-
+  const hasPermission = (moduleName: string, action: string): boolean => {
     // SuperAdmin has all permissions
-    if (user?.role === 'superadmin') {
-      console.log(`🔐 SuperAdmin bypass: ${module}.${action} = true (BYPASSED - SuperAdmin has all permissions)`);
+    if (user?.role === 'superadmin' || user?.role === 'super_admin') {
       return true;
     }
 
     // Check if user has the specific permission
-    const modulePermissions = permissions[module] as PermissionModule;
-    if (!modulePermissions) {
-      console.log(`🔐 Module '${module}' not found in permissions - available modules:`, Object.keys(permissions));
+    const modulePerms = permissions[moduleName] as PermissionModule;
+    if (!modulePerms) {
       return false;
     }
 
-    const hasAccess = modulePermissions[action as keyof PermissionModule] === true;
-
-    console.log(`🔐 Permission check result: ${module}.${action} = ${hasAccess}`);
-    console.log(`🔐 Module permissions for ${module}:`, modulePermissions);
-
-    return hasAccess;
+    return modulePerms[action as keyof PermissionModule] === true;
   };
 
   /**
@@ -113,16 +90,27 @@ export function usePermissions() {
   /**
    * Get all permissions for a specific module
    */
-  const getModulePermissions = (module: string): PermissionModule => {
-    return (permissions[module] as PermissionModule) || {};
+  const getModulePermissions = (moduleName: string): PermissionModule => {
+    // SuperAdmin gets all true
+    if (user?.role === 'superadmin' || user?.role === 'super_admin') {
+      return {
+        view: true, create: true, update: true, delete: true, manage: true,
+        assign: true, cancel: true, process: true, toggle: true, export: true
+      };
+    }
+    return (permissions[moduleName] as PermissionModule) || {};
   };
 
   /**
    * Check if user can perform any action in a module
    */
-  const canAccessModule = (module: string): boolean => {
-    const modulePermissions = getModulePermissions(module);
-    return Object.values(modulePermissions).some(permission => permission === true);
+  const canAccessModule = (moduleName: string): boolean => {
+    // SuperAdmin bypass
+    if (user?.role === 'superadmin' || user?.role === 'super_admin') {
+      return true;
+    }
+    const modulePerms = getModulePermissions(moduleName);
+    return Object.values(modulePerms).some(permission => permission === true);
   };
 
   /**
@@ -136,15 +124,34 @@ export function usePermissions() {
    * Check if user is admin or higher
    */
   const isAdmin = useMemo(() => {
-    return ['admin', 'superadmin'].includes(userRole);
+    return ['admin', 'superadmin', 'super_admin', 'tenant_admin', 'tenant_owner'].includes(userRole);
   }, [userRole]);
 
   /**
    * Check if user is superadmin
    */
   const isSuperAdmin = useMemo(() => {
-    return userRole === 'superadmin';
+    return ['superadmin', 'super_admin'].includes(userRole);
   }, [userRole]);
+
+  // If module is provided, return convenience flags
+  const moduleFlags = useMemo(() => {
+    if (!module) return {};
+
+    const modulePerms = getModulePermissions(module);
+
+    return {
+      canView: modulePerms.view === true,
+      canCreate: modulePerms.create === true,
+      canUpdate: modulePerms.update === true,
+      canDelete: modulePerms.delete === true,
+      canAssign: modulePerms.assign === true,
+      canCancel: modulePerms.cancel === true,
+      canProcess: modulePerms.process === true,
+      canManage: modulePerms.manage === true,
+      canRefund: modulePerms.cancel === true,
+    };
+  }, [module, permissions, user?.role]);
 
   return {
     permissions,
@@ -156,6 +163,7 @@ export function usePermissions() {
     userRole,
     isAdmin,
     isSuperAdmin,
+    ...moduleFlags
   };
 }
 

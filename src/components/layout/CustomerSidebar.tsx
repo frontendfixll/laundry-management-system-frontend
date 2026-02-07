@@ -27,6 +27,7 @@ import {
   Gift,
   MessageSquare
 } from 'lucide-react'
+import { APP_VERSION } from '@/lib/version'
 
 const baseNavigation = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -266,7 +267,7 @@ export default function CustomerSidebar({
         {!collapsed && (
           <div className="flex-shrink-0 px-4 py-2 border-t border-gray-200">
             <div className="text-xs text-gray-400 text-center">
-              v1.0.0
+              v{APP_VERSION}
             </div>
           </div>
         )}

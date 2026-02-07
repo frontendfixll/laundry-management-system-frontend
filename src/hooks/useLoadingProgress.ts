@@ -16,13 +16,22 @@ const DEFAULT_STAGES: LoadingStage[] = [
 ]
 
 export const useLoadingProgress = (isComplete: boolean = false) => {
-    const [progress, setProgress] = useState(0)
+    const [progress, setProgress] = useState(1)
     const [currentStage, setCurrentStage] = useState(DEFAULT_STAGES[0])
 
     useEffect(() => {
         if (isComplete) {
-            setProgress(100)
-            return
+            // Speed up to 100 when complete
+            const finishTimer = setInterval(() => {
+                setProgress(prev => {
+                    if (prev >= 100) {
+                        clearInterval(finishTimer)
+                        return 100
+                    }
+                    return Math.min(prev + 5, 100)
+                })
+            }, 50)
+            return () => clearInterval(finishTimer)
         }
 
         const timer = setInterval(() => {

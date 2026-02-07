@@ -183,6 +183,16 @@ export default function NotificationContainer() {
               Refresh UI Now
             </button>
             <button
+              onClick={() => {
+                router.push('/admin/notifications');
+                onClose();
+              }}
+              className="w-full flex items-center justify-center gap-2 bg-white border border-blue-100 hover:border-blue-200 text-blue-600 font-bold py-3 px-6 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm shadow-blue-50"
+            >
+              <Bell size={18} />
+              View Update Details
+            </button>
+            <button
               id="flash-close-btn"
               onClick={onClose}
               className="w-full text-gray-500 hover:text-gray-900 font-bold py-2 text-sm transition-colors"

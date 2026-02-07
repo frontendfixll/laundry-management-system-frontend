@@ -74,9 +74,8 @@ const formatTimeAgo = (dateString: string) => {
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
   const [showInbox, setShowInbox] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
-
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const {
     notifications,
     stats,
@@ -87,14 +86,13 @@ export function NotificationBell() {
     markAsRead,
     markAllAsRead,
     clearNotifications,
-    reconnect
+    reconnect,
+    isLoading
   } = useSocketIONotifications()
 
   const handleNotificationClick = useCallback((notification: Notification) => {
     markAsRead(notification.id)
-    setIsOpen(false)
-    router.push(`/admin/notifications/${notification.id}`)
-  }, [markAsRead, router])
+  }, [markAsRead])
 
   const handleMarkAllRead = useCallback(() => {
     markAllAsRead()
@@ -255,10 +253,19 @@ export function NotificationBell() {
             >
               {notifications.length === 0 ? (
                 <div className="px-6 py-12 text-center">
-                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Bell className="w-8 h-8 text-blue-200" />
-                  </div>
-                  <p className="text-sm font-bold text-gray-900">No notifications yet</p>
+                  {isLoading ? (
+                    <div className="flex flex-col items-center justify-center space-y-2">
+                      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                      <p className="text-[10px] font-medium text-gray-400">Loading...</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Bell className="w-8 h-8 text-blue-200" />
+                      </div>
+                      <p className="text-sm font-bold text-gray-900">No notifications yet</p>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="divide-y divide-gray-50">
@@ -309,18 +316,33 @@ export function NotificationBell() {
                               ))}
                             </div>
                           )}
-                          {notification.requiresAck && (
-                            <div className="mt-3">
+                          {/* Actions */}
+                          <div className="mt-3 flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markAsRead(notification.id);
+                                router.push('/admin/notifications');
+                                setIsOpen(false);
+                              }}
+                              className="text-[10px] bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-bold border border-blue-100 hover:bg-blue-100 transition-colors"
+                            >
+                              View Details
+                            </button>
+                            {!((notification as any).isRead || notification.metadata?.isRead) && (
                               <button
-                                onClick={(e) => { e.stopPropagation(); handleAcknowledge(notification.id); }}
-                                className="text-[10px] bg-emerald-50 text-emerald-700 px-3 py-1 rounded-lg font-bold border border-emerald-100"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  markAsRead(notification.id);
+                                }}
+                                className="text-[10px] text-gray-500 hover:text-blue-600 font-bold px-1"
                               >
-                                Acknowledge
+                                Mark as Read
                               </button>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
-                        {!notification.metadata?.isRead && (
+                        {!((notification as any).isRead || notification.metadata?.isRead) && (
                           <div className="absolute right-6 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                         )}
                       </div>
@@ -342,7 +364,7 @@ export function NotificationBell() {
                 <button
                   onClick={() => {
                     setIsOpen(false);
-                    router.push('/admin/notifications');
+                    setShowInbox(true);
                   }}
                   className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                 >
@@ -354,8 +376,6 @@ export function NotificationBell() {
           </div>
         )}
       </div>
-
-      {/* REDUNDANT: NotificationPriorityHandler removed - handled by NotificationContainer */}
 
       {showInbox && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 backdrop-blur-sm overflow-y-auto py-4">
@@ -369,6 +389,7 @@ export function NotificationBell() {
               onMarkAllAsRead={markAllAsRead}
               onAcknowledge={handleAcknowledge}
               onClear={clearNotifications}
+              isLoading={isLoading}
             />
           </div>
         </div>

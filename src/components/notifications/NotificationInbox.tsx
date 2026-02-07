@@ -41,6 +41,7 @@ interface NotificationInboxProps {
   onMarkAllAsRead: () => void;
   onAcknowledge?: (notificationId: string) => void;
   onClear: () => void;
+  isLoading?: boolean;
 }
 
 type FilterType = 'all' | 'unread' | 'P0' | 'P1' | 'P2' | 'P3' | 'P4';
@@ -59,7 +60,8 @@ export const NotificationInbox: React.FC<NotificationInboxProps> = ({
   onMarkAsRead,
   onMarkAllAsRead,
   onAcknowledge,
-  onClear
+  onClear,
+  isLoading = false
 }) => {
   const [filter, setFilter] = useState<FilterType>('all');
   const [sort, setSort] = useState<SortType>('newest');
@@ -120,7 +122,7 @@ export const NotificationInbox: React.FC<NotificationInboxProps> = ({
   // Stats
   const stats = useMemo(() => {
     const total = notifications.length;
-    const unread = notifications.filter(n => !n.metadata?.isRead).length;
+    const unread = notifications.filter(n => !(n.isRead || n.metadata?.isRead)).length;
     const byPriority = {
       P0: notifications.filter(n => (n.priority || 'P3') === 'P0').length,
       P1: notifications.filter(n => (n.priority || 'P3') === 'P1').length,
@@ -194,14 +196,23 @@ export const NotificationInbox: React.FC<NotificationInboxProps> = ({
       <div className="flex-1 overflow-y-auto">
         {filteredNotifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-            <Bell className="h-12 w-12 mb-4 text-gray-300" />
-            <p className="text-lg font-medium">No notifications found</p>
-            <p className="text-sm">
-              {searchTerm || filter !== 'all' || selectedCategory !== 'all'
-                ? 'Try adjusting your filters'
-                : 'You\'re all caught up!'
-              }
-            </p>
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <p className="text-lg font-medium">Fetching notifications...</p>
+              </div>
+            ) : (
+              <>
+                <Bell className="h-12 w-12 mb-4 text-gray-300" />
+                <p className="text-lg font-medium">No notifications found</p>
+                <p className="text-sm">
+                  {searchTerm || filter !== 'all' || selectedCategory !== 'all'
+                    ? 'Try adjusting your filters'
+                    : 'You\'re all caught up!'
+                  }
+                </p>
+              </>
+            )}
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
@@ -213,8 +224,7 @@ export const NotificationInbox: React.FC<NotificationInboxProps> = ({
               return (
                 <div
                   key={notification.id}
-                  className={`p-2.5 hover:bg-gray-50 transition-colors ${!isRead ? 'bg-blue-50' : ''
-                    }`}
+                  className={`p-2.5 hover:bg-gray-50 transition-colors ${!isRead ? 'bg-blue-50' : ''}`}
                 >
                   <div className="flex items-start space-x-2">
                     <div className={`flex-shrink-0 ${config.color}`}>

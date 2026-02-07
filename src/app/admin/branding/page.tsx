@@ -1,23 +1,27 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useBranding, BrandingData, LandingPageTemplate } from '@/hooks/useBranding';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import { 
-  Palette, 
-  Upload, 
-  Trash2, 
+import {
+  Palette,
+  Upload,
+  Trash2,
   Save,
   Image as ImageIcon,
   Layout,
   Check,
   ExternalLink,
   Eye,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 
 // Dynamic imports for templates
@@ -43,10 +47,11 @@ const landingTemplates: { value: LandingPageTemplate; label: string; description
 ];
 
 export default function BrandingPage() {
+  const router = useRouter();
   const { branding, loading, saving, updateBranding, uploadLogo, uploadSecondaryLogo, removeLogo } = useBranding();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const secondaryLogoInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [formData, setFormData] = useState<BrandingData>({
     businessName: '',
     tagline: '',
@@ -71,10 +76,16 @@ export default function BrandingPage() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<LandingPageTemplate>('original');
 
+  // Unsaved changes tracking
+  const [originalData, setOriginalData] = useState<BrandingData | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
   // Update form when branding loads
   useEffect(() => {
     if (branding?.branding) {
-      setFormData({
+      const loadedData = {
         businessName: branding.branding.businessName || '',
         tagline: branding.branding.tagline || '',
         slogan: branding.branding.slogan || '',
@@ -92,8 +103,11 @@ export default function BrandingPage() {
         fontFamily: branding.branding.theme?.fontFamily || 'Inter',
         landingPageTemplate: branding.branding.landingPageTemplate || 'original',
         customCss: branding.branding.customCss || '',
-      });
-      
+      };
+
+      setFormData(loadedData);
+      setOriginalData(loadedData);
+
       // Detect current theme color
       const primaryColor = branding.branding.theme?.primaryColor;
       if (primaryColor === '#14b8a6') setSelectedThemeColor('teal');
@@ -102,6 +116,21 @@ export default function BrandingPage() {
       else if (primaryColor === '#f97316') setSelectedThemeColor('orange');
     }
   }, [branding]);
+
+  // Track unsaved changes
+  useEffect(() => {
+    if (originalData) {
+      const hasChanges = JSON.stringify(formData) !== JSON.stringify(originalData);
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [formData, originalData]);
+
+  // Use unsaved changes warning hook
+  useUnsavedChangesWarning({
+    hasUnsavedChanges,
+    onNavigationAttempt: () => setShowExitModal(true),
+    isNavigating,
+  });
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -135,29 +164,59 @@ export default function BrandingPage() {
 
   const handleThemeColorChange = (color: ThemeColorOption) => {
     setSelectedThemeColor(color);
-    
+
     const colorMap = {
       teal: { primary: '#14b8a6', secondary: '#0d9488', accent: '#2dd4bf' },
       blue: { primary: '#3b82f6', secondary: '#2563eb', accent: '#60a5fa' },
       purple: { primary: '#8b5cf6', secondary: '#7c3aed', accent: '#a78bfa' },
       orange: { primary: '#f97316', secondary: '#ea580c', accent: '#fb923c' },
     };
-    
+
     const colors = colorMap[color];
-    setFormData({ 
-      ...formData, 
-      primaryColor: colors.primary, 
-      secondaryColor: colors.secondary, 
-      accentColor: colors.accent 
+    setFormData({
+      ...formData,
+      primaryColor: colors.primary,
+      secondaryColor: colors.secondary,
+      accentColor: colors.accent
     });
-    
+
     // Also update localStorage for immediate effect on landing page
     localStorage.setItem('landing_color', color);
     window.dispatchEvent(new CustomEvent('themeColorChange', { detail: { color } }));
   };
 
   const handleSave = async () => {
-    await updateBranding(formData);
+    const success = await updateBranding(formData);
+    if (success) {
+      setOriginalData(formData);
+      setHasUnsavedChanges(false);
+
+      // Trigger admin theme update event
+      window.dispatchEvent(new Event('adminThemeUpdate'));
+
+      toast.success('Branding updated! Theme applied to admin dashboard.');
+    }
+  };
+
+  const handleSaveAndContinue = async () => {
+    setIsNavigating(true);
+    await handleSave();
+    setShowExitModal(false);
+    setIsNavigating(false);
+  };
+
+  const handleDiscardChanges = () => {
+    if (originalData) {
+      setFormData(originalData);
+      setHasUnsavedChanges(false);
+    }
+    setIsNavigating(true);
+    setShowExitModal(false);
+
+    // Allow navigation to proceed
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 100);
   };
 
   // Map theme color to ThemeColor type
@@ -181,7 +240,7 @@ export default function BrandingPage() {
       themeColor: mapToThemeColor(selectedThemeColor),
       language: 'en' as const,
       isAuthenticated: false,
-      onBookNow: () => {},
+      onBookNow: () => { },
       user: null,
       tenantName: branding?.name || 'Demo Laundry',
       tenantLogo: logoUrl,
@@ -223,21 +282,43 @@ export default function BrandingPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Branding</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Branding {hasUnsavedChanges && <span className="text-orange-500">*</span>}
+          </h1>
           <p className="text-gray-500">Customize your laundry portal appearance</p>
         </div>
-        <Button onClick={handleSave} disabled={saving}>
-          <Save className="mr-2 h-4 w-4" />
-          {saving ? 'Saving...' : 'Save Changes'}
-        </Button>
       </div>
+
+      {/* Unsaved Changes Warning Banner */}
+      {hasUnsavedChanges && (
+        <div className="bg-orange-50 border-l-4 border-orange-400 rounded-lg p-4 animate-in slide-in-from-top-2 duration-300">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-orange-900">Unsaved Changes</h3>
+              <p className="text-sm text-orange-800 mt-1">
+                You have unsaved changes to your branding settings. Don't forget to save before leaving this page.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-orange-600 hover:bg-orange-700 text-white flex-shrink-0"
+            >
+              <Save className="mr-2 h-3 w-3" />
+              Save Now
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Preview URL */}
       {branding?.slug && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <p className="text-sm text-green-800 flex items-center gap-2">
             <strong>Customer Landing Page:</strong>
-            <a 
+            <a
               href={`/${branding.slug}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -273,7 +354,7 @@ export default function BrandingPage() {
                 This will appear on your website and communications
               </p>
             </div>
-            
+
             <div>
               <Label htmlFor="tagline">Tagline</Label>
               <input
@@ -289,7 +370,7 @@ export default function BrandingPage() {
                 A catchy phrase that describes your service
               </p>
             </div>
-            
+
             <div>
               <Label htmlFor="slogan">Slogan</Label>
               <input
@@ -321,9 +402,9 @@ export default function BrandingPage() {
             <div className="flex items-center gap-4">
               <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
                 {logoUrl ? (
-                  <img 
-                    src={logoUrl} 
-                    alt="Logo" 
+                  <img
+                    src={logoUrl}
+                    alt="Logo"
                     className="w-full h-full object-contain"
                   />
                 ) : (
@@ -338,8 +419,8 @@ export default function BrandingPage() {
                   accept="image/png,image/jpeg,image/svg+xml"
                   className="hidden"
                 />
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={saving}
@@ -348,8 +429,8 @@ export default function BrandingPage() {
                   Upload Logo
                 </Button>
                 {logoUrl && (
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={removeLogo}
                     disabled={saving}
@@ -377,9 +458,9 @@ export default function BrandingPage() {
             <div className="flex items-center gap-4">
               <div className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
                 {secondaryLogoUrl ? (
-                  <img 
-                    src={secondaryLogoUrl} 
-                    alt="Secondary Logo" 
+                  <img
+                    src={secondaryLogoUrl}
+                    alt="Secondary Logo"
                     className="w-full h-full object-contain"
                   />
                 ) : (
@@ -394,8 +475,8 @@ export default function BrandingPage() {
                   accept="image/png,image/jpeg,image/svg+xml"
                   className="hidden"
                 />
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => secondaryLogoInputRef.current?.click()}
                   disabled={saving}
@@ -423,11 +504,10 @@ export default function BrandingPage() {
                 <button
                   key={theme.value}
                   onClick={() => handleThemeColorChange(theme.value)}
-                  className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all hover:scale-105 ${
-                    selectedThemeColor === theme.value 
-                      ? 'border-gray-800 ring-2 ring-offset-2 ring-gray-400' 
+                  className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all hover:scale-105 ${selectedThemeColor === theme.value
+                      ? 'border-gray-800 ring-2 ring-offset-2 ring-gray-400'
                       : 'border-gray-200'
-                  }`}
+                    }`}
                   title={theme.label}
                 >
                   <div className="w-full h-full flex">
@@ -463,11 +543,10 @@ export default function BrandingPage() {
                 <div key={template.value} className="relative">
                   <button
                     onClick={() => setFormData({ ...formData, landingPageTemplate: template.value })}
-                    className={`w-full p-4 border-2 rounded-xl text-left transition-all hover:shadow-md ${
-                      formData.landingPageTemplate === template.value
+                    className={`w-full p-4 border-2 rounded-xl text-left transition-all hover:shadow-md ${formData.landingPageTemplate === template.value
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                   >
                     {formData.landingPageTemplate === template.value && (
                       <div className="absolute top-2 right-2">
@@ -475,12 +554,11 @@ export default function BrandingPage() {
                       </div>
                     )}
                     <div>
-                      <div 
-                        className={`w-full h-16 rounded-lg mb-3 flex items-center justify-center ${
-                          formData.landingPageTemplate === template.value 
-                            ? 'bg-blue-100' 
+                      <div
+                        className={`w-full h-16 rounded-lg mb-3 flex items-center justify-center ${formData.landingPageTemplate === template.value
+                            ? 'bg-blue-100'
                             : 'bg-gray-100'
-                        }`}
+                          }`}
                       >
                         <Button
                           variant="ghost"
@@ -489,19 +567,17 @@ export default function BrandingPage() {
                             e.stopPropagation();
                             handlePreview(template.value);
                           }}
-                          className={`h-12 px-4 ${
-                            formData.landingPageTemplate === template.value 
-                              ? 'text-blue-500 hover:text-blue-600' 
+                          className={`h-12 px-4 ${formData.landingPageTemplate === template.value
+                              ? 'text-blue-500 hover:text-blue-600'
                               : 'text-gray-500 hover:text-gray-600'
-                          }`}
+                            }`}
                         >
                           <Eye className="h-5 w-5 mr-2" />
                           Preview
                         </Button>
                       </div>
-                      <h3 className={`font-semibold ${
-                        formData.landingPageTemplate === template.value ? 'text-blue-700' : 'text-gray-800'
-                      }`}>
+                      <h3 className={`font-semibold ${formData.landingPageTemplate === template.value ? 'text-blue-700' : 'text-gray-800'
+                        }`}>
                         {template.label}
                       </h3>
                       <p className="text-xs text-gray-500 mt-1">{template.description}</p>
@@ -535,7 +611,7 @@ export default function BrandingPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="instagram">Instagram</Label>
                 <input
@@ -550,7 +626,7 @@ export default function BrandingPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="twitter">Twitter</Label>
                 <input
@@ -565,7 +641,7 @@ export default function BrandingPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="linkedin">LinkedIn</Label>
                 <input
@@ -580,7 +656,7 @@ export default function BrandingPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="youtube">YouTube</Label>
                 <input
@@ -595,7 +671,7 @@ export default function BrandingPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="whatsapp">WhatsApp</Label>
                 <input
@@ -617,11 +693,11 @@ export default function BrandingPage() {
 
       {/* Preview Modal */}
       {showPreview && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-2 sm:p-4"
           onClick={closePreview}
         >
-          <div 
+          <div
             className="bg-white rounded-lg w-full max-w-4xl lg:max-w-5xl h-[70vh] sm:h-[75vh] flex flex-col shadow-2xl mx-2"
             onClick={(e) => e.stopPropagation()}
           >
@@ -640,13 +716,13 @@ export default function BrandingPage() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            
+
             {/* Preview Content - Contained within modal */}
             <div className="flex-1 overflow-hidden relative">
               <div className="absolute inset-0 overflow-auto">
-                <div 
-                  className="w-full h-full template-preview-wrapper" 
-                  style={{ 
+                <div
+                  className="w-full h-full template-preview-wrapper"
+                  style={{
                     minHeight: '100%',
                     position: 'relative'
                   }}
@@ -655,7 +731,7 @@ export default function BrandingPage() {
                 </div>
               </div>
             </div>
-            
+
             {/* Modal Footer */}
             <div className="p-4 border-t bg-white flex items-center justify-between rounded-b-lg">
               <div className="text-sm text-gray-600">
@@ -665,7 +741,7 @@ export default function BrandingPage() {
                 <Button variant="outline" onClick={closePreview}>
                   Close Preview
                 </Button>
-                <Button 
+                <Button
                   onClick={() => {
                     setFormData({ ...formData, landingPageTemplate: previewTemplate });
                     closePreview();
@@ -678,6 +754,49 @@ export default function BrandingPage() {
           </div>
         </div>
       )}
+
+      {/* Exit Confirmation Modal */}
+      <Dialog open={showExitModal} onOpenChange={setShowExitModal}>
+        <DialogContent className="sm:max-w-[480px] rounded-[24px] p-0 overflow-hidden border-0 shadow-2xl">
+          <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-8">
+            <div className="flex flex-col items-center text-center space-y-6">
+              {/* Warning Icon */}
+              <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center shadow-lg shadow-orange-200/50">
+                <AlertTriangle className="w-10 h-10 text-orange-600" />
+              </div>
+
+              {/* Content */}
+              <div className="space-y-3">
+                <h3 className="text-2xl font-black text-gray-900 tracking-tight">
+                  Unsaved Changes
+                </h3>
+                <p className="text-sm text-gray-600 font-medium leading-relaxed max-w-sm">
+                  You have unsaved changes to your branding settings. What would you like to do?
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-col gap-3 w-full pt-4">
+                <Button
+                  onClick={handleSaveAndContinue}
+                  disabled={saving}
+                  className="w-full h-12 rounded-[16px] font-black uppercase tracking-widest text-xs bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200/50"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save & Continue'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleDiscardChanges}
+                  className="w-full h-12 rounded-[16px] font-black uppercase tracking-widest text-xs border-2 hover:bg-gray-50"
+                >
+                  Leave Without Saving
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

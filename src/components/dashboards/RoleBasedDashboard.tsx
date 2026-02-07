@@ -2,6 +2,7 @@
 
 import { useAuthStore } from '@/store/authStore'
 import { usePermissions } from '@/hooks/usePermissions'
+import { useAdminTheme } from '@/hooks/useAdminTheme'
 import { SuperAdminDashboard } from './SuperAdminDashboard'
 import { PlatformSupportDashboard } from './PlatformSupportDashboard'
 import { PlatformFinanceDashboard } from './PlatformFinanceDashboard'
@@ -102,6 +103,7 @@ export function DashboardWrapper({
   subtitle,
   roleColor = 'blue'
 }: DashboardWrapperProps) {
+  const { theme } = useAdminTheme()
   const colorClasses = {
     blue: 'from-blue-500 to-blue-600',
     green: 'from-green-500 to-green-600',
@@ -111,10 +113,18 @@ export function DashboardWrapper({
     gray: 'from-gray-500 to-gray-600'
   }
 
+  // Use theme colors for the header if branding is available
+  const headerStyle = {
+    background: `linear-gradient(to right, ${theme.primaryColor}, ${theme.secondaryColor})`
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Role-specific header */}
-      <div className={`bg-gradient-to-r ${colorClasses[roleColor as keyof typeof colorClasses]} text-white py-2 mb-3`}>
+      {/* Role-specific header - now theme aware */}
+      <div
+        className="text-white py-2 mb-3"
+        style={headerStyle}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-xl font-light tracking-tight">{title}</h1>
           {subtitle && (

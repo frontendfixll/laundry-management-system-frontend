@@ -44,6 +44,7 @@ import { useFeatures, FeatureKey } from '@/hooks/useFeatures'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useState, useEffect } from 'react'
 import { useBranding } from '@/hooks/useBranding'
+import { APP_VERSION } from '@/lib/version'
 
 interface NavigationItem {
   name: string;
@@ -58,7 +59,6 @@ interface NavigationItem {
 
 const enhancedNavigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: Home, permission: null, feature: null },
-  { name: 'Tenancies', href: '/admin/tenancies', icon: Building2, permission: null, feature: null },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingBag, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
   { name: 'Barcode Scanner', href: '/admin/scanner', icon: QrCode, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
   { name: 'Customers', href: '/admin/customers', icon: Users, permission: { module: 'customers', action: 'view' }, feature: 'customers' as FeatureKey },
@@ -557,7 +557,7 @@ export function SimpleSidebar() {
               sidebarCollapsed ? 'lg:h-0 lg:p-0 lg:opacity-0' : 'lg:h-auto lg:opacity-100'
             )}>
               <div className="text-[10px] text-gray-400 font-light tracking-widest uppercase">
-                v1.0.0 Stable
+                v{APP_VERSION} Stable
               </div>
             </div>
 

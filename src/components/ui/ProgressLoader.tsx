@@ -3,6 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
+import { APP_VERSION } from '@/lib/version'
 
 interface ProgressLoaderProps {
     progress: number
@@ -54,7 +55,7 @@ const ProgressLoader: React.FC<ProgressLoaderProps> = ({
                 {/* Footer Info */}
                 <div className="mt-6 flex justify-between items-center px-1">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">
-                        LMS Admin v2.0
+                        LMS Admin v{APP_VERSION}
                     </span>
                     <div className="flex gap-1.5">
                         {[1, 2, 3].map((i) => (

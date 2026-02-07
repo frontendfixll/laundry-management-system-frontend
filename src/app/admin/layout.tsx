@@ -9,9 +9,11 @@ import ProgressLoader from '@/components/ui/ProgressLoader'
 import { useLoadingProgress } from '@/hooks/useLoadingProgress'
 import { useAuthStore } from '@/store/authStore'
 import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
+import { useAdminTheme } from '@/hooks/useAdminTheme'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import '@/styles/admin-layout-consolidated.css' // FINAL FIX - Consolidated all layout rules
+import '@/styles/admin-theme.css' // Dynamic theme styles
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, _hasHydrated, sidebarCollapsed } = useAuthStore() // Add sidebarCollapsed
@@ -97,9 +99,11 @@ export default function AdminLayout({
     setIsLoading(false);
   }, [isAuthenticated, user, router, _hasHydrated]);
 
-  const { progress, message, subMessage } = useLoadingProgress(_hasHydrated && !isLoading && isAuthenticated && !!user)
+  const { loading: themeLoading } = useAdminTheme() // Load tenant theme
+  const isComplete = _hasHydrated && !isLoading && isAuthenticated && !!user && !themeLoading;
+  const { progress, message, subMessage } = useLoadingProgress(isComplete)
 
-  if (!_hasHydrated || isLoading || !isAuthenticated || !user || progress < 100) {
+  if (!isComplete || progress < 100) {
     return (
       <ProgressLoader
         progress={progress}

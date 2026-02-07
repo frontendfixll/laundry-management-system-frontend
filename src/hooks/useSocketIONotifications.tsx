@@ -49,6 +49,7 @@ interface UseSocketIONotificationsReturn {
   clearNotifications: () => void;
   reconnect: () => void;
   refresh: () => Promise<void>;
+  isLoading: boolean;
 }
 
 const SOCKET_URL = typeof window !== 'undefined'
@@ -69,6 +70,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const socketRef = useRef<Socket | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -189,6 +191,8 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
       }
     } catch (error) {
       console.error('❌ Failed to fetch notifications:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, [user, token, calculateStats]);
 
@@ -518,10 +522,8 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
 
     try {
       await notificationApi.clearAllNotifications();
-      toast.success('All notifications cleared');
     } catch (err) {
       console.error('Failed to sync clearNotifications to backend:', err);
-      toast.error('Failed to clear notifications from server');
     }
   }, []);
 
@@ -562,6 +564,7 @@ export const useSocketIONotifications = (): UseSocketIONotificationsReturn => {
     markAllAsRead,
     clearNotifications,
     reconnect,
-    refresh: fetchNotifications
+    refresh: fetchNotifications,
+    isLoading
   };
 };
