@@ -45,7 +45,7 @@ const navigation = [
   { name: 'Barcode Scanner', href: '/admin/scanner', icon: QrCode },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'Inventory', href: '/admin/inventory', icon: Package },
-  { name: 'Services', href: '/admin/services', icon: Sparkles },
+  { name: 'Services', href: '/admin/service', icon: Sparkles },
   { name: 'Branches', href: '/admin/branches', icon: MapPin },
   { name: 'Branch Admins', href: '/admin/branch-admins', icon: Users },
   {

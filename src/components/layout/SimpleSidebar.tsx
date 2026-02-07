@@ -63,7 +63,7 @@ const enhancedNavigation: NavigationItem[] = [
   { name: 'Barcode Scanner', href: '/admin/scanner', icon: QrCode, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
   { name: 'Customers', href: '/admin/customers', icon: Users, permission: { module: 'customers', action: 'view' }, feature: 'customers' as FeatureKey },
   { name: 'Inventory', href: '/admin/inventory', icon: Package, permission: { module: 'inventory', action: 'view' }, feature: 'inventory' as FeatureKey },
-  { name: 'Services', href: '/admin/services', icon: Sparkles, permission: { module: 'services', action: 'view' }, feature: 'services' as FeatureKey },
+  { name: 'Services', href: '/admin/service', icon: Sparkles, permission: { module: 'services', action: 'view' }, feature: 'services' as FeatureKey },
   { name: 'Branches', href: '/admin/branches', icon: MapPin, permission: { module: 'branches', action: 'view' }, feature: 'branches' as FeatureKey },
   { name: 'Branch Admins', href: '/admin/branch-admins', icon: Users, permission: { module: 'branchAdmins', action: 'view' }, feature: 'branch_admins' as FeatureKey },
   {

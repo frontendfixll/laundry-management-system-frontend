@@ -74,7 +74,7 @@ const ALL_QUICK_ACTIONS: QuickAction[] = [
     id: 'services',
     name: 'Services',
     description: 'Manage services',
-    href: '/admin/services',
+    href: '/admin/service',
     icon: Sparkles,
     gradient: 'from-cyan-500 to-blue-600',
     shadowColor: 'shadow-cyan-500/30',

@@ -550,7 +550,7 @@ export function DefaultAdminDashboard() {
 
             {/* Services */}
             {hasPermission('services', 'view') && (
-              <Link href="/admin/services" className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors group">
+              <Link href="/admin/service" className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors group">
                 <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>

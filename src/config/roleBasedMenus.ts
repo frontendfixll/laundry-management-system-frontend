@@ -539,21 +539,21 @@ export const TENANT_MENUS: Record<string, MenuSection[]> = {
           id: 'services',
           label: 'Services',
           icon: 'Wrench',
-          path: '/admin/services',
+          path: '/admin/service',
           requiredPermission: 'services_pricing.view'
         },
         {
           id: 'categories',
           label: 'Categories',
           icon: 'Grid3x3',
-          path: '/admin/services/categories',
+          path: '/admin/service/categories',
           requiredPermission: 'services_pricing.create'
         },
         {
           id: 'pricing-rules',
           label: 'Pricing Rules',
           icon: 'Calculator',
-          path: '/admin/services/pricing',
+          path: '/admin/service/pricing',
           requiredPermission: 'services_pricing.update'
         }
       ]
@@ -802,14 +802,14 @@ export const TENANT_MENUS: Record<string, MenuSection[]> = {
           id: 'view-services',
           label: 'View Services',
           icon: 'Wrench',
-          path: '/admin/services',
+          path: '/admin/service',
           requiredPermission: 'services_pricing.view'
         },
         {
           id: 'limited-edit',
           label: 'Limited Edit',
           icon: 'Edit',
-          path: '/admin/services/edit',
+          path: '/admin/service/edit',
           requiredPermission: 'services_pricing.edit'
         }
       ]

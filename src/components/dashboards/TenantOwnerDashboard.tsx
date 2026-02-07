@@ -259,7 +259,7 @@ export function TenantOwnerDashboard() {
             </PermissionGate>
 
             <PermissionGate permissions={[{ module: 'services_pricing', action: 'view' }]}>
-              <Link href="/admin/services">
+              <Link href="/admin/service">
                 <Button className="w-full justify-start" variant="outline">
                   <Wrench className="w-4 h-4 mr-2" />
                   Manage Services

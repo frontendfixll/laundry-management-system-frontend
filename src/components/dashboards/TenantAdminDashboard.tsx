@@ -649,7 +649,7 @@ export function TenantAdminDashboard() {
             </PermissionGate>
 
             <PermissionGate permissions={[{ module: 'services_pricing', action: 'view' }]}>
-              <Link href="/admin/services" className="group">
+              <Link href="/admin/service" className="group">
                 <div className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-xl p-4 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg">
                   <div className="flex items-center space-x-3">
                     <Settings className="w-5 h-5" />
