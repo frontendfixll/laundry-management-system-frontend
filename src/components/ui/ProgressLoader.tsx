@@ -1,14 +1,13 @@
 'use client'
 
 import React from 'react'
+import { APP_VERSION } from '@/lib/version'
 
 interface ProgressLoaderProps {
     progress: number
     message?: string
     subMessage?: string
 }
-
-import { APP_VERSION } from '@/lib/version'
 
 const ProgressLoader: React.FC<ProgressLoaderProps> = ({
     progress,

@@ -28,6 +28,7 @@ import {
   Gift,
   MessageSquare
 } from 'lucide-react'
+import { APP_VERSION } from '@/lib/version'
 
 const baseNavigation = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },

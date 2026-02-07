@@ -46,6 +46,7 @@ import { useFeatures, FeatureKey } from '@/hooks/useFeatures'
 import { usePermissions } from '@/hooks/usePermissions'
 import SidebarChatbox from '@/components/support/SidebarChatbox'
 import { useBranding } from '@/hooks/useBranding'
+import { APP_VERSION } from '@/lib/version'
 
 interface NavigationItem {
   name: string;

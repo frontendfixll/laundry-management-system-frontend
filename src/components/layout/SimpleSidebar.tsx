@@ -59,7 +59,6 @@ interface NavigationItem {
 
 const enhancedNavigation: NavigationItem[] = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: Home, permission: null, feature: null },
-  { name: 'Tenancies', href: '/admin/tenancies', icon: Building2, permission: null, feature: null },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingBag, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
   { name: 'Barcode Scanner', href: '/admin/scanner', icon: QrCode, permission: { module: 'orders', action: 'view' }, feature: 'orders' as FeatureKey },
   { name: 'Customers', href: '/admin/customers', icon: Users, permission: { module: 'customers', action: 'view' }, feature: 'customers' as FeatureKey },

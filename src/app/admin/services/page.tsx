@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { usePermissions } from '@/hooks/usePermissions'
-import { 
-  Sparkles, 
-  Search, 
+import {
+  Sparkles,
+  Search,
   Plus,
   Edit,
   Trash2,
@@ -43,11 +43,10 @@ const ToastContainer = ({ toasts, removeToast }: { toasts: Toast[], removeToast:
     {toasts.map(toast => (
       <div
         key={toast.id}
-        className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slide-in ${
-          toast.type === 'success' 
-            ? 'bg-green-500 text-white' 
-            : 'bg-red-500 text-white'
-        }`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg animate-slide-in ${toast.type === 'success'
+          ? 'bg-green-500 text-white'
+          : 'bg-red-500 text-white'
+          }`}
       >
         {toast.type === 'success' ? (
           <Check className="w-5 h-5" />
@@ -235,10 +234,10 @@ function AdminServicesPage() {
     e.preventDefault()
     try {
       const token = getAuthToken()
-      const url = isEditing 
+      const url = isEditing
         ? `${API_URL}/admin/services/${selectedService?._id}`
         : `${API_URL}/admin/services`
-      
+
       const response = await fetch(url, {
         method: isEditing ? 'PUT' : 'POST',
         headers: {
@@ -284,7 +283,7 @@ function AdminServicesPage() {
 
   const handleDelete = async () => {
     if (!deleteServiceId) return
-    
+
     try {
       const token = getAuthToken()
       const response = await fetch(`${API_URL}/admin/services/${deleteServiceId}`, {
@@ -325,7 +324,7 @@ function AdminServicesPage() {
 
       if (response.ok) {
         // Update state locally instead of re-fetching
-        setServices(prev => prev.map(s => 
+        setServices(prev => prev.map(s =>
           s._id === service._id ? { ...s, isActive: !s.isActive } : s
         ))
         showToast(service.isActive ? 'Service disabled successfully!' : 'Service enabled successfully!')
@@ -376,7 +375,7 @@ function AdminServicesPage() {
 
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(search.toLowerCase()) ||
-                         service.code.toLowerCase().includes(search.toLowerCase())
+      service.code.toLowerCase().includes(search.toLowerCase())
     const matchesCategory = !categoryFilter || service.category === categoryFilter
     return matchesSearch && matchesCategory
   })
@@ -384,7 +383,7 @@ function AdminServicesPage() {
   // Pagination
   const totalPages = Math.ceil(filteredServices.length / ITEMS_PER_PAGE)
   const paginatedServices = filteredServices.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
-  
+
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1)
@@ -443,7 +442,7 @@ function AdminServicesPage() {
       setAddingItem(true)
       const token = getAuthToken()
       const itemId = `${selectedService.code}_${newItem.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now().toString(36)}`
-      
+
       const response = await fetch(`${API_URL}/service-items`, {
         method: 'POST',
         headers: {
@@ -507,21 +506,21 @@ function AdminServicesPage() {
     setSelectedServiceForBranches(service)
     setShowBranchesModal(true)
     setBranchesLoading(true)
-    
+
     try {
       const token = getAuthToken()
-      
+
       // Fetch all branches for this tenancy
       const branchesResponse = await fetch(`${API_URL}/admin/branches-management`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
-      
+
       if (branchesResponse.ok) {
         const branchesData = await branchesResponse.json()
         setBranches(branchesData.data.branches || [])
-        
+
         // Fetch branch-service configurations for each branch
         const branchServicePromises = branchesData.data.branches.map(async (branch: any) => {
           const response = await fetch(`${API_URL}/admin/branches/${branch._id}/services`, {
@@ -529,7 +528,7 @@ function AdminServicesPage() {
               'Authorization': `Bearer ${token}`
             }
           })
-          
+
           if (response.ok) {
             const data = await response.json()
             const serviceConfig = data.data.services.find((s: any) => s._id === service._id)
@@ -542,7 +541,7 @@ function AdminServicesPage() {
               notes: serviceConfig?.branchConfig?.notes || ''
             }
           }
-          
+
           return {
             branchId: branch._id,
             branchName: branch.name,
@@ -552,7 +551,7 @@ function AdminServicesPage() {
             notes: ''
           }
         })
-        
+
         const branchServiceConfigs = await Promise.all(branchServicePromises)
         setBranchServices(branchServiceConfigs)
       }
@@ -566,7 +565,7 @@ function AdminServicesPage() {
 
   const toggleBranchService = async (branchId: string, currentStatus: boolean) => {
     if (!selectedServiceForBranches) return
-    
+
     try {
       const token = getAuthToken()
       const response = await fetch(`${API_URL}/admin/branches/${branchId}/services/${selectedServiceForBranches._id}/toggle`, {
@@ -575,14 +574,14 @@ function AdminServicesPage() {
           'Authorization': `Bearer ${token}`
         }
       })
-      
+
       if (response.ok) {
-        setBranchServices(prev => prev.map(bs => 
-          bs.branchId === branchId 
+        setBranchServices(prev => prev.map(bs =>
+          bs.branchId === branchId
             ? { ...bs, isEnabled: !currentStatus }
             : bs
         ))
-        
+
         const branchName = branchServices.find(bs => bs.branchId === branchId)?.branchName
         showToast(`Service ${!currentStatus ? 'enabled' : 'disabled'} for ${branchName}`)
       } else {
@@ -613,7 +612,7 @@ function AdminServicesPage() {
     <div className="space-y-6 mt-16">
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
-      
+
       {/* Animation styles */}
       <style jsx global>{`
         @keyframes slide-in {
@@ -634,11 +633,11 @@ function AdminServicesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Services Management</h1>
-          <p className="text-gray-600">Manage laundry services and service items</p>
+          <h1 className="text-2xl font-bold text-gray-800">Services Management</h1>
+          <p className="text-sm text-gray-600">Manage laundry services and service items</p>
         </div>
         {canCreate && (
-          <Button onClick={() => { resetForm(); setShowModal(true) }} className="bg-teal-500 hover:bg-teal-600">
+          <Button onClick={() => { resetForm(); setShowModal(true) }} className="bg-teal-500 hover:bg-teal-600 size-sm">
             <Plus className="w-4 h-4 mr-2" />
             Add Service
           </Button>
@@ -646,56 +645,56 @@ function AdminServicesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-4 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-[1.01] transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-4">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center mb-3">
+              <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-blue-100">Total Services</p>
-            <p className="text-3xl font-bold">{services.length}</p>
+            <p className="text-xs text-blue-100">Total Services</p>
+            <p className="text-2xl font-bold">{services.length}</p>
           </div>
         </div>
-        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-4 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.01] transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-4">
-              <CheckCircle className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center mb-3">
+              <CheckCircle className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-emerald-100">Active Services</p>
-            <p className="text-3xl font-bold">{services.filter(s => s.isActive).length}</p>
+            <p className="text-xs text-emerald-100">Active Services</p>
+            <p className="text-2xl font-bold">{services.filter(s => s.isActive).length}</p>
           </div>
         </div>
-        <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white shadow-xl shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+        <div className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-4 text-white shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-[1.01] transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-4">
-              <Zap className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center mb-3">
+              <Zap className="w-5 h-5 text-white" />
             </div>
-            <p className="text-sm text-amber-100">Express Available</p>
-            <p className="text-3xl font-bold">{services.filter(s => s.isExpressAvailable).length}</p>
+            <p className="text-xs text-amber-100">Express Available</p>
+            <p className="text-2xl font-bold">{services.filter(s => s.isExpressAvailable).length}</p>
           </div>
         </div>
       </div>
 
       {/* Search & Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search services..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+            className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
           >
             <option value="">All Categories</option>
             {categoryOptions.map(cat => (
@@ -717,8 +716,8 @@ function AdminServicesPage() {
 
       {/* Services List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800">Services ({filteredServices.length})</h2>
+        <div className="p-4 border-b border-gray-200">
+          <h2 className="text-base font-semibold text-gray-800">Services ({filteredServices.length})</h2>
         </div>
 
         <div className="divide-y divide-gray-200">
@@ -730,38 +729,38 @@ function AdminServicesPage() {
             </div>
           ) : (
             paginatedServices.map((service) => (
-              <div key={service._id} className="p-6 hover:bg-gray-50 transition-colors">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div className="flex items-start space-x-4">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                      service.isActive ? 'bg-gradient-to-r from-teal-500 to-emerald-600' : 'bg-gray-400'
-                    }`}>
-                      <Sparkles className="w-6 h-6 text-white" />
+              <div key={service._id} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                  <div className="flex items-start space-x-3">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${service.isActive ? 'bg-gradient-to-r from-teal-500 to-emerald-600' : 'bg-gray-400'
+                      }`}>
+                      <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-800">{service.displayName}</h3>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryBadgeColor(service.category)}`}>
-                          {service.category.replace('_', ' ')}
-                        </span>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          service.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {service.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                        {service.isExpressAvailable && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                            <Zap className="w-3 h-3 mr-1" />
-                            Express
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-gray-800 truncate">{service.displayName}</h3>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${getCategoryBadgeColor(service.category)}`}>
+                            {service.category.replace('_', ' ')}
                           </span>
-                        )}
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${service.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                            {service.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                          {service.isExpressAvailable && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-orange-100 text-orange-800">
+                              <Zap className="w-2.5 h-2.5 mr-0.5" />
+                              Express
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{service.description}</p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                        <span>Code: <strong>{service.code}</strong></span>
+                      <p className="text-xs text-gray-600 mb-1.5 line-clamp-1">{service.description}</p>
+                      <div className="flex flex-wrap gap-3 text-[11px] text-gray-500">
+                        <span>Code: <strong className="text-gray-700">{service.code}</strong></span>
                         <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {service.turnaroundTime.standard}h standard / {service.turnaroundTime.express}h express
+                          <Clock className="w-3 h-3 mr-1" />
+                          {service.turnaroundTime.standard}h / {service.turnaroundTime.express}h exp
                         </span>
                       </div>
                     </div>
@@ -769,8 +768,8 @@ function AdminServicesPage() {
 
                   <div className="flex gap-2">
                     {canUpdate && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => handleOpenItemsModal(service)}
                         className="text-blue-600 hover:bg-blue-50"
@@ -780,8 +779,8 @@ function AdminServicesPage() {
                       </Button>
                     )}
                     {canUpdate && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => handleOpenBranchesModal(service)}
                         className="text-purple-600 hover:bg-purple-50"
@@ -791,8 +790,8 @@ function AdminServicesPage() {
                       </Button>
                     )}
                     {canUpdate && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => openEditModal(service)}
                       >
@@ -801,8 +800,8 @@ function AdminServicesPage() {
                       </Button>
                     )}
                     {canUpdate && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => handleToggleStatus(service)}
                         className={service.isActive ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}
@@ -812,8 +811,8 @@ function AdminServicesPage() {
                       </Button>
                     )}
                     {canDelete && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => openDeleteModal(service)}
                         className="text-red-600 hover:bg-red-50"
@@ -827,7 +826,7 @@ function AdminServicesPage() {
             ))
           )}
         </div>
-        
+
         {/* Pagination */}
         {filteredServices.length > ITEMS_PER_PAGE && (
           <Pagination
@@ -845,34 +844,34 @@ function AdminServicesPage() {
       {showModal && typeof window !== 'undefined' && createPortal(
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4 overflow-y-auto" style={{ zIndex: 999999 }}>
           <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-800">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-lg font-bold text-gray-800">
                 {isEditing ? 'Edit Service' : 'Create New Service'}
               </h2>
-              <button onClick={() => { setShowModal(false); resetForm() }} className="p-2 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5 text-gray-500" />
+              <button onClick={() => { setShowModal(false); resetForm() }} className="p-1.5 hover:bg-gray-100 rounded-lg">
+                <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} className="p-4 space-y-3">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Service Name *</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Service Name *</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Service Code *</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Service Code *</label>
                   <input
                     type="text"
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toLowerCase().replace(/\s/g, '_') })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                     required
                     disabled={isEditing}
                   />
@@ -880,33 +879,33 @@ function AdminServicesPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Display Name</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Display Name</label>
                 <input
                   type="text"
                   value={formData.displayName}
                   onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                   placeholder="Leave empty to use service name"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                   rows={2}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Category</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                   >
                     {categoryOptions.map(cat => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -914,11 +913,11 @@ function AdminServicesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Icon</label>
                   <select
                     value={formData.icon}
                     onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                   >
                     {iconOptions.map(icon => (
                       <option key={icon} value={icon}>{icon}</option>
@@ -929,34 +928,34 @@ function AdminServicesPage() {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price Multiplier</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Price Multiplier</label>
                   <input
                     type="number"
                     step="0.1"
                     min="0.1"
                     value={formData.basePriceMultiplier}
                     onChange={(e) => setFormData({ ...formData, basePriceMultiplier: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Standard TAT (hours)</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Standard TAT (hours)</label>
                   <input
                     type="number"
                     min="1"
                     value={formData.turnaroundStandard}
                     onChange={(e) => setFormData({ ...formData, turnaroundStandard: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Express TAT (hours)</label>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">Express TAT (hours)</label>
                   <input
                     type="number"
                     min="1"
                     value={formData.turnaroundExpress}
                     onChange={(e) => setFormData({ ...formData, turnaroundExpress: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                   />
                 </div>
               </div>
@@ -967,18 +966,18 @@ function AdminServicesPage() {
                     type="checkbox"
                     checked={formData.isExpressAvailable}
                     onChange={(e) => setFormData({ ...formData, isExpressAvailable: e.target.checked })}
-                    className="w-4 h-4 text-teal-500 rounded focus:ring-teal-500"
+                    className="w-3.5 h-3.5 text-teal-500 rounded focus:ring-teal-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Express Service Available</span>
+                  <span className="ml-2 text-xs text-gray-700">Express Service Available</span>
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <Button type="button" variant="outline" onClick={() => { setShowModal(false); resetForm() }}>
+              <div className="flex justify-end gap-2 pt-3 border-t">
+                <Button type="button" variant="outline" size="sm" onClick={() => { setShowModal(false); resetForm() }}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-teal-500 hover:bg-teal-600">
-                  <Save className="w-4 h-4 mr-2" />
+                <Button type="submit" size="sm" className="bg-teal-500 hover:bg-teal-600">
+                  <Save className="w-4 h-4 mr-1.5" />
                   {isEditing ? 'Update Service' : 'Create Service'}
                 </Button>
               </div>
@@ -1001,14 +1000,14 @@ function AdminServicesPage() {
                 Are you sure you want to delete <strong>{deleteServiceName}</strong>? This action cannot be undone.
               </p>
               <div className="flex gap-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="flex-1"
                   onClick={() => { setShowDeleteModal(false); setDeleteServiceId(null); setDeleteServiceName('') }}
                 >
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   className="flex-1 bg-red-500 hover:bg-red-600 text-white"
                   onClick={handleDelete}
                 >
@@ -1043,30 +1042,30 @@ function AdminServicesPage() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {itemsLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-teal-500" />
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-5 h-5 animate-spin text-teal-500" />
                 </div>
               ) : (
                 <>
                   {/* Add Item Form */}
                   {showAddItemForm ? (
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-medium text-gray-800 mb-3">Add New Item</h4>
-                      <div className="space-y-3">
+                    <div className="bg-gray-50 rounded-lg p-3 mb-3 border border-gray-100">
+                      <h4 className="text-xs font-semibold text-gray-800 mb-3">Add New Item</h4>
+                      <div className="space-y-2">
                         <input
                           type="text"
                           placeholder="Item name (e.g., Shirt, Saree)"
                           value={newItem.name}
                           onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                          className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                         />
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-2">
                           <select
                             value={newItem.category}
                             onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
-                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            className="px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                           >
                             {itemCategoryOptions.map(opt => (
                               <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1078,20 +1077,22 @@ function AdminServicesPage() {
                             value={newItem.basePrice || ''}
                             onChange={(e) => setNewItem({ ...newItem, basePrice: parseFloat(e.target.value) || 0 })}
                             min="0"
-                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                           />
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 pt-1">
                           <Button
+                            size="sm"
                             onClick={handleAddItem}
                             disabled={addingItem || !newItem.name || newItem.basePrice <= 0}
                             className="flex-1 bg-teal-500 hover:bg-teal-600"
                           >
-                            {addingItem ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+                            {addingItem ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <Plus className="w-3.5 h-3.5 mr-1" />}
                             Add Item
                           </Button>
                           <Button
                             variant="outline"
+                            size="sm"
                             onClick={() => {
                               setShowAddItemForm(false)
                               setNewItem({ name: '', category: 'men', basePrice: 0, description: '' })
@@ -1105,45 +1106,45 @@ function AdminServicesPage() {
                   ) : (
                     <button
                       onClick={() => setShowAddItemForm(true)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-teal-500 hover:text-teal-600 mb-4"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-teal-500 hover:text-teal-600 mb-3"
                     >
-                      <Plus className="w-5 h-5" />
+                      <Plus className="w-4 h-4" />
                       Add New Item
                     </button>
                   )}
 
                   {/* Items List */}
                   {serviceItems.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <Package className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                      <p>No items added yet</p>
-                      <p className="text-sm">Add items that customers can select for this service</p>
+                    <div className="text-center py-6 text-gray-500">
+                      <Package className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm">No items added yet</p>
+                      <p className="text-xs">Add products customers can select</p>
                     </div>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {serviceItems.map((item) => (
                         <div
                           key={item._id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                          className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                         >
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-800">{item.name}</span>
-                              <span className="text-xs px-2 py-0.5 bg-gray-200 text-gray-600 rounded-full">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="font-medium text-sm text-gray-800 truncate">{item.name}</span>
+                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-200 text-gray-600 rounded-full shrink-0">
                                 {item.category}
                               </span>
                             </div>
-                            <span className="text-sm text-teal-600 font-medium">₹{item.basePrice}</span>
+                            <span className="text-xs text-teal-600 font-semibold">₹{item.basePrice}</span>
                           </div>
                           <button
                             onClick={() => handleDeleteItem(item._id)}
                             disabled={deletingItem === item._id}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-50"
+                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md disabled:opacity-50"
                           >
                             {deletingItem === item._id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             ) : (
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5" />
                             )}
                           </button>
                         </div>
@@ -1154,9 +1155,9 @@ function AdminServicesPage() {
               )}
             </div>
 
-            <div className="p-4 border-t bg-gray-50 rounded-b-xl">
-              <p className="text-xs text-gray-500">
-                💡 Items added here will be available for customers when they select this service.
+            <div className="p-3 border-t bg-gray-50 rounded-b-xl">
+              <p className="text-[10px] text-gray-500 text-center uppercase tracking-wider font-semibold">
+                Customer Item Selection Panel
               </p>
             </div>
           </div>
@@ -1168,98 +1169,94 @@ function AdminServicesPage() {
       {showBranchesModal && selectedServiceForBranches && typeof window !== 'undefined' && createPortal(
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
           <div className="bg-white rounded-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
               <div>
-                <h2 className="text-xl font-bold text-gray-800">Branch Service Management</h2>
-                <p className="text-sm text-gray-600">
+                <h2 className="text-lg font-bold text-gray-800">Branch Service Management</h2>
+                <p className="text-xs text-gray-600">
                   Configure "{selectedServiceForBranches.displayName}" for each branch
                 </p>
               </div>
-              <button 
-                onClick={() => setShowBranchesModal(false)} 
-                className="p-2 hover:bg-gray-100 rounded-lg"
+              <button
+                onClick={() => setShowBranchesModal(false)}
+                className="p-1.5 hover:bg-gray-100 rounded-lg"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-4 h-4 text-gray-500" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {branchesLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                <div className="flex items-center justify-center py-6">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
                 </div>
               ) : branchServices.length === 0 ? (
-                <div className="text-center py-8">
-                  <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No branches found</h3>
-                  <p className="text-gray-600">Create branches first to manage service availability</p>
+                <div className="text-center py-6">
+                  <Building2 className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+                  <h3 className="text-base font-medium text-gray-900 mb-1">No branches found</h3>
+                  <p className="text-xs text-gray-600">Create branches first to manage service availability</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {branchServices.map((branchService) => (
-                    <div 
-                      key={branchService.branchId} 
-                      className={`p-4 border rounded-lg transition-all ${
-                        branchService.isEnabled 
-                          ? 'border-green-200 bg-green-50' 
-                          : 'border-gray-200 bg-gray-50'
-                      }`}
+                    <div
+                      key={branchService.branchId}
+                      className={`p-3 border rounded-lg transition-all ${branchService.isEnabled
+                        ? 'border-green-200 bg-green-50'
+                        : 'border-gray-200 bg-gray-50'
+                        }`}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <Building2 className="w-5 h-5 text-purple-600" />
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
+                            <Building2 className="w-4 h-4 text-purple-600" />
                           </div>
-                          <div>
-                            <h3 className="font-medium text-gray-900">
+                          <div className="min-w-0">
+                            <h3 className="text-sm font-semibold text-gray-900 truncate">
                               {branchService.branchName}
                             </h3>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-[10px] text-gray-500 font-medium">
                               Code: {branchService.branchCode}
                             </p>
                           </div>
                         </div>
-                        
-                        <div className="flex items-center gap-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            branchService.isEnabled 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {branchService.isEnabled ? 'Enabled' : 'Disabled'}
+
+                        <div className="flex items-center gap-2.5">
+                          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${branchService.isEnabled
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-200 text-gray-600'
+                            }`}>
+                            {branchService.isEnabled ? 'Active' : 'N/A'}
                           </span>
-                          
+
                           {/* Modern Toggle Switch */}
                           <button
                             onClick={() => toggleBranchService(branchService.branchId, branchService.isEnabled)}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
-                              branchService.isEnabled 
-                                ? 'bg-teal-500 hover:bg-teal-600' 
-                                : 'bg-gray-300 hover:bg-gray-400'
-                            }`}
+                            className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${branchService.isEnabled
+                              ? 'bg-teal-500 hover:bg-teal-600'
+                              : 'bg-gray-300 hover:bg-gray-400'
+                              }`}
                           >
                             <span className="sr-only">
                               {branchService.isEnabled ? 'Disable' : 'Enable'} service for {branchService.branchName}
                             </span>
                             <span
-                              className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-200 ease-in-out ${
-                                branchService.isEnabled ? 'translate-x-6' : 'translate-x-1'
-                              }`}
+                              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200 ease-in-out ${branchService.isEnabled ? 'translate-x-5.5' : 'translate-x-1'
+                                }`}
                             />
                           </button>
                         </div>
                       </div>
-                      
+
                       {branchService.isEnabled && (
-                        <div className="mt-3 pt-3 border-t border-green-200">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-gray-600">Price Multiplier:</span>
-                              <span className="ml-2 font-medium">{branchService.priceMultiplier}x</span>
+                        <div className="mt-2.5 pt-2.5 border-t border-green-200">
+                          <div className="grid grid-cols-2 gap-3 text-[11px]">
+                            <div className="flex items-center justify-between bg-white/50 px-2 py-1 rounded">
+                              <span className="text-gray-500 font-medium tracking-tight">Price Multiplier</span>
+                              <span className="font-bold text-gray-900">{branchService.priceMultiplier}x</span>
                             </div>
-                            <div>
-                              <span className="text-gray-600">Status:</span>
-                              <span className="ml-2 font-medium text-green-600">Active</span>
+                            <div className="flex items-center justify-between bg-white/50 px-2 py-1 rounded">
+                              <span className="text-gray-500 font-medium tracking-tight">Status</span>
+                              <span className="font-bold text-green-600">Available</span>
                             </div>
                           </div>
                           {branchService.notes && (
@@ -1276,13 +1273,13 @@ function AdminServicesPage() {
               )}
             </div>
 
-            <div className="p-4 border-t bg-gray-50 rounded-b-xl">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-gray-500">
-                  💡 Toggle services on/off for each branch. Disabled services won't be available to customers at that branch.
+            <div className="p-3 border-t bg-gray-50 rounded-b-xl">
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-[10px] text-gray-400 font-medium italic">
+                  * Toggle services on/off for each branch.
                 </p>
-                <div className="text-xs text-gray-500">
-                  {branchServices.filter(bs => bs.isEnabled).length} of {branchServices.length} branches enabled
+                <div className="text-[10px] bg-white px-2 py-0.5 rounded border border-gray-100 text-gray-500 font-bold">
+                  {branchServices.filter(bs => bs.isEnabled).length} / {branchServices.length} Branch Active
                 </div>
               </div>
             </div>

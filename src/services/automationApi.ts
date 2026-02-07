@@ -1,5 +1,5 @@
 // Automation API Service
-import { api } from './api';
+import api from './api';
 
 export interface AutomationRule {
   _id: string;

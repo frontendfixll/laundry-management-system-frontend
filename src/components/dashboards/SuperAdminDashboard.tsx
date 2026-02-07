@@ -183,15 +183,6 @@ export function SuperAdminDashboard() {
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <PermissionGate permissions={[{ module: 'tenant_crud', action: 'create' }]}>
-              <Link href="/admin/tenancies">
-                <Button className="w-full justify-start" variant="outline">
-                  <Building2 className="w-4 h-4 mr-2" />
-                  Manage Tenancies
-                </Button>
-              </Link>
-            </PermissionGate>
-
             <PermissionGate permissions={[{ module: 'subscription_plans', action: 'view' }]}>
               <Link href="/superadmin/plans">
                 <Button className="w-full justify-start" variant="outline">

@@ -16,7 +16,7 @@ const DEFAULT_STAGES: LoadingStage[] = [
 ]
 
 export const useLoadingProgress = (isComplete: boolean = false) => {
-    const [progress, setProgress] = useState(0)
+    const [progress, setProgress] = useState(1)
     const [currentStage, setCurrentStage] = useState(DEFAULT_STAGES[0])
 
     useEffect(() => {

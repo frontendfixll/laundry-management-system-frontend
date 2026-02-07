@@ -26,6 +26,7 @@ import {
   Sparkles,
   X
 } from 'lucide-react'
+import { APP_VERSION } from '@/lib/version'
 
 const navigation = [
   { name: 'Dashboard', href: '/superadmin/dashboard', icon: LayoutDashboard, permission: 'analytics' },

@@ -22,6 +22,7 @@ import {
   FileText
 } from 'lucide-react'
 import Link from 'next/link'
+import { useAdminTheme } from '@/hooks/useAdminTheme'
 
 interface AdminMetrics {
   totalOrders: number
@@ -218,6 +219,7 @@ const LineChart = ({ data }: { data: { month: string; customers: number }[] }) =
 
 export function TenantAdminDashboard() {
   const { hasPermission } = usePermissions()
+  const { theme } = useAdminTheme()
   const [metrics, setMetrics] = useState<AdminMetrics | null>(null)
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([])
@@ -319,9 +321,9 @@ export function TenantAdminDashboard() {
         // Chart data
         setChartData({
           ordersByStatus: [
-            { name: 'Completed', value: 1239, color: '#10b981' },
+            { name: 'Completed', value: 1239, color: theme.primaryColor }, // Use theme primary
             { name: 'Pending', value: 8, color: '#f59e0b' },
-            { name: 'Processing', value: 15, color: '#3b82f6' },
+            { name: 'Processing', value: 15, color: theme.accentColor }, // Use theme accent
             { name: 'Cancelled', value: 3, color: '#ef4444' }
           ],
           revenueByWeek: [
@@ -332,8 +334,8 @@ export function TenantAdminDashboard() {
             { week: 'W5', revenue: 19000, orders: 58 }
           ],
           serviceDistribution: [
-            { service: 'Wash & Fold', percentage: 45, color: '#3b82f6' },
-            { service: 'Dry Cleaning', percentage: 30, color: '#8b5cf6' },
+            { service: 'Wash & Fold', percentage: 45, color: theme.primaryColor },
+            { service: 'Dry Cleaning', percentage: 30, color: theme.secondaryColor },
             { service: 'Ironing', percentage: 15, color: '#10b981' },
             { service: 'Express', percentage: 10, color: '#f59e0b' }
           ],

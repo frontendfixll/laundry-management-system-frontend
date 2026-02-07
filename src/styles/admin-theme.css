@@ -1,0 +1,308 @@
+/* Admin Dashboard Theme Styles */
+/* These styles use CSS variables set by useAdminTheme hook */
+
+/* Primary buttons and actions */
+.admin-layout .btn-primary,
+.admin-layout button[class*="bg-teal"],
+.admin-layout button[class*="bg-blue"]:not([class*="bg-blue-50"]):not([class*="bg-blue-100"]) {
+  background-color: var(--admin-primary) !important;
+}
+
+.admin-layout .btn-primary:hover {
+  background-color: var(--admin-secondary) !important;
+}
+
+/* Sidebar active item */
+.admin-layout .sidebar-item.active,
+.admin-layout .sidebar-item[data-active="true"] {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+  border-left-color: var(--admin-primary) !important;
+}
+
+.admin-layout .sidebar-item.active svg,
+.admin-layout .sidebar-item[data-active="true"] svg {
+  color: var(--admin-primary) !important;
+}
+
+.admin-layout .sidebar-item.active span,
+.admin-layout .sidebar-item[data-active="true"] span {
+  color: var(--admin-primary) !important;
+  font-weight: 600;
+}
+
+/* Sidebar hover */
+.admin-layout .sidebar-item:hover {
+  background-color: rgba(var(--admin-primary-rgb), 0.05) !important;
+}
+
+/* Links and text accents */
+.admin-layout a[class*="text-teal"],
+.admin-layout a[class*="text-blue"]:not([class*="text-blue-50"]):not([class*="text-blue-100"]) {
+  color: var(--admin-primary) !important;
+}
+
+/* Focus rings */
+.admin-layout input:focus,
+.admin-layout textarea:focus,
+.admin-layout select:focus {
+  border-color: var(--admin-primary) !important;
+  box-shadow: 0 0 0 2px rgba(var(--admin-primary-rgb), 0.3) !important;
+}
+
+/* Badges and pills */
+.admin-layout .badge-primary,
+.admin-layout [class*="bg-teal-100"] {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+  color: var(--admin-primary) !important;
+}
+
+/* Progress bars */
+.admin-layout .progress-bar {
+  background-color: var(--admin-primary) !important;
+}
+
+/* Checkboxes and radio buttons */
+.admin-layout input[type="checkbox"]:checked,
+.admin-layout input[type="radio"]:checked {
+  background-color: var(--admin-primary) !important;
+  border-color: var(--admin-primary) !important;
+}
+
+/* Tabs active state */
+.admin-layout .tab-active,
+.admin-layout [data-state="active"] {
+  border-bottom-color: var(--admin-primary) !important;
+  color: var(--admin-primary) !important;
+}
+
+/* Switch/Toggle */
+.admin-layout .switch-active,
+.admin-layout [data-state="checked"] {
+  background-color: var(--admin-primary) !important;
+}
+
+/* Loading spinners */
+.admin-layout .spinner,
+.admin-layout .animate-spin {
+  border-color: var(--admin-primary) transparent transparent transparent !important;
+}
+
+/* Header notification bell active */
+.admin-layout .notification-bell.has-unread {
+  color: var(--admin-primary) !important;
+}
+
+/* Cards with primary accent */
+.admin-layout .card-primary {
+  border-left-color: var(--admin-primary) !important;
+}
+
+/* Stats cards */
+.admin-layout .stat-card-icon {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+  color: var(--admin-primary) !important;
+}
+
+/* Dropdown active items */
+.admin-layout .dropdown-item:hover,
+.admin-layout .dropdown-item[data-active="true"] {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+}
+
+/* Pagination active */
+.admin-layout .pagination-active {
+  background-color: var(--admin-primary) !important;
+  color: white !important;
+}
+
+/* Charts and graphs (if using custom colors) */
+.admin-layout .chart-primary {
+  fill: var(--admin-primary) !important;
+  stroke: var(--admin-primary) !important;
+}
+
+/* Slider/Range inputs */
+.admin-layout input[type="range"]::-webkit-slider-thumb {
+  background-color: var(--admin-primary) !important;
+}
+
+.admin-layout input[type="range"]::-moz-range-thumb {
+  background-color: var(--admin-primary) !important;
+}
+
+/* Tooltips */
+.admin-layout .tooltip-primary {
+  background-color: var(--admin-primary) !important;
+}
+
+/* Alert/Banner primary */
+.admin-layout .alert-primary {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+  border-left-color: var(--admin-primary) !important;
+}
+
+/* Table row hover */
+.admin-layout table tbody tr:hover {
+  background-color: rgba(var(--admin-primary-rgb), 0.02) !important;
+}
+
+/* Selected table rows */
+.admin-layout table tbody tr.selected {
+  background-color: rgba(var(--admin-primary-rgb), 0.05) !important;
+}
+
+/* Icon buttons with primary color */
+.admin-layout .icon-btn-primary {
+  color: var(--admin-primary) !important;
+}
+
+.admin-layout .icon-btn-primary:hover {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+}
+
+/* Breadcrumb active */
+.admin-layout .breadcrumb-active {
+  color: var(--admin-primary) !important;
+}
+
+/* Status indicators */
+.admin-layout .status-active,
+.admin-layout .status-success {
+  color: var(--admin-primary) !important;
+}
+
+/* File upload dropzone */
+.admin-layout .dropzone:hover,
+.admin-layout .dropzone.active {
+  border-color: var(--admin-primary) !important;
+  background-color: rgba(var(--admin-primary-rgb), 0.05) !important;
+}
+
+/* Modal primary buttons */
+.admin-layout .modal-primary-btn {
+  background-color: var(--admin-primary) !important;
+}
+
+.admin-layout .modal-primary-btn:hover {
+  background-color: var(--admin-secondary) !important;
+}
+
+/* Stepper active step */
+.admin-layout .stepper-step.active {
+  background-color: var(--admin-primary) !important;
+  border-color: var(--admin-primary) !important;
+}
+
+/* Timeline items */
+.admin-layout .timeline-item::before {
+  background-color: var(--admin-primary) !important;
+}
+
+/* Accordion active */
+.admin-layout .accordion-item[data-state="open"]>button {
+  color: var(--admin-primary) !important;
+}
+
+/* Calendar selected date */
+.admin-layout .calendar-day.selected {
+  background-color: var(--admin-primary) !important;
+  color: white !important;
+}
+
+/* Tag/Chip primary */
+.admin-layout .chip-primary {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+  color: var(--admin-primary) !important;
+}
+
+/* Scrollbar thumb (webkit browsers) */
+.admin-layout ::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--admin-primary-rgb), 0.3) !important;
+}
+
+.admin-layout ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--admin-primary-rgb), 0.5) !important;
+}
+
+/* --- ADDED THEME UTILITIES & DASHBOARD OVERRIDES --- */
+
+/* Generic Theme Utilities */
+.admin-layout .theme-gradient-primary {
+  background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%) !important;
+}
+
+.admin-layout .theme-bg-soft {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+}
+
+.admin-layout .theme-border-soft {
+  border-color: rgba(var(--admin-primary-rgb), 0.2) !important;
+}
+
+.admin-layout .theme-text {
+  color: var(--admin-primary) !important;
+}
+
+/* Dashboard Specific Overrides */
+/* This catches the from-blue-500 to-blue-600 gradients used in metric cards */
+.admin-layout .bg-gradient-to-br.from-blue-500,
+.admin-layout .bg-gradient-to-r.from-blue-500 {
+  --tw-gradient-from: var(--admin-primary) !important;
+  --tw-gradient-to: var(--admin-secondary) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+/* Override the Welcome Banner gradients */
+.admin-layout .bg-gradient-to-r.from-blue-600.to-blue-700 {
+  background-image: linear-gradient(to right, var(--admin-primary), var(--admin-secondary)) !important;
+}
+
+/* Metric Icon Backgrounds (e.g., bg-blue-100) */
+.admin-layout .bg-blue-100,
+.admin-layout .bg-teal-100,
+.admin-layout .bg-cyan-100 {
+  background-color: rgba(var(--admin-primary-rgb), 0.1) !important;
+}
+
+/* Metric Soft Backgrounds (e.g., bg-blue-50) */
+.admin-layout .bg-blue-50,
+.admin-layout .bg-teal-50,
+.admin-layout .bg-cyan-50 {
+  background-color: rgba(var(--admin-primary-rgb), 0.05) !important;
+}
+
+/* Metric Icon Colors (e.g., text-blue-600) */
+.admin-layout .text-blue-600,
+.admin-layout .text-teal-600,
+.admin-layout .text-cyan-600 {
+  color: var(--admin-primary) !important;
+}
+
+/* Border accents */
+.admin-layout .border-blue-200,
+.admin-layout .border-teal-200 {
+  border-color: rgba(var(--admin-primary-rgb), 0.2) !important;
+}
+
+/* Specific text accents used in cards */
+.admin-layout .text-blue-700,
+.admin-layout .text-teal-700 {
+  color: var(--admin-primary) !important;
+  filter: brightness(0.9);
+}
+
+/* Hover scales and shadows for cards to use primary focus */
+.admin-layout .group:hover .bg-white\/20 {
+  background-color: rgba(var(--admin-primary-rgb), 0.3) !important;
+}
+
+/* Loading markers and pulse indicators */
+.admin-layout .bg-blue-500.rounded-full.animate-bounce {
+  background-color: var(--admin-primary) !important;
+}
+
+/* Responsive sidebars and other blue accents */
+.admin-layout div[class*="border-blue-"],
+.admin-layout div[class*="border-teal-"] {
+  border-color: var(--admin-primary) !important;
+}
