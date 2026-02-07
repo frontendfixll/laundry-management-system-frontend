@@ -43,6 +43,22 @@ export function middleware(request: NextRequest) {
     console.log('🌐 Middleware - Hostname:', hostname, 'Subdomain:', subdomain, 'Path:', pathname)
   }
 
+  // CRITICAL FIX: If subdomain exists and path starts with a reserved route,
+  // treat it as a global route, NOT a tenant route
+  if (subdomain && RESERVED_ROUTES.includes(firstSegment)) {
+    console.log('🔧 Reserved route on subdomain detected:', firstSegment, '- treating as global route')
+    const response = NextResponse.next()
+    // Still set tenant context for the application to use
+    response.headers.set('x-tenant-slug', subdomain)
+    response.headers.set('x-tenant-subdomain', subdomain)
+    response.cookies.set('tenant-slug', subdomain, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax'
+    })
+    return response
+  }
+
   // Determine tenant identifier (subdomain or first path segment)
   let tenantIdentifier: string | null = null
 
@@ -66,21 +82,6 @@ export function middleware(request: NextRequest) {
 
       const response = NextResponse.rewrite(url)
       response.headers.set('x-tenant-slug', tenantIdentifier)
-      response.cookies.set('tenant-slug', tenantIdentifier, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      })
-      return response
-    }
-
-    // IMPORTANT: If subdomain is present and path starts with /admin, treat it as admin route
-    // This fixes the issue where tenacy.laundrylobby.com/admin/services redirects to landing page
-    if (subdomain && firstSegment === 'admin') {
-      console.log('🔧 Admin route detected on subdomain, allowing direct access')
-      const response = NextResponse.next()
-      response.headers.set('x-tenant-slug', tenantIdentifier)
-      response.headers.set('x-tenant-subdomain', subdomain)
       response.cookies.set('tenant-slug', tenantIdentifier, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
