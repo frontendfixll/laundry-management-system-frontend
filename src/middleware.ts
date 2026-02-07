@@ -31,32 +31,39 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const hostname = request.headers.get('host') || ''
 
-  // Get the first segment of the path
+  // Get all path segments
   const pathSegments = pathname.split('/').filter(Boolean)
-  const firstSegment = pathSegments[0]
+  const firstSegment = pathSegments[0] || ''
+  const secondSegment = pathSegments[1] || ''
 
   // Extract subdomain from hostname
   const subdomain = extractSubdomain(hostname)
 
-  // Disable logging to prevent spam - only log for debugging
-  if (process.env.NODE_ENV === 'development' && pathname !== '/login') {
-    console.log('🌐 Middleware - Hostname:', hostname, 'Subdomain:', subdomain, 'Path:', pathname)
+  // Enhanced logging for production troubleshooting
+  // Always log in development, and log important transitions in production (especially for admin routes)
+  if (process.env.NODE_ENV === 'development' || (pathname.includes('admin') && !pathname.includes('_next'))) {
+    console.log(`🌐 [Middleware] Host: ${hostname} | Sub: ${subdomain} | Path: ${pathname} | Seg1: ${firstSegment} | Seg2: ${secondSegment}`)
   }
 
-  // CRITICAL FIX: If subdomain exists and path starts with a reserved route,
-  // treat it as a global route, NOT a tenant route
-  if (subdomain && RESERVED_ROUTES.includes(firstSegment)) {
-    console.log('🔧 Reserved route on subdomain detected:', firstSegment, '- treating as global route')
-    const response = NextResponse.next()
-    // Still set tenant context for the application to use
-    response.headers.set('x-tenant-slug', subdomain)
-    response.headers.set('x-tenant-subdomain', subdomain)
-    response.cookies.set('tenant-slug', subdomain, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    })
-    return response
+  // CRITICAL FIX: If path starts with a reserved route, treat it as a global route immediately.
+  // This ensures /admin/* is NEVER rewritten to a tenant-specific path like /services.
+  if (RESERVED_ROUTES.includes(firstSegment)) {
+    if (subdomain) {
+      console.log(`🔧 [Middleware] Reserved route '${firstSegment}' on subdomain '${subdomain}' -> Passing as global route with tenant context`)
+      const response = NextResponse.next()
+      // Set tenant headers for components to use (branding, etc.)
+      response.headers.set('x-tenant-slug', subdomain)
+      response.headers.set('x-tenant-subdomain', subdomain)
+      response.cookies.set('tenant-slug', subdomain, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      })
+      return response
+    }
+
+    // Main domain, reserved route - standard behavior
+    return NextResponse.next()
   }
 
   // Determine tenant identifier (subdomain or first path segment)

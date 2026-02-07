@@ -26,35 +26,35 @@ export function useSubdomain(): SubdomainInfo {
 
     const hostname = window.location.hostname
     const pathname = window.location.pathname
-    
+
     console.log('🌐 Subdomain detection - Hostname:', hostname, 'Path:', pathname)
-    
+
     // Extract subdomain from hostname
     const subdomain = extractSubdomain(hostname)
-    
+
     // Check for tenant in URL path (fallback)
     const pathTenant = extractTenantFromPath(pathname)
-    
+
     // Check cookies for tenant info
     const cookieTenant = getCookieTenant()
-    
+
     // Determine final tenant
     const finalTenant = subdomain || pathTenant || cookieTenant
-    
+
     const info: SubdomainInfo = {
       subdomain,
       isSubdomain: !!subdomain,
       fullDomain: hostname,
       tenantSlug: finalTenant
     }
-    
+
     console.log('🏢 Tenant info:', info)
-    
+
     // Store tenant info in sessionStorage for consistency
     if (finalTenant) {
       sessionStorage.setItem('currentTenant', finalTenant)
     }
-    
+
     setSubdomainInfo(info)
   }, [])
 
@@ -72,40 +72,40 @@ export function useSubdomain(): SubdomainInfo {
 function extractSubdomain(hostname: string): string | null {
   // Remove port if present
   const cleanHostname = hostname.split(':')[0]
-  
+
   // Skip localhost and IP addresses
   if (cleanHostname === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(cleanHostname)) {
     return null
   }
-  
+
   // Skip Vercel preview URLs
   if (cleanHostname.endsWith('.vercel.app')) {
     return null
   }
-  
+
   // Split hostname into parts
   const parts = cleanHostname.split('.')
-  
+
   // Need at least 3 parts for subdomain (subdomain.domain.com)
   if (parts.length < 3) {
     return null
   }
-  
+
   // Check if it's our main domain
   const domain = parts.slice(-2).join('.') // Get last 2 parts (domain.com)
   if (domain !== 'laundrylobby.com') {
     return null
   }
-  
+
   // Get subdomain (first part)
   const subdomain = parts[0]
-  
+
   // Reserved subdomains
-  const reserved = ['www', 'superadmin', 'marketing', 'api', 'admin']
+  const reserved = ['www', 'superadmin', 'marketing', 'api', 'admin', 'services']
   if (reserved.includes(subdomain)) {
     return null
   }
-  
+
   return subdomain
 }
 
@@ -117,14 +117,14 @@ function extractSubdomain(hostname: string): string | null {
  */
 function extractTenantFromPath(pathname: string): string | null {
   const segments = pathname.split('/').filter(Boolean)
-  
+
   if (segments.length === 0) return null
-  
+
   // Check for /tenant/slug pattern
   if (segments[0] === 'tenant' && segments[1]) {
     return segments[1]
   }
-  
+
   // Check if first segment could be a tenant slug
   const firstSegment = segments[0]
   const reservedRoutes = [
@@ -132,11 +132,11 @@ function extractTenantFromPath(pathname: string): string | null {
     'debug-login', 'help', 'pricing', 'role-switcher', 'services',
     'test-auth', 'track', 'version', 'releases'
   ]
-  
+
   if (!reservedRoutes.includes(firstSegment)) {
     return firstSegment
   }
-  
+
   return null
 }
 
@@ -145,16 +145,16 @@ function extractTenantFromPath(pathname: string): string | null {
  */
 function getCookieTenant(): string | null {
   if (typeof document === 'undefined') return null
-  
+
   const cookies = document.cookie.split(';')
-  const tenantCookie = cookies.find(cookie => 
+  const tenantCookie = cookies.find(cookie =>
     cookie.trim().startsWith('tenant-subdomain=')
   )
-  
+
   if (tenantCookie) {
     return tenantCookie.split('=')[1]?.trim() || null
   }
-  
+
   return null
 }
 
@@ -175,12 +175,12 @@ export function useTenantBranding(tenantSlug: string | null) {
     const fetchBranding = async () => {
       setLoading(true)
       setError(null)
-      
+
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
         const response = await fetch(`${API_URL}/public/tenancy/branding/${tenantSlug}`)
         const data = await response.json()
-        
+
         if (data.success) {
           setBranding(data.data)
           console.log('🎨 Tenant branding loaded:', data.data.branding?.businessName)
