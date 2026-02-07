@@ -74,6 +74,21 @@ export function middleware(request: NextRequest) {
       return response
     }
 
+    // IMPORTANT: If subdomain is present and path starts with /admin, treat it as admin route
+    // This fixes the issue where tenacy.laundrylobby.com/admin/services redirects to landing page
+    if (subdomain && firstSegment === 'admin') {
+      console.log('🔧 Admin route detected on subdomain, allowing direct access')
+      const response = NextResponse.next()
+      response.headers.set('x-tenant-slug', tenantIdentifier)
+      response.headers.set('x-tenant-subdomain', subdomain)
+      response.cookies.set('tenant-slug', tenantIdentifier, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      })
+      return response
+    }
+
     // Standard tenant route (e.g., /dgsfg or subdomain access)
     const response = NextResponse.next()
     response.headers.set('x-tenant-slug', tenantIdentifier)
