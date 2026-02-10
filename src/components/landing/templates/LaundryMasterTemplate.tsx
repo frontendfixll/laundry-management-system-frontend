@@ -746,6 +746,80 @@ export default function LaundryMasterTemplate({
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
+      {/* Header Navigation */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm h-20 flex items-center" style={{ backgroundColor: theme.headerBg }}>
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2">
+              {tenantLogo ? (
+                <img src={tenantLogo} alt={tenantName || 'Logo'} className="h-10 w-auto" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-8 h-8" style={{ color: theme.accent }} />
+                  <span className="text-xl font-bold" style={{ color: theme.textPrimary }}>
+                    {tenantBusinessName || tenantName || 'LaundryLobby'}
+                  </span>
+                </div>
+              )}
+            </Link>
+
+            {/* Navigation Links */}
+            <nav className="hidden md:flex items-center gap-6">
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
+                Home
+              </Link>
+              <Link href="/services" className="text-gray-700 hover:text-gray-900 font-medium">
+                Services
+              </Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-gray-900 font-medium">
+                Pricing
+              </Link>
+              <Link href="/help" className="text-gray-700 hover:text-gray-900 font-medium">
+                Help
+              </Link>
+            </nav>
+
+            {/* CTA Buttons */}
+            <div className="flex items-center gap-3">
+              {isAuthenticated ? (
+                <>
+                  <Link href="/customer/dashboard">
+                    <Button variant="outline" size="sm">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button 
+                    size="sm"
+                    style={{ backgroundColor: theme.accent }}
+                    className="text-white"
+                    onClick={onBookNow}
+                  >
+                    Book Now
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login">
+                    <Button variant="outline" size="sm">
+                      Login
+                    </Button>
+                  </Link>
+                  <Button 
+                    size="sm"
+                    style={{ backgroundColor: theme.accent }}
+                    className="text-white"
+                    onClick={onBookNow}
+                  >
+                    Book Now
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative h-[650px] flex items-center overflow-hidden pt-20">
         <div className="max-w-screen-2xl mx-auto w-full">

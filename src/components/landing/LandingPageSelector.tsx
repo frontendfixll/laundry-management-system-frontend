@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import TemplateHeader from '@/components/layout/TemplateHeader'
+import { TenantProvider } from '@/contexts/TenantContext'
+import toast, { Toaster } from 'react-hot-toast'
 import { useAuthStore } from '@/store/authStore'
 import ThemeCustomizer, { TemplateType, ThemeColor } from './ThemeCustomizer'
 import { Language } from '@/lib/translations'
@@ -22,7 +25,7 @@ const STORAGE_KEY_LANGUAGE = 'landing_language'
 export default function LandingPageSelector() {
   const router = useRouter()
   const { isAuthenticated, user } = useAuthStore()
-  
+
   // State for template, color, and language - default to 'original'
   const [currentTemplate, setCurrentTemplate] = useState<TemplateType>('original')
   const [currentColor, setCurrentColor] = useState<ThemeColor>('teal')
@@ -36,7 +39,7 @@ export default function LandingPageSelector() {
       const savedTemplate = localStorage.getItem(STORAGE_KEY_TEMPLATE) as TemplateType
       const savedColor = localStorage.getItem(STORAGE_KEY_COLOR) as ThemeColor
       const savedLanguage = localStorage.getItem(STORAGE_KEY_LANGUAGE) as Language
-      
+
       // Set template - default to 'original' if not saved or invalid
       if (savedTemplate && ['original', 'minimal', 'freshspin', 'starter'].includes(savedTemplate)) {
         setCurrentTemplate(savedTemplate)
@@ -45,21 +48,21 @@ export default function LandingPageSelector() {
         setCurrentTemplate('original')
         localStorage.setItem(STORAGE_KEY_TEMPLATE, 'original')
       }
-      
+
       if (savedColor && ['teal', 'blue', 'purple', 'orange'].includes(savedColor)) {
         setCurrentColor(savedColor)
       } else {
         setCurrentColor('teal')
         localStorage.setItem(STORAGE_KEY_COLOR, 'teal')
       }
-      
+
       if (savedLanguage && ['en', 'es', 'hi'].includes(savedLanguage)) {
         setCurrentLanguage(savedLanguage)
       } else {
         setCurrentLanguage('en')
         localStorage.setItem(STORAGE_KEY_LANGUAGE, 'en')
       }
-      
+
       setIsLoaded(true)
     }
   }, [])
@@ -130,43 +133,43 @@ export default function LandingPageSelector() {
 
     switch (currentTemplate) {
       case 'original':
-        return <OriginalPage 
-          {...baseProps} 
+        return <OriginalPage
+          {...baseProps}
           user={user}
-          onColorChange={handleColorChange} 
+          onColorChange={handleColorChange}
           onLanguageChange={handleLanguageChange}
           onTemplateChange={(t) => handleTemplateChange(t as TemplateType)}
           currentTemplate={currentTemplate}
         />
       case 'minimal':
-        return <MinimalTemplate 
-          {...baseProps} 
-          onColorChange={handleColorChange} 
+        return <MinimalTemplate
+          {...baseProps}
+          onColorChange={handleColorChange}
           onLanguageChange={handleLanguageChange}
           onTemplateChange={(t) => handleTemplateChange(t as TemplateType)}
           currentTemplate={currentTemplate}
         />
       case 'freshspin':
-        return <FreshSpinTemplate 
-          {...baseProps} 
-          onColorChange={handleColorChange} 
+        return <FreshSpinTemplate
+          {...baseProps}
+          onColorChange={handleColorChange}
           onLanguageChange={handleLanguageChange}
           onTemplateChange={(t) => handleTemplateChange(t as TemplateType)}
           currentTemplate={currentTemplate}
         />
       case 'starter':
-        return <LaundryMasterTemplate 
-          {...baseProps} 
-          onColorChange={handleColorChange} 
+        return <LaundryMasterTemplate
+          {...baseProps}
+          onColorChange={handleColorChange}
           onLanguageChange={handleLanguageChange}
           onTemplateChange={(t) => handleTemplateChange(t as TemplateType)}
           currentTemplate={currentTemplate}
         />
       default:
-        return <OriginalPage 
-          {...baseProps} 
+        return <OriginalPage
+          {...baseProps}
           user={user}
-          onColorChange={handleColorChange} 
+          onColorChange={handleColorChange}
           onLanguageChange={handleLanguageChange}
           onTemplateChange={(t) => handleTemplateChange(t as TemplateType)}
           currentTemplate={currentTemplate}
@@ -175,33 +178,40 @@ export default function LandingPageSelector() {
   }
 
   return (
-    <>
-      {/* Public Header - Only show for templates that don't have their own */}
-      {needsHeader && <PublicHeader />}
+    <TenantProvider tenant={null} isTenantPage={false}>
+      <div className="relative">
+        <Toaster position="top-right" />
 
-      {/* Selected Template */}
-      <div className={needsHeader ? 'pt-16' : ''}>
-        {renderTemplate()}
+        {/* Public Header - Only show for templates that don't have their own */}
+        {needsHeader ? (
+          <PublicHeader />
+        ) : (
+          <TemplateHeader />
+        )}
+
+        {/* Selected Template */}
+        <div className={needsHeader ? 'pt-16' : ''}>
+          {renderTemplate()}
+        </div>
+
+        {/* Floating Theme Selector - Only for customization */}
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+          <ThemeCustomizer
+            onColorChange={handleColorChange}
+            onTemplateChange={(t) => handleTemplateChange(t as TemplateType)}
+            currentTemplate={currentTemplate}
+            currentColor={currentColor}
+            currentLanguage={currentLanguage}
+            onLanguageChange={handleLanguageChange}
+          />
+        </div>
       </div>
 
-      {/* Theme Customizer - Hidden for all templates with built-in settings */}
-      {false && (
-        <ThemeCustomizer
-          currentTemplate={currentTemplate}
-          currentColor={currentColor}
-          currentLanguage={currentLanguage}
-          onTemplateChange={handleTemplateChange}
-          onColorChange={handleColorChange}
-          onLanguageChange={handleLanguageChange}
-        />
-      )}
-
-      {/* Booking Modal */}
-      <BookingModal 
-        isOpen={showBookingModal} 
+      <BookingModal
+        isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onLoginRequired={handleLoginRequired}
       />
-    </>
+    </TenantProvider>
   )
 }

@@ -248,7 +248,7 @@ export default function TemplateHeader() {
   const dropdownHover = isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
 
   // Don't render until loaded to prevent hydration mismatch and incorrect template flicker
-  if (!isLoaded || (effectiveTenantSlug === null && template === null)) {
+  if (!isLoaded) {
     return (
       <header className="h-20 fixed top-0 left-0 right-0 bg-white z-[60]">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
