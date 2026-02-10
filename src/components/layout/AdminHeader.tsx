@@ -10,20 +10,22 @@ import {
   User,
   Settings,
   LogOut,
-  Command,
   HelpCircle,
+  X,
 } from 'lucide-react'
 
 interface AdminHeaderProps {
   onMenuClick?: () => void
+  onSearchChange?: (query: string) => void
 }
 
-export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
-  const { user, logout, sidebarCollapsed } = useAuthStore()
+export default function AdminHeader({ onMenuClick, onSearchChange }: AdminHeaderProps) {
+  const { user, logout } = useAuthStore()
   const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const profileRef = useRef<HTMLDivElement>(null)
 
-  // Click outside handler for profile dropdown only
+  // Click outside handler for profile dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
@@ -34,6 +36,22 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Handle search input change
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value)
+    if (onSearchChange) {
+      onSearchChange(value)
+    }
+  }
+
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchQuery('')
+    if (onSearchChange) {
+      onSearchChange('')
+    }
+  }
 
   const handleLogout = () => {
     logout()
@@ -68,15 +86,26 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
             <Menu className="h-6 w-6 text-gray-600" />
           </button>
 
-          {/* Search Bar */}
+          {/* Search Bar - Filters Sidebar */}
           <div className="flex-1 max-w-md">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search orders, customers..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 focus:bg-white transition-all duration-200"
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Search menu items..."
+                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 focus:bg-white transition-all duration-200"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
 

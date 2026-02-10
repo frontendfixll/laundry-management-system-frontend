@@ -2,14 +2,14 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
-  MapPin, 
-  Shirt, 
-  Sparkles, 
-  Truck, 
-  CheckCircle, 
-  Clock, 
-  CreditCard, 
+import {
+  MapPin,
+  Shirt,
+  Sparkles,
+  Truck,
+  CheckCircle,
+  Clock,
+  CreditCard,
   Headphones,
   Star,
   ArrowRight,
@@ -68,44 +68,44 @@ function HeroCarousel({
     primaryButton: { text: string; icon: any; action: string }
     secondaryButton: { text: string; icon: any; href: string }
   }> = [
-    {
-      id: 1,
-      title: isAuthenticated
-        ? `Welcome back, ${user?.name}!`
-        : 'Welcome to LaundryLobby',
-      subtitle: "India's #1 Laundry Service",
-      description: isAuthenticated
-        ? "Ready to schedule your next laundry pickup? We're here to make your life easier!"
-        : 'Serving across 20+ Cities with over 20+ Outlets across the nation.',
-      features: [
-        { icon: Clock, text: 'Schedule Collection Days' },
-        { icon: Truck, text: '24-48 hours Delivery' },
-        { icon: CreditCard, text: 'Easy Payment Options' },
-        { icon: Headphones, text: 'Dedicated Customer Support' },
-      ],
-      image: '/images/hero-laundry.jpg',
-      discount: '20%',
-      primaryButton: { text: 'Book New Order', icon: Truck, action: 'book' },
-      secondaryButton: { text: 'Chat on WhatsApp', icon: Phone, href: '#' },
-    },
-    {
-      id: 2,
-      title: 'Premium Dry Cleaning',
-      subtitle: 'Professional Care for Your Clothes',
-      description:
-        'Expert dry cleaning services with advanced technology and eco-friendly solutions.',
-      features: [
-        { icon: Shield, text: '100% Safe & Secure' },
-        { icon: Sparkles, text: 'Premium Quality Care' },
-        { icon: Award, text: 'Certified Professionals' },
-        { icon: Star, text: '5-Star Rated Service' },
-      ],
-      image: '/images/hero-slide-2.jpg',
-      discount: '15%',
-      primaryButton: { text: 'Book Dry Cleaning', icon: Sparkles, action: 'book' },
-      secondaryButton: { text: 'View Services', icon: ArrowRight, href: '#services' },
-    },
-  ]
+      {
+        id: 1,
+        title: isAuthenticated
+          ? `Welcome back, ${user?.name}!`
+          : 'Welcome to LaundryLobby',
+        subtitle: "India's #1 Laundry Service",
+        description: isAuthenticated
+          ? "Ready to schedule your next laundry pickup? We're here to make your life easier!"
+          : 'Serving across 20+ Cities with over 20+ Outlets across the nation.',
+        features: [
+          { icon: Clock, text: 'Schedule Collection Days' },
+          { icon: Truck, text: '24-48 hours Delivery' },
+          { icon: CreditCard, text: 'Easy Payment Options' },
+          { icon: Headphones, text: 'Dedicated Customer Support' },
+        ],
+        image: '/images/hero-laundry.jpg',
+        discount: '20%',
+        primaryButton: { text: 'Book New Order', icon: Truck, action: 'book' },
+        secondaryButton: { text: 'Chat on WhatsApp', icon: Phone, href: '#' },
+      },
+      {
+        id: 2,
+        title: 'Premium Dry Cleaning',
+        subtitle: 'Professional Care for Your Clothes',
+        description:
+          'Expert dry cleaning services with advanced technology and eco-friendly solutions.',
+        features: [
+          { icon: Shield, text: '100% Safe & Secure' },
+          { icon: Sparkles, text: 'Premium Quality Care' },
+          { icon: Award, text: 'Certified Professionals' },
+          { icon: Star, text: '5-Star Rated Service' },
+        ],
+        image: '/images/hero-slide-2.jpg',
+        discount: '15%',
+        primaryButton: { text: 'Book Dry Cleaning', icon: Sparkles, action: 'book' },
+        secondaryButton: { text: 'View Services', icon: ArrowRight, href: '#services' },
+      },
+    ]
 
   const nextSlide = () => {
     if (isAnimating) return
@@ -137,18 +137,16 @@ function HeroCarousel({
       {/* Navigation Arrows - Only visible on hover */}
       <button
         onClick={prevSlide}
-        className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-gray-500 hover:bg-gray-600 rounded-lg p-3 shadow-lg transition-all duration-300 hover:scale-110 ${
-          isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-        }`}
+        className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-gray-500 hover:bg-gray-600 rounded-lg p-3 shadow-lg transition-all duration-300 hover:scale-110 ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+          }`}
       >
         <ChevronLeft className="w-6 h-6 text-white" />
       </button>
 
       <button
         onClick={nextSlide}
-        className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-gray-500 hover:bg-gray-600 rounded-lg p-3 shadow-lg transition-all duration-300 hover:scale-110 ${
-          isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
-        }`}
+        className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-gray-500 hover:bg-gray-600 rounded-lg p-3 shadow-lg transition-all duration-300 hover:scale-110 ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+          }`}
       >
         <ChevronRight className="w-6 h-6 text-white" />
       </button>
@@ -158,11 +156,10 @@ function HeroCarousel({
         {/* Previous Slide (exits) */}
         {isAnimating && (
           <div
-            className={`absolute inset-0 z-10 ${
-              slideDirection === 'right'
+            className={`absolute inset-0 z-10 ${slideDirection === 'right'
                 ? 'animate-[slideOutLeft_0.6s_ease-in-out_forwards]'
                 : 'animate-[slideOutRight_0.6s_ease-in-out_forwards]'
-            }`}
+              }`}
           >
             <div className="grid lg:grid-cols-2 gap-4 items-center">
               <div className="px-4 lg:pl-16">
@@ -198,7 +195,7 @@ function HeroCarousel({
                     muted
                     playsInline
                     className="w-auto max-h-[520px] object-contain object-bottom"
-                    style={{ 
+                    style={{
                       filter: 'hue-rotate(-50deg) saturate(0.8)',
                       mixBlendMode: 'multiply'
                     }}
@@ -208,7 +205,7 @@ function HeroCarousel({
                     src={previousSlideData.image}
                     alt={previousSlideData.title}
                     className="w-auto max-h-[500px] object-contain object-bottom"
-                    style={{ 
+                    style={{
                       mixBlendMode: 'multiply'
                     }}
                   />
@@ -220,13 +217,12 @@ function HeroCarousel({
 
         {/* Current Slide (enters) */}
         <div
-          className={`relative z-20 ${
-            isAnimating
+          className={`relative z-20 ${isAnimating
               ? slideDirection === 'right'
                 ? 'animate-[slideInRight_0.6s_ease-in-out_forwards]'
                 : 'animate-[slideInLeft_0.6s_ease-in-out_forwards]'
               : ''
-          }`}
+            }`}
         >
           <div className="grid lg:grid-cols-2 gap-4 items-center">
             <div className="px-4 lg:pl-16">
@@ -243,8 +239,8 @@ function HeroCarousel({
                 ))}
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-teal-500 hover:bg-teal-600 text-white px-6"
                   onClick={onBookNow}
                 >
@@ -268,7 +264,7 @@ function HeroCarousel({
                   muted
                   playsInline
                   className="w-auto max-h-[520px] object-contain object-bottom"
-                  style={{ 
+                  style={{
                     filter: 'hue-rotate(-50deg) saturate(0.8)',
                     mixBlendMode: 'multiply'
                   }}
@@ -278,7 +274,7 @@ function HeroCarousel({
                   src={currentSlideData.image}
                   alt={currentSlideData.title}
                   className="w-auto max-h-[500px] object-contain object-bottom"
-                  style={{ 
+                  style={{
                     mixBlendMode: 'multiply'
                   }}
                 />
@@ -431,15 +427,15 @@ function TestimonialsCarousel() {
 
       {/* Testimonials Container */}
       <div className="overflow-hidden mx-6 sm:mx-8">
-        <div 
+        <div
           className="flex transition-transform duration-500 ease-in-out"
-          style={{ 
+          style={{
             transform: `translateX(-${(currentIndex + testimonials.length) * slideWidth}%)`,
           }}
         >
           {extendedTestimonials.map((testimonial, index) => (
-            <div 
-              key={`${testimonial.id}-${index}`} 
+            <div
+              key={`${testimonial.id}-${index}`}
               className="flex-shrink-0 px-2"
               style={{ width: `${slideWidth}%` }}
             >
@@ -486,31 +482,31 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current) return
-      
+
       const rect = sectionRef.current.getBoundingClientRect()
       const windowHeight = window.innerHeight
       const sectionTop = rect.top
-      
+
       // Calculate progress - SLOWER growth, takes longer to reach 100%
       // Progress from 0 to 1 over the entire section height
       const progress = Math.max(0, Math.min(1, (windowHeight - sectionTop) / (windowHeight * 1.2)))
       setScrollProgress(progress)
-      
+
       // Pin the section when it enters viewport and progress is between 0.1 and 0.95
       const shouldPin = progress > 0.1 && progress < 0.95
       setIsPinned(shouldPin)
-      
+
       // Check if banner has scrolled up past the viewport (negative top means it's above screen)
       if (bannerRef.current) {
         const bannerRect = bannerRef.current.getBoundingClientRect()
         // Banner is considered "scrolled up" when its bottom edge goes above viewport
         setBannerScrolledUp(bannerRect.bottom < 0)
       }
-      
+
       // Image row offset - directly based on scroll position for continuous movement
       const scrollY = window.scrollY
       setImageRowOffset(scrollY * 0.5) // Move at half the scroll speed
-      
+
       // Notify parent when gallery becomes visible (progress > 0.8)
       const showGallery = progress > 0.8
       if (onGalleryVisible) {
@@ -520,30 +516,30 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
 
     window.addEventListener('scroll', handleScroll)
     handleScroll() // Initial call
-    
+
     return () => window.removeEventListener('scroll', handleScroll)
   }, [onGalleryVisible])
 
   // Banner starts SMALL and GROWS to FULL WIDTH - SLOWER
   // Starts at 40% width, grows to 100%
   const bannerWidth = 40 + (scrollProgress * 60) // 40% to 100%
-  
+
   // Padding grows as banner expands
   const bannerPaddingY = 30 + (scrollProgress * 80) // 30px to 110px
   const bannerPaddingX = 24 + (scrollProgress * 40) // 24px to 64px
-  
+
   // Border radius - top corners become 0, bottom corners stay rounded
   // Top radius: 20px to 0px as it grows
   const topRadius = Math.max(0, 20 - (scrollProgress * 20)) // 20px to 0px
   // Bottom radius: stays at 20px always for pinned effect
   const bottomRadius = 20
-  
+
   // Color transition - starts light teal, becomes darker teal (theme color)
   // RGB values: light teal (204, 251, 241) to teal-500 (20, 184, 166)
   const colorR = 204 - (scrollProgress * 184) // 204 to 20
   const colorG = 251 - (scrollProgress * 67) // 251 to 184
   const colorB = 241 - (scrollProgress * 75) // 241 to 166
-  
+
   // Image gallery visibility - shows when banner is 80% grown
   const showGallery = scrollProgress > 0.8
   const galleryOpacity = Math.max(0, (scrollProgress - 0.8) * 5) // 0 to 1 after 80%
@@ -576,18 +572,18 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
   return (
     <div ref={sectionRef} className="relative" style={{ minHeight: isPinned ? '200vh' : 'auto' }}>
       {/* Background Section - Transitions from white to black */}
-      <section 
+      <section
         ref={bannerRef}
         className={`py-16 min-h-[100vh] flex items-center justify-center overflow-hidden transition-colors duration-300 ${isPinned ? 'sticky top-0' : ''}`}
-        style={{ 
+        style={{
           zIndex: isPinned ? 10 : 1,
           backgroundColor: `rgb(${bgR}, ${bgG}, ${bgB})`
         }}
       >
         <div className="w-full flex justify-center">
-          <div 
+          <div
             className="transition-all duration-300 ease-out relative"
-            style={{ 
+            style={{
               width: `${bannerWidth}%`,
               padding: `${bannerPaddingY}px ${bannerPaddingX}px`,
               borderRadius: `${topRadius}px ${topRadius}px ${bottomRadius}px ${bottomRadius}px`,
@@ -598,14 +594,14 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
             {/* Fixed Bottom Corners - visible when banner is growing */}
             {scrollProgress > 0.3 && scrollProgress < 0.95 && (
               <>
-                <div 
+                <div
                   className="fixed bottom-0 left-0 w-8 h-8 z-50 transition-opacity duration-300"
                   style={{
                     background: `radial-gradient(circle at top right, transparent 70%, rgb(${colorR}, ${colorG}, ${colorB}) 70%)`,
                     opacity: scrollProgress > 0.5 ? 1 : (scrollProgress - 0.3) * 5,
                   }}
                 />
-                <div 
+                <div
                   className="fixed bottom-0 right-0 w-8 h-8 z-50 transition-opacity duration-300"
                   style={{
                     background: `radial-gradient(circle at top left, transparent 70%, rgb(${colorR}, ${colorG}, ${colorB}) 70%)`,
@@ -615,18 +611,18 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
               </>
             )}
             {/* "Schedule today to" - always on top, smoothly grows */}
-            <p 
+            <p
               className="font-bold tracking-[0.2em] uppercase text-gray-600 transition-all duration-300 ease-out"
-              style={{ 
+              style={{
                 fontSize: `${10 + scrollProgress * 6}px`,
                 marginBottom: `${8 + scrollProgress * 16}px`,
               }}
             >
               Schedule today to
             </p>
-            
+
             {/* Main heading - smoothly grows */}
-            <h2 
+            <h2
               className="leading-tight transition-all duration-300 ease-out"
               style={{
                 fontSize: `${22 + scrollProgress * 44}px`,
@@ -640,10 +636,10 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
                 your first order
               </span>
             </h2>
-            
+
             {/* Button */}
             <Link href={isAuthenticated ? "/customer/orders/new" : "/auth/login?redirect=/customer/orders/new"}>
-              <Button 
+              <Button
                 className="rounded-full font-bold transition-all duration-300 ease-out bg-teal-500 hover:bg-teal-600 text-white"
                 style={{
                   padding: `${10 + scrollProgress * 6}px ${24 + scrollProgress * 20}px`,
@@ -659,29 +655,29 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
 
       {/* Image Gallery with Dark Background - Hidden until banner is mostly grown */}
       {showGallery && (
-        <section 
+        <section
           className="bg-gray-900 py-8 overflow-hidden transition-all duration-500"
-          style={{ 
+          style={{
             opacity: galleryOpacity,
             transform: `translateY(${galleryTranslateY}px)`,
           }}
         >
           {/* Top Row - Moves Right to Left on Scroll Down */}
           <div className="mb-4 overflow-hidden">
-            <div 
+            <div
               className="flex gap-4"
-              style={{ 
+              style={{
                 width: 'max-content',
                 transform: `translateX(-${imageRowOffset % 1000}px)`,
               }}
             >
               {[...topRowImages, ...topRowImages, ...topRowImages].map((img, index) => (
-                <div 
-                  key={`top-${index}`} 
+                <div
+                  key={`top-${index}`}
                   className="w-72 h-48 flex-shrink-0 rounded-xl overflow-hidden"
                 >
-                  <img 
-                    src={img} 
+                  <img
+                    src={img}
                     alt={`Laundry ${index + 1}`}
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                   />
@@ -692,20 +688,20 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
 
           {/* Bottom Row - Moves Left to Right on Scroll Down (Reverse Direction) */}
           <div className="overflow-hidden">
-            <div 
+            <div
               className="flex gap-4"
-              style={{ 
+              style={{
                 width: 'max-content',
                 transform: `translateX(-${1000 - (imageRowOffset % 1000)}px)`,
               }}
             >
               {[...bottomRowImages, ...bottomRowImages, ...bottomRowImages].map((img, index) => (
-                <div 
-                  key={`bottom-${index}`} 
+                <div
+                  key={`bottom-${index}`}
                   className="w-72 h-48 flex-shrink-0 rounded-xl overflow-hidden"
                 >
-                  <img 
-                    src={img} 
+                  <img
+                    src={img}
                     alt={`Laundry ${index + 1}`}
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                   />
@@ -730,7 +726,7 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible }: { isAuthenti
                   ))}
                 </div>
                 <p className="text-gray-300 text-lg leading-relaxed">
-                  Every order is backed by our industry-leading guarantee. If you're not satisfied with the 
+                  Every order is backed by our industry-leading guarantee. If you're not satisfied with the
                   cleaning of your clothes, we will re-clean them – free of charge.
                 </p>
               </div>
@@ -779,157 +775,18 @@ export default function HomePage() {
   const handleGalleryVisible = (visible: boolean) => {
     setIsDarkTheme(visible)
   }
-  
+
   return (
     <div className={`min-h-screen transition-colors duration-500 ${isDarkTheme ? 'bg-gray-900' : 'bg-white'}`}>
       {/* Booking Modal */}
-      <BookingModal 
-        isOpen={showBookingModal} 
+      <BookingModal
+        isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onLoginRequired={handleLoginRequired}
       />
-      {/* Navigation - Fixed */}
-      <nav className={`shadow-sm border-b fixed top-0 left-0 right-0 z-50 transition-colors duration-500 ${isDarkTheme ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <span className={`text-2xl font-bold transition-colors duration-500 ${isDarkTheme ? 'text-white' : 'text-gray-800'}`}>LaundryLobby</span>
-            </div>
-            
-            {/* Mobile Menu Button */}
-            <button 
-              className={`md:hidden p-2 rounded-lg transition-colors duration-500 ${isDarkTheme ? 'hover:bg-gray-800 text-white' : 'hover:bg-gray-100 text-gray-800'}`}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className={`transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`}>Home</Link>
-              <Link href="/services" className={`transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`}>Services</Link>
-              <Link href="/pricing" className={`transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`}>Pricing</Link>
-              <Link href="/help" className={`transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`}>Help</Link>
-              
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  {/* Dashboard Button */}
-                  <Link href="/customer/dashboard">
-                    <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-                      <User className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <div className="relative group">
-                    <button className={`flex items-center space-x-2 py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-700 hover:text-teal-500'}`}>
-                      <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-sm font-medium">
-                          {user?.name?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <span className="font-medium">{user?.name?.split(' ')[0]}</span>
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                    <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="py-2">
-                        <Link href="/customer/dashboard" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">
-                          <User className="w-4 h-4 mr-3" />
-                          Dashboard
-                        </Link>
-                        <Link href="/customer/orders" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">
-                          <ShoppingBag className="w-4 h-4 mr-3" />
-                          My Orders
-                        </Link>
-                        <Link href="/customer/addresses" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">
-                          <MapPin className="w-4 h-4 mr-3" />
-                          Addresses
-                        </Link>
-                        <Link href="/customer/profile" className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-50">
-                          <User className="w-4 h-4 mr-3" />
-                          Profile
-                        </Link>
-                        <hr className="my-2" />
-                        <button 
-                          onClick={() => {
-                            useAuthStore.getState().logout()
-                            window.location.href = '/'
-                          }}
-                          className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50"
-                        >
-                          <LogOut className="w-4 h-4 mr-3" />
-                          Logout
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <Link href="/auth/login">
-                    <Button variant="outline" className={`transition-colors duration-500 ${isDarkTheme ? 'border-teal-400 text-teal-400 hover:bg-teal-400/10' : 'border-teal-500 text-teal-600 hover:bg-teal-50'}`}>
-                      Login
-                    </Button>
-                  </Link>
-                  <Link href="/auth/register">
-                    <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Mobile Menu */}
-          {mobileMenuOpen && (
-            <div className={`md:hidden border-t mt-4 pt-4 pb-2 transition-colors duration-500 ${isDarkTheme ? 'border-gray-700' : 'border-gray-200'}`}>
-              <div className="flex flex-col space-y-3">
-                <Link href="/" className={`py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`} onClick={() => setMobileMenuOpen(false)}>Home</Link>
-                <Link href="/services" className={`py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`} onClick={() => setMobileMenuOpen(false)}>Services</Link>
-                <Link href="/pricing" className={`py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`} onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
-                <Link href="/help" className={`py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`} onClick={() => setMobileMenuOpen(false)}>Help</Link>
-                
-                {isAuthenticated ? (
-                  <>
-                    <hr className={`my-2 transition-colors duration-500 ${isDarkTheme ? 'border-gray-700' : 'border-gray-200'}`} />
-                    <Link href="/customer/dashboard" className={`py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
-                    <Link href="/customer/orders" className={`py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`} onClick={() => setMobileMenuOpen(false)}>My Orders</Link>
-                    <Link href="/customer/profile" className={`py-2 transition-colors duration-500 ${isDarkTheme ? 'text-gray-300 hover:text-teal-400' : 'text-gray-600 hover:text-teal-500'}`} onClick={() => setMobileMenuOpen(false)}>Profile</Link>
-                    <button 
-                      onClick={() => {
-                        useAuthStore.getState().logout()
-                        setMobileMenuOpen(false)
-                        window.location.href = '/'
-                      }}
-                      className="text-left text-red-600 hover:text-red-700 py-2"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  <div className="flex flex-col space-y-2 pt-2">
-                    <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className={`w-full transition-colors duration-500 ${isDarkTheme ? 'border-teal-400 text-teal-400 hover:bg-teal-400/10' : 'border-teal-500 text-teal-600 hover:bg-teal-50'}`}>
-                        Login
-                      </Button>
-                    </Link>
-                    <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)}>
-                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white">
-                        Sign Up
-                      </Button>
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </nav>
 
       {/* Hero Section with Carousel */}
-      <section className="relative bg-blue-100 pt-24 pb-0 overflow-hidden">
+      <section className="relative bg-blue-100 pt-0 pb-0 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <HeroCarousel isAuthenticated={isAuthenticated} user={user} onBookNow={handleBookNow} />
         </div>
@@ -945,8 +802,8 @@ export default function HomePage() {
               Laundry & Dry Cleaning
             </h2>
             <p className="text-gray-800 font-semibold max-w-3xl mx-auto">
-              At LaundryLobby, we offer a seamless laundry and dry cleaning experience tailored 
-              to your busy lifestyle. From pickup to delivery, every step is handled with 
+              At LaundryLobby, we offer a seamless laundry and dry cleaning experience tailored
+              to your busy lifestyle. From pickup to delivery, every step is handled with
               professionalism and care.
             </p>
           </div>
@@ -959,8 +816,8 @@ export default function HomePage() {
               </div>
               <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 border border-gray-100">
                 <div className="h-44 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                  <img
+                    src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
                     alt="Order Online"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -982,8 +839,8 @@ export default function HomePage() {
               </div>
               <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 border border-gray-100">
                 <div className="h-44 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                  <img
+                    src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
                     alt="Pick Up"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -1005,8 +862,8 @@ export default function HomePage() {
               </div>
               <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 border border-gray-100">
                 <div className="h-44 overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                  <img
+                    src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
                     alt="Cleaning"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -1028,8 +885,8 @@ export default function HomePage() {
               </div>
               <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-hover:-translate-y-1 border border-gray-100">
                 <div className="h-44 overflow-hidden">
-                  <img 
-                    src="/images/del.jpg" 
+                  <img
+                    src="/images/del.jpg"
                     alt="Drop Off"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -1095,22 +952,22 @@ export default function HomePage() {
               >
                 <source src="/images/pricing.mp4" type="video/mp4" />
               </video>
-              
+
               {/* Dark Overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-900/85 to-gray-800/90"></div>
-              
+
               {/* Content */}
               <div className="relative z-10 p-8 h-full flex flex-col justify-center">
                 <div className="w-16 h-16 bg-teal-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                   <Sparkles className="w-8 h-8 text-white" />
                 </div>
-                
+
                 <h3 className="text-3xl font-bold text-white mb-4">Ready to Experience Premium Laundry Service?</h3>
-                
+
                 <p className="text-gray-200 text-lg mb-4">
                   Join over 50,000+ satisfied customers who trust LaundryLobby with their laundry needs every day.
                 </p>
-                
+
                 <ul className="space-y-2 mb-6">
                   <li className="flex items-center text-gray-200">
                     <CheckCircle className="w-5 h-5 text-teal-400 mr-2 flex-shrink-0" />
@@ -1125,11 +982,11 @@ export default function HomePage() {
                     100% satisfaction guaranteed
                   </li>
                 </ul>
-                
+
                 <div className="flex flex-col sm:flex-row gap-3">
                   {isAuthenticated ? (
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="bg-teal-500 hover:bg-teal-600 text-white w-full sm:w-auto shadow-lg"
                       onClick={handleBookNow}
                     >
@@ -1137,8 +994,8 @@ export default function HomePage() {
                       Book New Order
                     </Button>
                   ) : (
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="bg-teal-500 hover:bg-teal-600 text-white w-full sm:w-auto shadow-lg"
                       onClick={handleBookNow}
                     >
@@ -1166,8 +1023,8 @@ export default function HomePage() {
             <p className="text-teal-500 font-semibold mb-2">Premium Laundry And Dry Clean Service in India</p>
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Quality Cleaning with Great Savings!</h2>
             <p className="text-gray-800 font-semibold max-w-4xl mx-auto">
-              At LaundryLobby, we take care of all your clothing needs — from everyday home wear to formal office attire — ensuring 
-              each piece is cleaned with expert care. Our services go beyond garments, offering shoe cleaning, curtain cleaning, 
+              At LaundryLobby, we take care of all your clothing needs — from everyday home wear to formal office attire — ensuring
+              each piece is cleaned with expert care. Our services go beyond garments, offering shoe cleaning, curtain cleaning,
               carpet cleaning, and more to provide complete home care solutions.
             </p>
           </div>
@@ -1273,7 +1130,7 @@ export default function HomePage() {
           <div className="text-center">
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               {isAuthenticated ? (
-                <Button 
+                <Button
                   className="bg-teal-500 hover:bg-teal-600 text-white"
                   onClick={handleBookNow}
                 >
@@ -1281,7 +1138,7 @@ export default function HomePage() {
                   Book New Order
                 </Button>
               ) : (
-                <Button 
+                <Button
                   className="bg-teal-500 hover:bg-teal-600 text-white"
                   onClick={handleBookNow}
                 >
@@ -1436,7 +1293,7 @@ export default function HomePage() {
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-4">Services</h3>
               <ul className="space-y-2 text-gray-400">
@@ -1446,7 +1303,7 @@ export default function HomePage() {
                 <li><Link href="#" className="hover:text-white transition-colors">Curtain Cleaning</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-4">Company</h3>
               <ul className="space-y-2 text-gray-400">
@@ -1456,7 +1313,7 @@ export default function HomePage() {
                 <li><Link href="#" className="hover:text-white transition-colors">Help Center</Link></li>
               </ul>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
               <div className="space-y-3 text-gray-400">
@@ -1475,7 +1332,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
             <p>&copy; 2024 LaundryLobby. All rights reserved. | Privacy Policy | Terms of Service</p>
           </div>

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
+import {
   MapPin, Shirt, Sparkles, Truck, CheckCircle, Clock, CreditCard, Headphones,
   Star, Shield, Zap, Award, Phone, Mail, Instagram, Facebook, Twitter, Linkedin, Youtube,
   ChevronLeft, ChevronRight, User, ShoppingBag, LogOut, ChevronDown, Package, Menu, X,
@@ -238,7 +238,7 @@ const getThemeColors = (colorName: ThemeColor, scheme: SchemeMode): ThemeColors 
 }
 
 // Settings Panel Component
-function SettingsPanel({ 
+function SettingsPanel({
   themeColor,
   currentLanguage,
   currentScheme,
@@ -247,7 +247,7 @@ function SettingsPanel({
   onLanguageChange,
   onSchemeChange,
   onTemplateChange
-}: { 
+}: {
   themeColor: ThemeColor
   currentLanguage: Language
   currentScheme: SchemeMode
@@ -292,10 +292,9 @@ function SettingsPanel({
         </div>
       )}
 
-      <div 
-        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      <div
+        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-bold text-gray-800">{getTranslation(currentLanguage, 'original.settings.title')}</h2>
@@ -312,11 +311,10 @@ function SettingsPanel({
                 <button
                   key={mode}
                   onClick={() => onSchemeChange?.(mode)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${
-                    currentScheme === mode 
-                      ? 'border-blue-500 bg-blue-50 text-blue-600' 
-                      : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                  }`}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${currentScheme === mode
+                    ? 'border-blue-500 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                    }`}
                 >
                   {mode === 'auto' && <Monitor className="w-4 h-4" />}
                   {mode === 'dark' && <Moon className="w-4 h-4" />}
@@ -339,9 +337,8 @@ function SettingsPanel({
                 <button
                   key={color}
                   onClick={() => onColorChange?.(color)}
-                  className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                    themeColor === color ? `border-gray-800 ring-2 ring-offset-2 ring-${color}-400` : 'border-gray-200'
-                  }`}
+                  className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === color ? `border-gray-800 ring-2 ring-offset-2 ring-${color}-400` : 'border-gray-200'
+                    }`}
                   title={`${color} Theme`}
                 >
                   <div className="w-full h-full flex">
@@ -361,9 +358,8 @@ function SettingsPanel({
                 <button
                   key={lang.id}
                   onClick={() => onLanguageChange?.(lang.id as Language)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                    currentLanguage === lang.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${currentLanguage === lang.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <span className="text-2xl">{lang.flag}</span>
                   <span className={`font-medium ${currentLanguage === lang.id ? 'text-blue-600' : 'text-gray-700'}`}>{lang.name}</span>
@@ -380,29 +376,29 @@ function SettingsPanel({
 
 // Color classes for dynamic theming
 const colorClasses = {
-  teal: { 
-    primary: 'bg-teal-500', hover: 'hover:bg-teal-600', text: 'text-teal-500', 
+  teal: {
+    primary: 'bg-teal-500', hover: 'hover:bg-teal-600', text: 'text-teal-500',
     light: 'bg-teal-50', lightText: 'text-teal-600', border: 'border-teal-500',
     lightBorder: 'border-teal-100', hoverText: 'hover:text-teal-500', hoverTextDark: 'hover:text-teal-400',
     gradient: 'from-teal-50 to-cyan-50', heroBg: 'bg-teal-100', sectionBg: 'bg-teal-50/50',
     testimonialBg: 'bg-gradient-to-br from-teal-50 to-cyan-50'
   },
-  blue: { 
-    primary: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-blue-500', 
+  blue: {
+    primary: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-blue-500',
     light: 'bg-blue-50', lightText: 'text-blue-600', border: 'border-blue-500',
     lightBorder: 'border-blue-100', hoverText: 'hover:text-blue-500', hoverTextDark: 'hover:text-blue-400',
     gradient: 'from-blue-50 to-indigo-50', heroBg: 'bg-blue-100', sectionBg: 'bg-blue-50/50',
     testimonialBg: 'bg-gradient-to-br from-blue-50 to-indigo-50'
   },
-  purple: { 
-    primary: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-purple-500', 
+  purple: {
+    primary: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-purple-500',
     light: 'bg-purple-50', lightText: 'text-purple-600', border: 'border-purple-500',
     lightBorder: 'border-purple-100', hoverText: 'hover:text-purple-500', hoverTextDark: 'hover:text-purple-400',
     gradient: 'from-purple-50 to-pink-50', heroBg: 'bg-purple-100', sectionBg: 'bg-purple-50/50',
     testimonialBg: 'bg-gradient-to-br from-purple-50 to-pink-50'
   },
-  orange: { 
-    primary: 'bg-orange-500', hover: 'hover:bg-orange-600', text: 'text-orange-500', 
+  orange: {
+    primary: 'bg-orange-500', hover: 'hover:bg-orange-600', text: 'text-orange-500',
     light: 'bg-orange-50', lightText: 'text-orange-600', border: 'border-orange-500',
     lightBorder: 'border-orange-100', hoverText: 'hover:text-orange-500', hoverTextDark: 'hover:text-orange-400',
     gradient: 'from-orange-50 to-amber-50', heroBg: 'bg-orange-100', sectionBg: 'bg-orange-50/50',
@@ -419,20 +415,20 @@ const colorRGB = {
 }
 
 // Hero Carousel Component with Infinite Slide Effect
-function HeroCarousel({ 
-  isAuthenticated, 
-  user, 
-  onBookNow, 
-  colors, 
-  t, 
+function HeroCarousel({
+  isAuthenticated,
+  user,
+  onBookNow,
+  colors,
+  t,
   theme,
   tenantTagline,
-}: { 
-  isAuthenticated: boolean; 
-  user: any; 
-  onBookNow: () => void; 
-  colors: any; 
-  t: (key: string) => string; 
+}: {
+  isAuthenticated: boolean;
+  user: any;
+  onBookNow: () => void;
+  colors: any;
+  t: (key: string) => string;
   theme: ThemeColors;
   tenantTagline?: string;
 }) {
@@ -530,7 +526,7 @@ function HeroCarousel({
 
       {/* Slides Container */}
       <div className="relative">
-        <div 
+        <div
           className={`flex ${isTransitioning ? 'transition-transform duration-500 ease-in-out' : ''}`}
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
@@ -538,8 +534,8 @@ function HeroCarousel({
             <div key={index} className="w-full flex-shrink-0">
               <div className="grid lg:grid-cols-2 gap-4 pt-8 pb-0">
                 <div className="px-4 lg:pl-16 flex flex-col justify-center">
-                  <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{slide.title}</h1>
-                  
+                  <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 leading-tight" style={{ color: theme.textPrimary }}>{slide.title}</h1>
+
                   {/* Tagline Display */}
                   {tenantTagline && (
                     <p className="text-2xl font-semibold mb-4 flex items-center gap-2 animate-fade-in" style={{ color: theme.accent }}>
@@ -547,13 +543,13 @@ function HeroCarousel({
                       {tenantTagline}
                     </p>
                   )}
-                  
-                  <p className="text-lg font-medium text-gray-800 mb-6">{slide.description}</p>
+
+                  <p className="text-lg font-medium mb-6" style={{ color: theme.textSecondary }}>{slide.description}</p>
                   <div className="space-y-3 mb-8">
                     {slide.features.map((feature, idx) => (
                       <div key={idx} className="flex items-center space-x-3">
                         <CheckCircle className={`w-5 h-5 ${colors.text} flex-shrink-0`} />
-                        <span className="text-gray-800 font-medium">{feature.text}</span>
+                        <span className="font-medium" style={{ color: theme.textSecondary }}>{feature.text}</span>
                       </div>
                     ))}
                   </div>
@@ -569,13 +565,13 @@ function HeroCarousel({
                   </div>
                 </div>
                 <div className="relative flex justify-center items-end h-full">
-                  <img 
-                    src={slide.image} 
-                    alt={slide.title} 
-                    className="w-auto max-h-[520px] object-contain" 
-                    style={{ 
+                  <img
+                    src={slide.image}
+                    alt={slide.title}
+                    className="w-auto max-h-[520px] object-contain"
+                    style={{
                       mixBlendMode: 'multiply'
-                    }} 
+                    }}
                   />
                 </div>
               </div>
@@ -590,11 +586,10 @@ function HeroCarousel({
           <button
             key={index}
             onClick={() => { setIsTransitioning(true); setCurrentSlide(index + 1) }}
-            className={`h-2 rounded-full transition-all ${
-              getActualIndex() === index 
-                ? `w-8 ${colors.primary}` 
-                : 'w-2 bg-gray-400 hover:bg-gray-500'
-            }`}
+            className={`h-2 rounded-full transition-all ${getActualIndex() === index
+              ? `w-8 ${colors.primary}`
+              : 'w-2 bg-gray-400 hover:bg-gray-500'
+              }`}
           />
         ))}
       </div>
@@ -607,7 +602,7 @@ function TestimonialsCarousel({ colors, theme, tenancyId }: { colors: any; theme
   const [reviews, setReviews] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [isPaused, setIsPaused] = useState(false)
-  
+
   // Fallback testimonials if no real reviews
   const fallbackTestimonials = [
     { id: 1, name: 'Divya K.', review: 'I gave them my silk saree and was honestly worried. But they handled it with such care. Impressive service!', rating: 5 },
@@ -626,13 +621,13 @@ function TestimonialsCarousel({ colors, theme, tenancyId }: { colors: any; theme
         setLoading(false)
         return
       }
-      
+
       try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
         const apiBase = baseUrl.endsWith('/api') ? baseUrl.slice(0, -4) : baseUrl
         const response = await fetch(`${apiBase}/api/public/tenancy/reviews/tenancy/${tenancyId}/featured?limit=12`)
         const data = await response.json()
-        
+
         if (data.success && data.data.reviews && data.data.reviews.length > 0) {
           const formattedReviews = data.data.reviews.map((review: any, index: number) => ({
             id: review._id || index,
@@ -654,7 +649,7 @@ function TestimonialsCarousel({ colors, theme, tenancyId }: { colors: any; theme
         setLoading(false)
       }
     }
-    
+
     fetchReviews()
   }, [tenancyId])
 
@@ -665,8 +660,8 @@ function TestimonialsCarousel({ colors, theme, tenancyId }: { colors: any; theme
 
   // Render single testimonial card
   const renderCard = (testimonial: any, index: number) => (
-    <div 
-      key={`${testimonial.id}-${index}`} 
+    <div
+      key={`${testimonial.id}-${index}`}
       className="flex-shrink-0 w-72 sm:w-80"
     >
       <div className="bg-white rounded-xl p-5 sm:p-6 text-center h-full shadow-sm border border-gray-100 flex flex-col hover:shadow-lg transition-shadow duration-300">
@@ -711,7 +706,7 @@ function TestimonialsCarousel({ colors, theme, tenancyId }: { colors: any; theme
         </div>
       ) : shouldScroll ? (
         // Infinite scroll for many reviews
-        <div 
+        <div
           className="relative"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
@@ -719,9 +714,9 @@ function TestimonialsCarousel({ colors, theme, tenancyId }: { colors: any; theme
           {/* Gradient overlays for fade effect */}
           <div className="absolute left-0 top-0 bottom-0 w-16 z-10 pointer-events-none" style={{ background: `linear-gradient(to right, ${theme.sectionBg}, transparent)` }} />
           <div className="absolute right-0 top-0 bottom-0 w-16 z-10 pointer-events-none" style={{ background: `linear-gradient(to left, ${theme.sectionBg}, transparent)` }} />
-          
+
           {/* Scrolling container */}
-          <div 
+          <div
             className="flex gap-4 py-4"
             style={{
               animation: `scroll ${testimonials.length * 5}s linear infinite`,
@@ -731,7 +726,7 @@ function TestimonialsCarousel({ colors, theme, tenancyId }: { colors: any; theme
           >
             {duplicatedTestimonials.map((testimonial, index) => renderCard(testimonial, index))}
           </div>
-          
+
           {/* CSS Animation */}
           <style jsx>{`
             @keyframes scroll {
@@ -782,13 +777,13 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible, colors, themeC
   const bannerWidth = 40 + (scrollProgress * 60)
   const bannerPaddingY = 30 + (scrollProgress * 80)
   const topRadius = Math.max(0, 20 - (scrollProgress * 20))
-  
+
   // Dynamic color interpolation based on theme
   const rgb = colorRGB[themeColor]
   const colorR = rgb.start.r - (scrollProgress * (rgb.start.r - rgb.end.r))
   const colorG = rgb.start.g - (scrollProgress * (rgb.start.g - rgb.end.g))
   const colorB = rgb.start.b - (scrollProgress * (rgb.start.b - rgb.end.b))
-  
+
   const showGallery = scrollProgress > 0.8
   const galleryOpacity = Math.max(0, (scrollProgress - 0.8) * 5)
   const bgColorProgress = Math.max(0, (scrollProgress - 0.6) * 2.5)
@@ -837,8 +832,8 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible, colors, themeC
               <span className="font-extrabold text-gray-900">Get 20% off </span>
               <span className={`font-semibold ${accentTextClass}`}>your first order</span>
             </h2>
-            <Button 
-              className={`rounded-full font-bold ${colors.primary} ${colors.hover} text-white`} 
+            <Button
+              className={`rounded-full font-bold ${colors.primary} ${colors.hover} text-white`}
               style={{ padding: `${10 + scrollProgress * 6}px ${24 + scrollProgress * 20}px`, fontSize: `${13 + scrollProgress * 3}px` }}
               onClick={onBookNow}
             >
@@ -886,16 +881,16 @@ function ScrollBannerSection({ isAuthenticated, onGalleryVisible, colors, themeC
 
 
 // Main Component
-export default function OriginalTemplate({ 
-  themeColor, 
-  isAuthenticated, 
-  user, 
-  onBookNow, 
-  onColorChange, 
-  onLanguageChange, 
-  onTemplateChange, 
-  currentTemplate, 
-  isTenantPage, 
+export default function OriginalTemplate({
+  themeColor,
+  isAuthenticated,
+  user,
+  onBookNow,
+  onColorChange,
+  onLanguageChange,
+  onTemplateChange,
+  currentTemplate,
+  isTenantPage,
   tenantName,
   tenantLogo,
   tenantSecondaryLogo,
@@ -907,49 +902,6 @@ export default function OriginalTemplate({
 }: OriginalTemplateProps) {
   // Use language hook for reactive translations
   const { language, setLanguage, t } = useLanguage()
-  const router = useRouter()
-  
-  // Handle logout - redirect to tenant page if on tenant, otherwise to home
-  const handleLogout = () => {
-    useAuthStore.getState().logout()
-    if (isTenantPage && tenantName) {
-      // Get tenant slug from URL
-      const pathParts = window.location.pathname.split('/')
-      if (pathParts.length > 1 && pathParts[1]) {
-        window.location.href = `/${pathParts[1]}`
-        return
-      }
-    }
-    window.location.href = '/'
-  }
-  
-  // Get tenant-aware URL helper
-  const getTenantUrl = (path: string) => {
-    if (isTenantPage) {
-      const pathParts = window.location.pathname.split('/')
-      if (pathParts.length > 1 && pathParts[1]) {
-        // For root path, return just the tenant slug
-        if (path === '/') return `/${pathParts[1]}`
-        // For other paths, append to tenant slug
-        return `/${pathParts[1]}${path}`
-      }
-    }
-    // For non-tenant pages, return the path as-is
-    return path
-  }
-  
-  // Get login URL with tenant redirect if on tenant page
-  const getLoginUrl = () => {
-    if (isTenantPage) {
-      const pathParts = window.location.pathname.split('/')
-      if (pathParts.length > 1 && pathParts[1]) {
-        return `/auth/login?redirect=${encodeURIComponent(`/${pathParts[1]}`)}`
-      }
-    }
-    return '/auth/login'
-  }
-  
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isDarkTheme, setIsDarkTheme] = useState(false)
   const [scheme, setScheme] = useState<SchemeMode>('light')
   const colors = colorClasses[themeColor]
@@ -1013,184 +965,15 @@ export default function OriginalTemplate({
 
   return (
     <div className={`min-h-screen transition-colors duration-500`} style={{ backgroundColor: isDarkTheme ? '#111827' : theme.pageBg }}>
-      
-      {/* Navigation */}
-      <nav 
-        className="shadow-sm border-b fixed top-0 left-0 right-0 z-50 transition-colors duration-500"
-        style={{ 
-          backgroundColor: isDarkTheme ? '#111827' : theme.headerBg,
-          borderColor: isDarkTheme ? '#374151' : theme.border
-        }}
-      >
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.accent }}><Sparkles className="w-6 h-6 text-white" /></div>
-              <span className="text-2xl font-bold" style={{ color: isDarkTheme ? '#ffffff' : theme.textPrimary }}>LaundryLobby</span>
-            </div>
-            <div className="flex items-center space-x-2 md:hidden">
-              {/* Mobile Dark Mode Toggle */}
-              <button
-                onClick={() => {
-                  const newScheme = scheme === 'dark' ? 'light' : 'dark'
-                  handleSchemeChange(newScheme)
-                }}
-                className="p-2 rounded-full transition-colors"
-                style={{ 
-                  backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                  border: `1px solid ${isDarkTheme ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`
-                }}
-                title={scheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                {scheme === 'dark' ? (
-                  <Sun className="w-5 h-5 text-yellow-400" />
-                ) : (
-                  <Moon className="w-5 h-5" style={{ color: theme.textSecondary }} />
-                )}
-              </button>
-              <button 
-                className="p-2 rounded-lg"
-                style={{ color: isDarkTheme ? '#ffffff' : theme.textPrimary }}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-
-            {/* Mobile Menu Dropdown */}
-            {mobileMenuOpen && (
-              <div 
-                className="absolute top-full left-0 right-0 md:hidden shadow-lg border-t"
-                style={{ 
-                  backgroundColor: isDarkTheme ? '#1f2937' : theme.cardBg,
-                  borderColor: isDarkTheme ? '#374151' : theme.border
-                }}
-              >
-                <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col gap-3">
-                  <Link href={getTenantUrl('/')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.home')}</Link>
-                  <Link href={getTenantUrl('/services')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.services')}</Link>
-                  <Link href={getTenantUrl('/pricing')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.pricing')}</Link>
-                  <Link href={getTenantUrl('/help')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.help')}</Link>
-                  <hr style={{ borderColor: isDarkTheme ? '#374151' : theme.border }} />
-                  {isAuthenticated ? (
-                    <>
-                      <Link href={getTenantUrl('/dashboard')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.dashboard')}</Link>
-                      <Link href={getTenantUrl('/orders')} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.myOrders')}</Link>
-                      <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="py-2 font-medium text-left text-red-500">{t('nav.logout')}</button>
-                    </>
-                  ) : (
-                    <>
-                      <Link href={getLoginUrl()} onClick={() => setMobileMenuOpen(false)} className="py-2 font-medium" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.login')}</Link>
-                      <Button className="text-white w-full" style={{ backgroundColor: theme.accent }} onClick={() => { onBookNow(); setMobileMenuOpen(false); }}>{t('nav.bookNow')}</Button>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href={getTenantUrl('/')} className="hover:opacity-80 transition-opacity" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.home')}</Link>
-              <Link href={getTenantUrl('/services')} className="hover:opacity-80 transition-opacity" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.services')}</Link>
-              <Link href={getTenantUrl('/pricing')} className="hover:opacity-80 transition-opacity" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.pricing')}</Link>
-              <Link href={getTenantUrl('/help')} className="hover:opacity-80 transition-opacity" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>{t('nav.help')}</Link>
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  {/* Dark Mode Toggle */}
-                  <button
-                    onClick={() => {
-                      const newScheme = scheme === 'dark' ? 'light' : 'dark'
-                      handleSchemeChange(newScheme)
-                    }}
-                    className="p-2 rounded-full transition-colors"
-                    style={{ 
-                      backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                      border: `1px solid ${isDarkTheme ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`
-                    }}
-                    title={scheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                  >
-                    {scheme === 'dark' ? (
-                      <Sun className="w-5 h-5 text-yellow-400" />
-                    ) : (
-                      <Moon className="w-5 h-5" style={{ color: theme.textSecondary }} />
-                    )}
-                  </button>
-                  <Link href={getTenantUrl('/dashboard')}><Button className="text-white" style={{ backgroundColor: theme.accent }}><User className="w-4 h-4 mr-2" />{t('nav.dashboard')}</Button></Link>
-                  <div className="relative group">
-                    <button className="flex items-center space-x-2 py-2" style={{ color: isDarkTheme ? '#d1d5db' : theme.textSecondary }}>
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.accent }}><span className="text-white text-sm font-medium">{user?.name?.charAt(0).toUpperCase()}</span></div>
-                      <span className="font-medium">{user?.name?.split(' ')[0]}</span>
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                    <div className="absolute right-0 top-full mt-1 w-48 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50" style={{ backgroundColor: theme.cardBg, borderColor: theme.border }}>
-                      <div className="py-2">
-                        <Link href={getTenantUrl('/dashboard')} className="flex items-center px-4 py-2 hover:opacity-80" style={{ color: theme.textSecondary }}><User className="w-4 h-4 mr-3" />{t('nav.dashboard')}</Link>
-                        <Link href={getTenantUrl('/orders')} className="flex items-center px-4 py-2 hover:opacity-80" style={{ color: theme.textSecondary }}><ShoppingBag className="w-4 h-4 mr-3" />{t('nav.myOrders')}</Link>
-                        <Link href={getTenantUrl('/addresses')} className="flex items-center px-4 py-2 hover:opacity-80" style={{ color: theme.textSecondary }}><MapPin className="w-4 h-4 mr-3" />{t('nav.addresses')}</Link>
-                        <hr style={{ borderColor: theme.border }} className="my-2" />
-                        {/* Language Selector */}
-                        <div className="px-4 py-2">
-                          <p className="text-xs font-medium mb-2" style={{ color: theme.textSecondary }}>{t('theme.language')}</p>
-                          <div className="flex gap-1">
-                            {[
-                              { id: 'en', flag: '🇺🇸' },
-                              { id: 'es', flag: '🇪🇸' },
-                              { id: 'hi', flag: '🇮🇳' },
-                            ].map((lang) => (
-                              <button
-                                key={lang.id}
-                                onClick={() => setLanguage(lang.id as Language)}
-                                className={`flex-1 py-1.5 rounded text-lg transition-all ${language === lang.id ? 'bg-blue-100 ring-2 ring-blue-500' : 'hover:bg-gray-100'}`}
-                                title={lang.id === 'en' ? 'English' : lang.id === 'es' ? 'Español' : 'हिंदी'}
-                              >
-                                {lang.flag}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                        <hr style={{ borderColor: theme.border }} className="my-2" />
-                        <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-red-500 hover:bg-red-50/10"><LogOut className="w-4 h-4 mr-3" />{t('nav.logout')}</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  {/* Dark Mode Toggle */}
-                  <button
-                    onClick={() => {
-                      const newScheme = scheme === 'dark' ? 'light' : 'dark'
-                      handleSchemeChange(newScheme)
-                    }}
-                    className="p-2 rounded-full transition-colors"
-                    style={{ 
-                      backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                      border: `1px solid ${isDarkTheme ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`
-                    }}
-                    title={scheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                  >
-                    {scheme === 'dark' ? (
-                      <Sun className="w-5 h-5 text-yellow-400" />
-                    ) : (
-                      <Moon className="w-5 h-5" style={{ color: theme.textSecondary }} />
-                    )}
-                  </button>
-                  <Link href={getLoginUrl()}><Button variant="outline" style={{ borderColor: theme.accent, color: theme.accentText }}>{t('nav.login')}</Button></Link>
-                  <Button className="text-white" style={{ backgroundColor: theme.accent }} onClick={onBookNow}>{t('nav.bookNow')}</Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Hero Section */}
-      <section className="relative pt-20 pb-0 overflow-hidden transition-colors duration-300" style={{ backgroundColor: theme.heroBg }}>
+      <section className="relative pt-0 pb-0 overflow-hidden transition-colors duration-300" style={{ backgroundColor: theme.heroBg }}>
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <HeroCarousel 
-            isAuthenticated={isAuthenticated} 
-            user={user} 
-            onBookNow={onBookNow} 
-            colors={colors} 
-            t={t} 
+          <HeroCarousel
+            isAuthenticated={isAuthenticated}
+            user={user}
+            onBookNow={onBookNow}
+            colors={colors}
+            t={t}
             theme={theme}
             tenantTagline={tenantTagline}
           />
@@ -1295,7 +1078,7 @@ export default function OriginalTemplate({
           <TestimonialsCarousel colors={colors} theme={theme} tenancyId={tenancyId} />
           {isTenantPage && tenantName && (
             <div className="text-center mt-8">
-              <Link 
+              <Link
                 href={`/${tenantName}/all-reviews`}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors"
                 style={{ backgroundColor: theme.accent, color: '#fff' }}
@@ -1314,9 +1097,9 @@ export default function OriginalTemplate({
             <div>
               <div className="flex items-center gap-2 mb-4">
                 {(tenantSecondaryLogo || tenantLogo) ? (
-                  <img 
-                    src={tenantSecondaryLogo || tenantLogo} 
-                    alt={tenantBusinessName || tenantName || 'Logo'} 
+                  <img
+                    src={tenantSecondaryLogo || tenantLogo}
+                    alt={tenantBusinessName || tenantName || 'Logo'}
                     className="w-8 h-8 object-contain"
                   />
                 ) : (
@@ -1357,66 +1140,66 @@ export default function OriginalTemplate({
               </ul>
               <div className="flex gap-3 mt-4">
                 {tenantSocialMedia?.instagram && (
-                  <a 
-                    href={tenantSocialMedia.instagram} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.instagram}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors" 
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Instagram className="w-4 h-4" />
                   </a>
                 )}
                 {tenantSocialMedia?.facebook && (
-                  <a 
-                    href={tenantSocialMedia.facebook} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.facebook}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors" 
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Facebook className="w-4 h-4" />
                   </a>
                 )}
                 {tenantSocialMedia?.twitter && (
-                  <a 
-                    href={tenantSocialMedia.twitter} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.twitter}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors" 
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Twitter className="w-4 h-4" />
                   </a>
                 )}
                 {tenantSocialMedia?.linkedin && (
-                  <a 
-                    href={tenantSocialMedia.linkedin} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.linkedin}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors" 
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Linkedin className="w-4 h-4" />
                   </a>
                 )}
                 {tenantSocialMedia?.youtube && (
-                  <a 
-                    href={tenantSocialMedia.youtube} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.youtube}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors" 
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Youtube className="w-4 h-4" />
                   </a>
                 )}
                 {tenantSocialMedia?.whatsapp && (
-                  <a 
-                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`} 
-                    target="_blank" 
+                  <a
+                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors" 
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: '#25D366', color: '#ffffff' }}
                   >
                     <Phone className="w-4 h-4" />

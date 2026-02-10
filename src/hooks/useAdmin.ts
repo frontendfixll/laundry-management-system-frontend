@@ -246,6 +246,12 @@ export function useAdminCustomers(filters?: {
     total: 0,
     limit: 8
   })
+  const [stats, setStats] = useState({
+    totalCustomers: 0,
+    activeCustomers: 0,
+    vipCustomers: 0,
+    newThisMonth: 0
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -263,6 +269,10 @@ export function useAdminCustomers(filters?: {
         total: backendPagination.totalItems,
         limit: backendPagination.itemsPerPage
       })
+      // Set stats if available
+      if (response.data.stats) {
+        setStats(response.data.stats)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch customers')
     } finally {
@@ -299,6 +309,7 @@ export function useAdminCustomers(filters?: {
   return {
     customers,
     pagination,
+    stats,
     loading,
     error,
     toggleStatus,

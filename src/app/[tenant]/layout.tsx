@@ -5,6 +5,7 @@ import { TenantProvider } from '@/contexts/TenantContext'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { usePreviewStore } from '@/store/previewStore'
+import TemplateHeader from '@/components/layout/TemplateHeader'
 
 interface TenantBranding {
   name: string
@@ -14,6 +15,7 @@ interface TenantBranding {
   landingPageTemplate: string
   branding: {
     logo?: { url?: string }
+    secondaryLogo?: { url?: string }
     theme?: {
       primaryColor?: string
       secondaryColor?: string
@@ -21,6 +23,17 @@ interface TenantBranding {
       fontFamily?: string
     }
     landingPageTemplate?: string
+    businessName?: string
+    tagline?: string
+    slogan?: string
+    socialMedia?: {
+      facebook?: string
+      instagram?: string
+      twitter?: string
+      linkedin?: string
+      youtube?: string
+      whatsapp?: string
+    }
   }
   contact: {
     email?: string
@@ -34,7 +47,7 @@ interface TenantBranding {
 export default function TenantLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
   const router = useRouter()
-  const tenant = params.tenant as string
+  const tenant = params?.tenant as string
   const { user } = useAuthStore()
   const { isAdminPreviewMode } = usePreviewStore()
   const [tenantData, setTenantData] = useState<TenantBranding | null>(null)
@@ -114,7 +127,8 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
   }
 
   // Get template - prioritize branding.landingPageTemplate
-  const template = tenantData.branding?.landingPageTemplate || tenantData.landingPageTemplate || 'original'
+  const rawTemplate = tenantData.branding?.landingPageTemplate || tenantData.landingPageTemplate || 'original'
+  const template = rawTemplate.toLowerCase().replace(/\s+/g, '')
 
   return (
     <TenantProvider
@@ -122,14 +136,22 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
         name: tenantData.name,
         slug: tenantData.slug,
         logo: tenantData.branding?.logo?.url,
+        secondaryLogo: tenantData.branding?.secondaryLogo?.url,
+        businessName: tenantData.branding?.businessName || tenantData.name,
+        tagline: tenantData.branding?.tagline,
+        slogan: tenantData.branding?.slogan,
+        socialMedia: tenantData.branding?.socialMedia,
         primaryColor: tenantData.branding?.theme?.primaryColor,
         secondaryColor: tenantData.branding?.theme?.secondaryColor,
         accentColor: tenantData.branding?.theme?.accentColor,
         landingPageTemplate: template,
         contact: tenantData.contact,
+        branches: tenantData.branches,
+        tenancyId: tenantData.tenancyId,
       }}
       isTenantPage={true}
     >
+      <TemplateHeader />
       {children}
     </TenantProvider>
   )

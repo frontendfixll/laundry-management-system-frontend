@@ -141,7 +141,7 @@ function AdminCustomersContent() {
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [loadingDetails, setLoadingDetails] = useState(false)
 
-  const { customers, pagination, loading, error, toggleStatus, updateVIPStatus, refetch } = useAdminCustomers(filters)
+  const { customers, pagination, stats, loading, error, toggleStatus, updateVIPStatus, refetch } = useAdminCustomers(filters)
 
   const updateURL = (newFilters: typeof filters) => {
     const params = new URLSearchParams()
@@ -316,7 +316,7 @@ function AdminCustomersContent() {
               <Users className="w-5 h-5 text-white" />
             </div>
             <p className="text-xs text-blue-100">Total Customers</p>
-            <p className="text-xl font-bold">{pagination.total}</p>
+            <p className="text-xl font-bold">{stats.totalCustomers}</p>
           </div>
         </div>
 
@@ -327,7 +327,7 @@ function AdminCustomersContent() {
               <UserCheck className="w-6 h-6 text-white" />
             </div>
             <p className="text-sm text-emerald-100">Active Customers</p>
-            <p className="text-3xl font-bold">{customers.filter(c => c.isActive).length}</p>
+            <p className="text-3xl font-bold">{stats.activeCustomers}</p>
           </div>
         </div>
 
@@ -338,7 +338,7 @@ function AdminCustomersContent() {
               <Crown className="w-6 h-6 text-white" />
             </div>
             <p className="text-sm text-amber-100">VIP Customers</p>
-            <p className="text-3xl font-bold">{customers.filter(c => c.isVIP).length}</p>
+            <p className="text-3xl font-bold">{stats.vipCustomers}</p>
           </div>
         </div>
 
@@ -346,10 +346,10 @@ function AdminCustomersContent() {
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="relative z-10">
             <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center mb-4">
-              <Users className="w-6 h-6 text-white" />
+              <TrendingUp className="w-6 h-6 text-white" />
             </div>
-            <p className="text-sm text-purple-100">This Page</p>
-            <p className="text-3xl font-bold">{customers.length}</p>
+            <p className="text-sm text-purple-100">New This Month</p>
+            <p className="text-3xl font-bold">{stats.newThisMonth}</p>
           </div>
         </div>
       </div>

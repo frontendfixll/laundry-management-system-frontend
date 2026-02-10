@@ -293,31 +293,37 @@ export default function BaseLoginForm({
                 </Button>
               </form>
 
-              <div className="mt-6 text-center">
-                <p className="text-gray-600" style={{ fontSize: '15px' }}>
-                  Don't have an account?{' '}
-                  <Link href="/auth/register" className={`font-medium text-${theme.primary}-600 hover:text-${theme.primary}-500 transition-colors`}>
-                    Create one now
-                  </Link>
-                </p>
-              </div>
+              {/* Only show "Create account" link if redirect parameter exists (customer context) */}
+              {redirectUrl && (
+                <div className="mt-6 text-center">
+                  <p className="text-gray-600" style={{ fontSize: '15px' }}>
+                    Don't have an account?{' '}
+                    <Link href="/auth/register" className={`font-medium text-${theme.primary}-600 hover:text-${theme.primary}-500 transition-colors`}>
+                      Create one now
+                    </Link>
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Demo Accounts */}
             <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Demo Login:</h3>
               <div className="space-y-2">
-                {/* First row: 3 items */}
-                <div className="grid grid-cols-3 gap-2">
-                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <input
-                      type="radio"
-                      name="demoAccount"
-                      className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
-                      onChange={() => setFormData({ email: 'testcustomer@demo.com', password: 'password123' })}
-                    />
-                    <span className="text-xs text-gray-600">Customer</span>
-                  </label>
+                {/* First row: 3 items (or 2 if no redirect parameter) */}
+                <div className={`grid ${redirectUrl ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
+                  {/* Only show Customer option if redirect parameter exists */}
+                  {redirectUrl && (
+                    <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                      <input
+                        type="radio"
+                        name="demoAccount"
+                        className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
+                        onChange={() => setFormData({ email: 'testcustomer@demo.com', password: 'password123' })}
+                      />
+                      <span className="text-xs text-gray-600">Customer</span>
+                    </label>
+                  )}
                   <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
                     <input
                       type="radio"

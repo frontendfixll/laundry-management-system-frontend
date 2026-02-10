@@ -126,7 +126,11 @@ const enhancedNavigation: NavigationItem[] = [
   { name: 'Help', href: '/admin/support', icon: HelpCircle, permission: null, feature: null },
 ]
 
-export function SimpleSidebar() {
+interface SimpleSidebarProps {
+  searchQuery?: string
+}
+
+export function SimpleSidebar({ searchQuery = '' }: SimpleSidebarProps) {
   // Debug: Confirm SimpleSidebar is loading
   // console.log('🚀 SimpleSidebar Component Loading - LIVE CHAT ADDED v3.0!', new Date().toISOString());
   // console.log('📋 SimpleSidebar Navigation Items:', enhancedNavigation.map(item => ({
@@ -192,6 +196,50 @@ export function SimpleSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  // Filter navigation items based on search query
+  const filteredNavigation = React.useMemo(() => {
+    if (!searchQuery.trim()) return dynamicNavigation
+
+    const query = searchQuery.toLowerCase()
+    
+    return dynamicNavigation.filter(item => {
+      // Check if main item matches
+      const mainMatches = item.name.toLowerCase().includes(query)
+      
+      // Check if any sub-item matches
+      const subItemMatches = item.subItems?.some(subItem => 
+        subItem.name.toLowerCase().includes(query)
+      )
+      
+      return mainMatches || subItemMatches
+    }).map(item => {
+      // If item has sub-items, filter them too
+      if (item.subItems) {
+        const filteredSubItems = item.subItems.filter(subItem =>
+          subItem.name.toLowerCase().includes(query) ||
+          item.name.toLowerCase().includes(query) // Include all sub-items if parent matches
+        )
+        
+        return {
+          ...item,
+          subItems: filteredSubItems
+        }
+      }
+      
+      return item
+    })
+  }, [dynamicNavigation, searchQuery])
+
+  // Auto-expand items when searching
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const itemsToExpand = filteredNavigation
+        .filter(item => item.isExpandable && item.subItems && item.subItems.length > 0)
+        .map(item => item.name)
+      setExpandedItems(itemsToExpand)
+    }
+  }, [searchQuery, filteredNavigation])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -507,7 +555,7 @@ export function SimpleSidebar() {
             'flex-1 px-0 py-6 space-y-0',
             sidebarCollapsed ? 'overflow-visible' : 'overflow-y-auto custom-scrollbar'
           )}>
-            {dynamicNavigation
+            {filteredNavigation
               .filter(item => {
                 const hasPermissionResult = hasPermissionCheck(item.permission)
                 const hasFeatureResult = checkFeature(item.feature as FeatureKey | null)
@@ -523,6 +571,24 @@ export function SimpleSidebar() {
                 return hasPermissionResult && hasFeatureResult
               })
               .map((item) => renderNavItem(item))}
+            
+            {/* No Results Message */}
+            {searchQuery.trim() && filteredNavigation.filter(item => {
+              const hasPermissionResult = hasPermissionCheck(item.permission)
+              const hasFeatureResult = checkFeature(item.feature as FeatureKey | null)
+              if (item.isExpandable && item.subItems) {
+                const visibleSubItems = item.subItems.filter((subItem: any) =>
+                  hasPermissionCheck(subItem.permission) && checkFeature(subItem.feature as FeatureKey | null)
+                )
+                return hasPermissionResult && hasFeatureResult && visibleSubItems.length > 0
+              }
+              return hasPermissionResult && hasFeatureResult
+            }).length === 0 && (
+              <div className="px-4 py-8 text-center">
+                <p className="text-sm text-gray-500">No menu items found</p>
+                <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
+              </div>
+            )}
           </nav>
 
           {/* Fixed Footer Elements */}

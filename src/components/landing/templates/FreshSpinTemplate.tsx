@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
+import {
   Phone, Mail, Clock, Truck, Sparkles, CheckCircle, Shield, Award, Zap, Star,
   Instagram, Facebook, Twitter, Linkedin, Youtube, MapPin, ChevronLeft, ChevronRight, Package, Shirt, Waves,
   User, LogOut, ShoppingBag, ChevronDown, Settings, Sun, Moon, X
@@ -11,7 +11,6 @@ import { useState, useEffect } from 'react'
 import { ThemeColor } from '../ThemeCustomizer'
 import { Language, getTranslation } from '@/lib/translations'
 import { useAuthStore } from '@/store/authStore'
-import TemplateHeader from '@/components/layout/TemplateHeader'
 import { useLanguage } from '@/hooks/useLanguage'
 
 interface FreshSpinTemplateProps {
@@ -250,7 +249,7 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [translateX, setTranslateX] = useState(0)
-  
+
   const slides = [
     {
       image: '/images/hero-slide-1.jpg',
@@ -324,9 +323,9 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
   return (
     <section className="relative min-h-[420px] flex items-center justify-center overflow-hidden rounded-none lg:rounded-2xl mx-0 lg:mx-8">
       {/* Sliding Background Images Container */}
-      <div 
+      <div
         className={`absolute inset-0 flex ${isTransitioning ? 'transition-transform duration-700 ease-in-out' : ''}`}
-        style={{ 
+        style={{
           width: `${extendedSlides.length * 100}%`,
           transform: `translateX(-${translateX / extendedSlides.length}%)`
         }}
@@ -337,8 +336,8 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
             className="relative flex-shrink-0"
             style={{ width: `${100 / extendedSlides.length}%` }}
           >
-            <img 
-              src={slide.image} 
+            <img
+              src={slide.image}
               alt={slide.title}
               className="w-full h-[420px] object-cover"
             />
@@ -348,13 +347,13 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
       </div>
 
       {/* Navigation Arrows */}
-      <button 
+      <button
         onClick={goToPrev}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-all"
       >
         <ChevronLeft className="w-6 h-6 text-white" />
       </button>
-      <button 
+      <button
         onClick={goToNext}
         className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-all"
       >
@@ -369,7 +368,7 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
         <h1 className="text-4xl md:text-6xl font-bold mb-8 font-serif leading-tight" key={`title-${actualSlideIndex}`}>
           {slides[actualSlideIndex].title}
         </h1>
-        
+
         {/* Tagline Display */}
         {tenantTagline && (
           <p className="text-2xl md:text-3xl font-semibold mb-6 flex items-center justify-center gap-2 text-white animate-fade-in">
@@ -377,9 +376,9 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
             {tenantTagline}
           </p>
         )}
-        
-        <Button 
-          size="lg" 
+
+        <Button
+          size="lg"
           className="bg-white text-gray-900 hover:bg-gray-100 px-10 py-6 text-lg rounded-full font-semibold"
           onClick={onBookNow}
         >
@@ -393,17 +392,16 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
           <button
             key={index}
             onClick={() => goToSlide(index)}
-            className={`h-3 rounded-full transition-all overflow-hidden ${
-              actualSlideIndex === index 
-                ? 'w-10' 
-                : 'w-3 bg-white/50 hover:bg-white/80'
-            }`}
+            className={`h-3 rounded-full transition-all overflow-hidden ${actualSlideIndex === index
+              ? 'w-10'
+              : 'w-3 bg-white/50 hover:bg-white/80'
+              }`}
             style={actualSlideIndex === index ? { backgroundColor: theme.accent } : {}}
           >
             {actualSlideIndex === index && (
-              <div 
+              <div
                 className="h-full bg-white/40 animate-progress"
-                style={{ 
+                style={{
                   animation: 'progress 4s linear infinite',
                 }}
               />
@@ -429,34 +427,34 @@ function HeroCarousel({ onBookNow, t, theme, tenantTagline }: { onBookNow: () =>
 // Testimonials Section with Profile Images and Scrollable Reviews
 function TestimonialsSection({ theme, onBookNow, t }: { theme: ThemeColors; onBookNow: () => void; t: (key: string) => string }) {
   const [activeIndex, setActiveIndex] = useState(2) // Middle one selected by default
-  
+
   const testimonials = [
-    { 
-      name: 'Thomas Willimas', 
+    {
+      name: 'Thomas Willimas',
       role: t('services.washFold'),
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       review: t('about.desc1')
     },
-    { 
-      name: 'Leslie Alexander', 
+    {
+      name: 'Leslie Alexander',
       role: t('services.dryCleaning'),
       image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face',
       review: t('about.desc1')
     },
-    { 
-      name: 'Darlene Robertson', 
+    {
+      name: 'Darlene Robertson',
       role: t('services.steamPress'),
       image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
       review: t('about.desc1')
     },
-    { 
-      name: 'Jennifer Nguyen', 
+    {
+      name: 'Jennifer Nguyen',
       role: t('services.express'),
       image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
       review: t('about.desc1')
     },
-    { 
-      name: 'Alex Deo', 
+    {
+      name: 'Alex Deo',
       role: t('services.steamPress'),
       image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
       review: t('about.desc1')
@@ -464,7 +462,7 @@ function TestimonialsSection({ theme, onBookNow, t }: { theme: ThemeColors; onBo
   ]
 
   return (
-    <section 
+    <section
       className="transition-colors duration-300"
       style={{ backgroundColor: theme.sectionBg, paddingTop: '4rem', paddingBottom: '4rem' }}
     >
@@ -485,18 +483,17 @@ function TestimonialsSection({ theme, onBookNow, t }: { theme: ThemeColors; onBo
               <button
                 key={idx}
                 onClick={() => setActiveIndex(idx)}
-                className={`rounded-full overflow-hidden transition-all duration-300 ${
-                  activeIndex === idx 
-                    ? 'w-16 h-16 ring-2 ring-offset-2 shadow-lg' 
-                    : 'w-14 h-14 opacity-80 hover:opacity-100'
-                }`}
-                style={{ 
+                className={`rounded-full overflow-hidden transition-all duration-300 ${activeIndex === idx
+                  ? 'w-16 h-16 ring-2 ring-offset-2 shadow-lg'
+                  : 'w-14 h-14 opacity-80 hover:opacity-100'
+                  }`}
+                style={{
                   backgroundColor: theme.cardBg,
                   ringColor: activeIndex === idx ? theme.accent : 'transparent',
                 }}
               >
-                <img 
-                  src={testimonial.image} 
+                <img
+                  src={testimonial.image}
                   alt={testimonial.name}
                   className="w-full h-full object-cover"
                 />
@@ -527,10 +524,10 @@ function TestimonialsSection({ theme, onBookNow, t }: { theme: ThemeColors; onBo
 }
 
 // Settings Panel Component for FreshSpin - Only Language selector
-function SettingsPanel({ 
+function SettingsPanel({
   currentLanguage,
   onLanguageChange,
-}: { 
+}: {
   currentLanguage: Language
   onLanguageChange?: (language: Language) => void
 }) {
@@ -560,15 +557,14 @@ function SettingsPanel({
       )}
 
       {/* Settings Panel */}
-      <div 
-        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      <div
+        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-bold text-gray-800">Settings</h2>
-          <button 
+          <button
             onClick={() => setIsOpen(false)}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
           >
@@ -586,11 +582,10 @@ function SettingsPanel({
                 <button
                   key={lang.id}
                   onClick={() => onLanguageChange?.(lang.id as Language)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                    currentLanguage === lang.id 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${currentLanguage === lang.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <span className="text-2xl">{lang.flag}</span>
                   <span className={`font-medium ${currentLanguage === lang.id ? 'text-blue-600' : 'text-gray-700'}`}>
@@ -609,14 +604,14 @@ function SettingsPanel({
   )
 }
 
-export default function FreshSpinTemplate({ 
-  themeColor, 
-  isAuthenticated, 
-  onBookNow, 
-  onColorChange, 
-  onLanguageChange, 
-  onTemplateChange, 
-  currentTemplate, 
+export default function FreshSpinTemplate({
+  themeColor,
+  isAuthenticated,
+  onBookNow,
+  onColorChange,
+  onLanguageChange,
+  onTemplateChange,
+  currentTemplate,
   isTenantPage = false,
   user,
   tenantName,
@@ -633,7 +628,7 @@ export default function FreshSpinTemplate({
 
   // Get computed theme colors based on scheme
   const theme = getThemeColors(themeColor, scheme)
-  
+
   // Check if dark mode
   const isDark = scheme === 'dark' || (scheme === 'auto' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -678,7 +673,7 @@ export default function FreshSpinTemplate({
 
   const whyChooseUs = [
     t('whyChoose.household'),
-    t('whyChoose.corporate'), 
+    t('whyChoose.corporate'),
     t('whyChoose.allItems'),
     t('whyChoose.dryCleanWashFold'),
     t('about.feature3'),
@@ -688,18 +683,15 @@ export default function FreshSpinTemplate({
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
-      {/* Shared Header Component */}
-      <TemplateHeader />
-
       {/* Hero Banner with Carousel */}
-      <div className="pt-20">
+      <div>
         <div className="max-w-screen-2xl mx-auto w-full relative">
           <HeroCarousel onBookNow={onBookNow} t={t} theme={theme} tenantTagline={tenantTagline} />
         </div>
       </div>
 
       {/* Welcome Section - 2 Columns */}
-      <section 
+      <section
         className="pt-16 pb-12 transition-colors duration-300"
         style={{ backgroundColor: theme.sectionBg }}
       >
@@ -709,27 +701,27 @@ export default function FreshSpinTemplate({
             <div className="relative pt-12 pl-4">
               {/* Circular Overlay Image - Top Right of Main Image */}
               <div className="absolute -top-2 right-0 lg:right-12 xl:right-20 z-10">
-                <div 
+                <div
                   className="w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden shadow-2xl"
                   style={{ border: `3px solid ${theme.accent}`, backgroundColor: theme.cardBg }}
                 >
-                  <img 
-                    src="/images/welcome-circle.png" 
+                  <img
+                    src="/images/welcome-circle.png"
                     alt="Fresh Clothes"
                     className="w-full h-full object-cover"
                   />
                 </div>
               </div>
-              
+
               {/* Main Washing Machine Image */}
               <div className="relative">
-                <img 
-                  src="/images/welcome-laundry.jpg" 
+                <img
+                  src="/images/welcome-laundry.jpg"
                   alt="Laundry Service"
                   className="rounded-xl shadow-xl w-full max-w-md"
                 />
                 {/* Years Badge - Bottom Left */}
-                <div 
+                <div
                   className="absolute bottom-4 left-4 text-white p-3 rounded-lg shadow-2xl"
                   style={{ backgroundColor: theme.accent }}
                 >
@@ -764,7 +756,7 @@ export default function FreshSpinTemplate({
                 ))}
               </ul>
 
-              <Button 
+              <Button
                 className="text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: theme.accent }}
                 onClick={onBookNow}
@@ -778,7 +770,7 @@ export default function FreshSpinTemplate({
       </section>
 
       {/* Services Section */}
-      <section 
+      <section
         className="pt-12 pb-20 transition-colors duration-300"
         style={{ backgroundColor: theme.sectionBgAlt }}
       >
@@ -798,7 +790,7 @@ export default function FreshSpinTemplate({
               <div className="flex gap-8 mb-8">
                 {features.map((f, idx) => (
                   <div key={idx} className="text-center">
-                    <div 
+                    <div
                       className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3 border-4 shadow-lg transition-colors duration-300"
                       style={{ backgroundColor: theme.accentLight, borderColor: theme.cardBg }}
                     >
@@ -810,8 +802,8 @@ export default function FreshSpinTemplate({
                 ))}
               </div>
 
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="text-white px-8 py-4 rounded-full font-semibold hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: theme.accent }}
                 onClick={onBookNow}
@@ -825,7 +817,7 @@ export default function FreshSpinTemplate({
               {services.map((service, idx) => {
                 const cardColor = idx % 2 === 0 ? theme.accent : theme.accentSecondary
                 return (
-                  <div 
+                  <div
                     key={idx}
                     className="rounded-2xl p-6 text-center shadow-md hover:shadow-xl transition-all cursor-pointer group"
                     style={{ backgroundColor: theme.cardBg }}
@@ -833,7 +825,7 @@ export default function FreshSpinTemplate({
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = cardColor}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.cardBg}
                   >
-                    <div 
+                    <div
                       className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-white/20 transition-colors"
                       style={{ backgroundColor: theme.accentLight }}
                     >
@@ -851,7 +843,7 @@ export default function FreshSpinTemplate({
 
 
       {/* How It Works */}
-      <section 
+      <section
         className="py-20 transition-colors duration-300"
         style={{ backgroundColor: theme.sectionBg }}
       >
@@ -872,7 +864,7 @@ export default function FreshSpinTemplate({
                 {idx < 3 && (
                   <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5" style={{ backgroundColor: theme.border }}></div>
                 )}
-                <div 
+                <div
                   className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 relative z-10 shadow-lg"
                   style={{ backgroundColor: theme.accent }}
                 >
@@ -888,24 +880,24 @@ export default function FreshSpinTemplate({
       </section>
 
       {/* Quality Cleaning System Section */}
-      <section 
+      <section
         className="py-16 relative overflow-hidden transition-colors duration-300"
         style={{ backgroundColor: theme.sectionBgAlt }}
       >
         {/* Top decorative line */}
         <div className="absolute top-0 left-0 right-0 h-1" style={{ backgroundColor: `${theme.accent}30` }}></div>
-        
+
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 items-end">
             {/* Left - Image with circular background */}
             <div className="relative">
               {/* Circular teal background */}
-              <div 
+              <div
                 className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full -z-10"
                 style={{ backgroundColor: theme.accentLight }}
               ></div>
-              <img 
-                src="/images/cleanstaff.jpg" 
+              <img
+                src="/images/cleanstaff.jpg"
                 alt="Professional Cleaning Staff"
                 className="relative z-10 max-h-[500px] w-auto object-contain"
               />
@@ -919,7 +911,7 @@ export default function FreshSpinTemplate({
               <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight" style={{ color: theme.textPrimary }}>
                 {t('about.title')}
               </h2>
-              
+
               {/* Description with left border */}
               <div className="border-l-4 pl-4 mb-8" style={{ borderColor: theme.accent }}>
                 <p className="text-sm" style={{ color: theme.textSecondary }}>
@@ -945,8 +937,8 @@ export default function FreshSpinTemplate({
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="text-white px-8 py-5 rounded-full font-semibold hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: theme.accent }}
                   onClick={onBookNow}
@@ -954,7 +946,7 @@ export default function FreshSpinTemplate({
                   {t('nav.bookNow')}
                 </Button>
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-12 h-12 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: `${theme.accent}15` }}
                   >
@@ -977,19 +969,19 @@ export default function FreshSpinTemplate({
           <div className="rounded-3xl relative min-h-[280px] flex items-center" style={{ backgroundColor: theme.footerBg }}>
             {/* Left - Image */}
             <div className="absolute left-8 lg:left-20 bottom-0 top-0 flex items-end">
-              <img 
-                src="/images/cta-refer.png" 
+              <img
+                src="/images/cta-refer.png"
                 alt="Refer a Friend"
                 className="h-[300px] w-auto object-contain"
               />
             </div>
-            
+
             {/* Decorative Bubbles */}
             <div className="absolute top-8 left-[260px] lg:left-[320px] w-6 h-6 rounded-full border-2 border-white/30"></div>
             <div className="absolute top-16 left-[300px] lg:left-[360px] w-4 h-4 rounded-full border-2 border-white/20"></div>
             <div className="absolute bottom-16 left-[220px] lg:left-[280px] w-10 h-10 rounded-full border-2 border-white/20"></div>
             <div className="absolute top-20 left-[330px] lg:left-[390px] w-3 h-3 rounded-full bg-white/10"></div>
-            
+
             {/* Right - Content */}
             <div className="w-full py-10 px-8 lg:py-12 lg:px-16 text-center lg:text-left lg:ml-[320px] xl:ml-[380px]">
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 font-serif" style={{ color: theme.footerText }}>
@@ -998,8 +990,8 @@ export default function FreshSpinTemplate({
               <p className="mb-6" style={{ color: `${theme.footerText}99` }}>
                 {t('cta.desc')}
               </p>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="text-white px-8 py-5 rounded-full font-semibold hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: theme.accent }}
                 onClick={onBookNow}
@@ -1028,7 +1020,7 @@ export default function FreshSpinTemplate({
             ></iframe>
 
             {/* Contact Card Overlay */}
-            <div 
+            <div
               className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 p-6 md:p-8 rounded-lg shadow-2xl max-w-sm"
               style={{ backgroundColor: theme.footerBg }}
             >
@@ -1036,10 +1028,10 @@ export default function FreshSpinTemplate({
               <p className="text-sm mb-6" style={{ color: `${theme.footerText}99` }}>
                 Professional laundry services at your doorstep
               </p>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: theme.accent }}
                   >
@@ -1048,7 +1040,7 @@ export default function FreshSpinTemplate({
                   <span className="text-sm" style={{ color: theme.footerText }}>20+ Cities across India</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: theme.accent }}
                   >
@@ -1057,7 +1049,7 @@ export default function FreshSpinTemplate({
                   <span className="text-sm" style={{ color: theme.footerText }}>+91 98765 43210</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: theme.accent }}
                   >
@@ -1086,66 +1078,66 @@ export default function FreshSpinTemplate({
               </p>
               <div className="flex gap-3">
                 {tenantSocialMedia?.facebook && (
-                  <a 
-                    href={tenantSocialMedia.facebook} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.facebook}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" 
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Facebook className="w-5 h-5" />
                   </a>
                 )}
                 {tenantSocialMedia?.twitter && (
-                  <a 
-                    href={tenantSocialMedia.twitter} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.twitter}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" 
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Twitter className="w-5 h-5" />
                   </a>
                 )}
                 {tenantSocialMedia?.linkedin && (
-                  <a 
-                    href={tenantSocialMedia.linkedin} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.linkedin}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" 
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Linkedin className="w-5 h-5" />
                   </a>
                 )}
                 {tenantSocialMedia?.instagram && (
-                  <a 
-                    href={tenantSocialMedia.instagram} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.instagram}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" 
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Instagram className="w-5 h-5" />
                   </a>
                 )}
                 {tenantSocialMedia?.youtube && (
-                  <a 
-                    href={tenantSocialMedia.youtube} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.youtube}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" 
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: `${theme.footerText}20`, color: theme.footerText }}
                   >
                     <Youtube className="w-5 h-5" />
                   </a>
                 )}
                 {tenantSocialMedia?.whatsapp && (
-                  <a 
-                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`} 
-                    target="_blank" 
+                  <a
+                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity" 
+                    className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity"
                     style={{ backgroundColor: '#25D366', color: '#ffffff' }}
                   >
                     <Phone className="w-5 h-5" />

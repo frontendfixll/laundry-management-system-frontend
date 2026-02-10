@@ -6,9 +6,9 @@ import { Truck, ChevronDown, Loader2, Phone } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import TemplateHeader from '@/components/layout/TemplateHeader'
 import { ThemeColor, SchemeMode, Language, getThemeColors } from '@/components/layout/SettingsPanel'
 import { translations } from '@/lib/translations'
+import { useTenant } from '@/contexts/TenantContext'
 import BookingModal from '@/components/BookingModal'
 
 interface PriceItem { _id: string; garment: string; dryClean: number; steamPress: number; washFold: number; washIron: number }
@@ -17,7 +17,12 @@ function PricingTable({ theme, t }: { theme: ReturnType<typeof getThemeColors>; 
   const [activeCategory, setActiveCategory] = useState('men')
   const [pricingData, setPricingData] = useState<Record<string, PriceItem[]>>({})
   const [loading, setLoading] = useState(true)
-  const categories = [{ id: 'men', label: t('pricing.categories.men') }, { id: 'women', label: t('pricing.categories.women') }, { id: 'kids', label: t('pricing.categories.kids') }, { id: 'household', label: t('pricing.categories.household') }]
+  const categories = [
+    { id: 'men', label: t('pricing.categories.men') },
+    { id: 'women', label: t('pricing.categories.women') },
+    { id: 'kids', label: t('pricing.categories.kids') },
+    { id: 'household', label: t('pricing.categories.household') }
+  ]
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -79,15 +84,40 @@ function PricingTable({ theme, t }: { theme: ReturnType<typeof getThemeColors>; 
 
 export default function TenantPricingPage() {
   const params = useParams()
-  const tenant = params.tenant as string
+  const tenantSlug = params?.tenant as string
   const router = useRouter()
   const { isAuthenticated } = useAuthStore()
+  const { tenant: tenantData } = useTenant()
+
+  // Get template type - prioritize branding.landingPageTemplate
+  const rawTemplate = tenantData?.landingPageTemplate || 'original'
+  const template = rawTemplate.toLowerCase().replace(/\s+/g, '')
+
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [themeColor, setThemeColor] = useState<ThemeColor>('teal')
   const [scheme, setScheme] = useState<SchemeMode>('light')
   const [language, setLanguage] = useState<Language>('en')
+
   const theme = getThemeColors(themeColor, scheme)
   const t = (key: string) => translations[language]?.[key] || translations['en'][key] || key
+
+  // Map hex colors to theme color names
+  function mapHexToThemeColor(hex?: string): ThemeColor {
+    if (!hex) return 'teal'
+    const lowerHex = hex.toLowerCase()
+    if (lowerHex.includes('14b8a6') || lowerHex.includes('0d9488') || lowerHex.includes('2dd4bf')) return 'teal'
+    if (lowerHex.includes('3b82f6') || lowerHex.includes('2563eb') || lowerHex.includes('60a5fa')) return 'blue'
+    if (lowerHex.includes('8b5cf6') || lowerHex.includes('7c3aed') || lowerHex.includes('a78bfa')) return 'purple'
+    if (lowerHex.includes('f97316') || lowerHex.includes('ea580c') || lowerHex.includes('fb923c')) return 'orange'
+    return 'teal'
+  }
+
+  // Update theme color when tenant data changes
+  useEffect(() => {
+    if (tenantData?.primaryColor) {
+      setThemeColor(mapHexToThemeColor(tenantData.primaryColor))
+    }
+  }, [tenantData])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -107,16 +137,15 @@ export default function TenantPricingPage() {
   }, [])
 
   const handleBookNow = () => {
-    if (!isAuthenticated) { router.push(`/${tenant}?openBooking=true`); return }
+    if (!isAuthenticated) { router.push(`/${tenantSlug}?openBooking=true`); return }
     setShowBookingModal(true)
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: theme.pageBg }}>
-      <TemplateHeader />
-      <BookingModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} onLoginRequired={() => router.push(`/${tenant}`)} />
-      
-      <section className="relative h-[400px] overflow-hidden pt-28">
+    <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
+      <BookingModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} onLoginRequired={() => router.push(`/${tenantSlug}`)} />
+
+      <section className="relative h-[400px] overflow-hidden pt-20">
         <div className="max-w-screen-2xl mx-auto h-full relative">
           <div className="absolute inset-0 mx-0 lg:mx-8 rounded-none lg:rounded-2xl overflow-hidden">
             <video autoPlay loop muted playsInline className="w-full h-full object-cover"><source src="/images/pricing.mp4" type="video/mp4" /></video>

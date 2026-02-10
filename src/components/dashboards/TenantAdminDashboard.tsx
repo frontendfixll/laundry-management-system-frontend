@@ -481,75 +481,83 @@ export function TenantAdminDashboard() {
         {/* Key Metrics - Vibrant Colors */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <PermissionGate permissions={[{ module: 'orders_view', action: 'view' }]}>
-            <div className="group bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-blue-100 text-[10px] font-medium uppercase tracking-wider">Total Orders</p>
-                  <p className="text-xl font-bold mt-0.5">{metrics?.totalOrders.toLocaleString()}</p>
-                  <p className="text-blue-200 text-xs mt-1 flex items-center">
-                    <TrendingUp className="w-3 h-3 mr-1" />
-                    +{metrics?.todayOrders} today
-                  </p>
-                </div>
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                  <ShoppingBag className="w-5 h-5" />
+            <Link href="/admin/orders" className="block">
+              <div className="group bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-blue-100 text-[10px] font-medium uppercase tracking-wider">Total Orders</p>
+                    <p className="text-xl font-bold mt-0.5">{metrics?.totalOrders.toLocaleString()}</p>
+                    <p className="text-blue-200 text-xs mt-1 flex items-center">
+                      <TrendingUp className="w-3 h-3 mr-1" />
+                      +{metrics?.todayOrders} today
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                    <ShoppingBag className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           </PermissionGate>
 
           <PermissionGate permissions={[{ module: 'orders_view', action: 'view' }]}>
-            <div className="group bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-4 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-emerald-100 text-[10px] font-medium uppercase tracking-wider">Monthly Revenue</p>
-                  <p className="text-xl font-bold mt-0.5">₹{metrics?.monthlyRevenue.toLocaleString()}</p>
-                  <p className="text-emerald-200 text-xs mt-1 flex items-center">
-                    <DollarSign className="w-3 h-3 mr-1" />
-                    Avg: ₹{metrics?.averageOrderValue}
-                  </p>
-                </div>
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                  <DollarSign className="w-5 h-5" />
+            <Link href="/admin/payments" className="block">
+              <div className="group bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-4 text-white hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-emerald-100 text-[10px] font-medium uppercase tracking-wider">Monthly Revenue</p>
+                    <p className="text-xl font-bold mt-0.5">₹{metrics?.monthlyRevenue.toLocaleString()}</p>
+                    <p className="text-emerald-200 text-xs mt-1 flex items-center">
+                      <DollarSign className="w-3 h-3 mr-1" />
+                      Avg: ₹{metrics?.averageOrderValue}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           </PermissionGate>
 
           <PermissionGate permissions={[{ module: 'staff_management', action: 'view' }]}>
-            <div className="group bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-purple-100 text-[10px] font-medium uppercase tracking-wider">Active Staff</p>
-                  <p className="text-xl font-bold mt-0.5">{metrics?.activeStaff}</p>
-                  <p className="text-purple-200 text-xs mt-1 flex items-center">
-                    <Users className="w-3 h-3 mr-1" />
-                    {metrics?.totalStaff} total staff
-                  </p>
-                </div>
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                  <Users className="w-5 h-5" />
+            <Link href="/admin/staff" className="block">
+              <div className="group bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-purple-100 text-[10px] font-medium uppercase tracking-wider">Active Staff</p>
+                    <p className="text-xl font-bold mt-0.5">{metrics?.activeStaff}</p>
+                    <p className="text-purple-200 text-xs mt-1 flex items-center">
+                      <Users className="w-3 h-3 mr-1" />
+                      {metrics?.totalStaff} total staff
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                    <Users className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           </PermissionGate>
 
           <PermissionGate permissions={[{ module: 'customer_management', action: 'view' }]}>
-            <div className="group bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-4 text-white hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-amber-100 text-[10px] font-medium uppercase tracking-wider">Rating</p>
-                  <p className="text-xl font-bold mt-0.5">{metrics?.customerSatisfaction}/5</p>
-                  <p className="text-amber-200 text-xs mt-1 flex items-center">
-                    <Star className="w-3 h-3 mr-1 fill-current" />
-                    Excellent rating
-                  </p>
-                </div>
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                  <Star className="w-5 h-5" />
+            <Link href="/admin/analytics" className="block">
+              <div className="group bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-4 text-white hover:from-amber-600 hover:to-amber-700 transition-all duration-300 transform hover:scale-105 shadow hover:shadow-lg cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-amber-100 text-[10px] font-medium uppercase tracking-wider">Total Revenue</p>
+                    <p className="text-xl font-bold mt-0.5">₹{metrics?.totalRevenue.toLocaleString()}</p>
+                    <p className="text-amber-200 text-xs mt-1 flex items-center">
+                      <TrendingUp className="w-3 h-3 mr-1" />
+                      +12% this month
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                    <DollarSign className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           </PermissionGate>
         </div>
 

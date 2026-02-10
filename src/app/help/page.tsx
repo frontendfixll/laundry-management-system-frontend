@@ -2,10 +2,10 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
-  Sparkles, 
-  Phone, 
-  Mail, 
+import {
+  Sparkles,
+  Phone,
+  Mail,
   MessageCircle,
   Clock,
   MapPin,
@@ -48,29 +48,27 @@ function FAQItem({ question, answer, isOpen, onToggle, primaryColor, isDark }: {
       <button
         onClick={onToggle}
         className={`w-full px-8 py-5 text-left flex items-center justify-between transition-colors duration-200`}
-        style={{ 
-          backgroundColor: isOpen 
+        style={{
+          backgroundColor: isOpen
             ? isDark ? primaryColor : '#f3f4f6'
-            : isDark 
-              ? '#1f2937' 
+            : isDark
+              ? '#1f2937'
               : '#f3f4f6'
         }}
       >
-        <h4 className={`text-base font-medium pr-4 ${
-          isOpen 
-            ? isDark ? 'text-white' : 'text-gray-800'
-            : isDark 
-              ? 'text-white' 
-              : 'text-gray-800'
-        }`}>{question}</h4>
+        <h4 className={`text-base font-medium pr-4 ${isOpen
+          ? isDark ? 'text-white' : 'text-gray-800'
+          : isDark
+            ? 'text-white'
+            : 'text-gray-800'
+          }`}>{question}</h4>
         <div className="flex-shrink-0">
-          <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${
-            isOpen 
-              ? isDark ? 'text-white' : 'text-gray-600'
-              : isDark 
-                ? 'text-white' 
-                : 'text-gray-600'
-          } ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${isOpen
+            ? isDark ? 'text-white' : 'text-gray-600'
+            : isDark
+              ? 'text-white'
+              : 'text-gray-600'
+            } ${isOpen ? 'rotate-180' : ''}`} />
         </div>
       </button>
       <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
@@ -82,15 +80,15 @@ function FAQItem({ question, answer, isOpen, onToggle, primaryColor, isDark }: {
   )
 }
 
-export default function HelpPage() {
+export default function HelpPage({ showHeader = true }: { showHeader?: boolean }) {
   const { isAuthenticated, user } = useAuthStore()
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [activeCategory, setActiveCategory] = useState('general')
   const [themeColor, setThemeColor] = useState<ThemeColor>('teal')
   const [scheme, setScheme] = useState<SchemeMode>('light')
-  
+
   // Use language hook for reactive translations
-  const { language, t } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
 
   // Get computed theme colors based on scheme
   const theme = getThemeColors(themeColor, scheme)
@@ -258,7 +256,7 @@ export default function HelpPage() {
   ]
 
   // Calculate top padding based on template
-  const topPadding = 'pt-8'
+  const topPadding = 'pt-20'
 
   // Dark mode classes
   const isDark = scheme === 'dark'
@@ -270,34 +268,34 @@ export default function HelpPage() {
 
   return (
     <div className={`min-h-screen ${bgClass}`}>
-      <TemplateHeader />
-      
+      {showHeader && <TemplateHeader />}
+
       {/* Hero Section */}
       <section className={`relative ${topPadding} pb-20 overflow-hidden min-h-[400px]`}>
         <div className="max-w-screen-2xl mx-auto relative h-full">
           {/* Background Image - Contained */}
-          <div 
+          <div
             className="absolute inset-0 mx-0 lg:mx-8 rounded-none lg:rounded-2xl overflow-hidden bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: "url('https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=1920&q=80')" }}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-transparent"></div>
           </div>
-          
+
           <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="max-w-xl pt-8 lg:ml-8">
-              <div 
+              <div
                 className="inline-flex items-center gap-2 backdrop-blur-sm px-4 py-2 rounded-full text-sm mb-4"
-                style={{ backgroundColor: `${theme.primaryHex}33`, color: theme.primaryHex }}
+                style={{ backgroundColor: `${theme.accent}33`, color: theme.accent }}
               >
                 <Headphones className="w-4 h-4" />
                 <span>{t('help.hero.badge')}</span>
               </div>
-              
+
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                 {t('help.hero.title')}
               </h1>
-              
-              <p className="text-lg text-gray-300 mb-6">
+
+              <p className="text-lg text-gray-100 mb-6">
                 {t('help.hero.subtitle')}
               </p>
 
@@ -328,29 +326,28 @@ export default function HelpPage() {
             {quickHelpCards.map((card, index) => (
               <Link key={index} href={card.link}>
                 <div className={`rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border group cursor-pointer h-full flex flex-col ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                  <div 
-                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
-                      isDark ? 'shadow-lg' : 'shadow-md'
-                    }`}
-                    style={isDark ? { 
-                      background: `linear-gradient(135deg, ${theme.primaryHex}, ${theme.secondaryHex})`,
-                      boxShadow: `0 4px 14px ${theme.primaryHex}40`
+                  <div
+                    className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${isDark ? 'shadow-lg' : 'shadow-md'
+                      }`}
+                    style={isDark ? {
+                      background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentSecondary})`,
+                      boxShadow: `0 4px 14px ${theme.accent}40`
                     } : {
-                      backgroundColor: theme.light,
-                      border: `2px solid ${theme.primaryHex}`
+                      backgroundColor: theme.accentLight,
+                      border: `2px solid ${theme.accent}`
                     }}
                   >
-                    <card.icon 
+                    <card.icon
                       className={`w-7 h-7 ${isDark ? 'text-white' : ''}`}
                       strokeWidth={2.5}
-                      style={!isDark ? { color: theme.primaryHex } : {}}
+                      style={!isDark ? { color: theme.accent } : {}}
                     />
                   </div>
                   <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>{card.title}</h3>
                   <p className={`text-sm mb-3 flex-grow ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{card.description}</p>
-                  <div 
+                  <div
                     className="flex items-center text-sm font-medium group-hover:gap-2 transition-all"
-                    style={{ color: theme.primaryHex }}
+                    style={{ color: theme.accent }}
                   >
                     <span>{t('help.quickHelp.getStarted')}</span>
                     <ArrowRight className="w-4 h-4 ml-1" />
@@ -366,9 +363,9 @@ export default function HelpPage() {
       <section className={`py-20 ${isDark ? 'bg-gray-900' : ''}`}>
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 max-w-screen-2xl">
           <div className="text-center mb-12">
-            <div 
+            <div
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-              style={{ backgroundColor: isDark ? `${theme.primaryHex}33` : theme.light, color: theme.primaryHex }}
+              style={{ backgroundColor: isDark ? `${theme.accent}33` : theme.accentLight, color: theme.accent }}
             >
               <MessageCircle className="w-4 h-4" />
               <span>{t('help.contact.badge')}</span>
@@ -383,85 +380,85 @@ export default function HelpPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Phone */}
-            <div 
+            <div
               className={`rounded-2xl p-8 text-center border hover:shadow-lg transition-all ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
-              style={{ background: isDark ? `linear-gradient(to bottom right, ${theme.primaryHex}22, transparent)` : `linear-gradient(to bottom right, ${theme.light}, white)` }}
+              style={{ background: isDark ? `linear-gradient(to bottom right, ${theme.accent}22, transparent)` : `linear-gradient(to bottom right, ${theme.accentLight}, white)` }}
             >
-              <div 
+              <div
                 className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 ${isDark ? 'shadow-lg' : 'shadow-md'}`}
-                style={isDark ? { 
-                  background: `linear-gradient(135deg, ${theme.primaryHex}, ${theme.secondaryHex})`,
-                  boxShadow: `0 4px 14px ${theme.primaryHex}40`
+                style={isDark ? {
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentSecondary})`,
+                  boxShadow: `0 4px 14px ${theme.accent}40`
                 } : {
-                  backgroundColor: theme.light,
-                  border: `2px solid ${theme.primaryHex}`
+                  backgroundColor: theme.accentLight,
+                  border: `2px solid ${theme.accent}`
                 }}
               >
-                <Phone 
+                <Phone
                   className={`w-8 h-8 ${isDark ? 'text-white' : ''}`}
                   strokeWidth={2}
-                  style={!isDark ? { color: theme.primaryHex } : {}}
+                  style={!isDark ? { color: theme.accent } : {}}
                 />
               </div>
               <h3 className={`text-xl font-semibold mb-2 ${textClass}`}>{t('help.contact.callUs')}</h3>
               <p className={`mb-4 ${textMutedClass}`}>{t('help.contact.callUsDesc')}</p>
-              <a href="tel:+911234567890" className="font-semibold text-lg hover:opacity-80" style={{ color: theme.primaryHex }}>
+              <a href="tel:+911234567890" className="font-semibold text-lg hover:opacity-80" style={{ color: theme.accent }}>
                 +91 123 456 7890
               </a>
             </div>
 
             {/* Email */}
-            <div 
+            <div
               className={`rounded-2xl p-8 text-center border hover:shadow-lg transition-all ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
-              style={{ background: isDark ? `linear-gradient(to bottom right, ${theme.primaryHex}22, transparent)` : `linear-gradient(to bottom right, ${theme.light}, white)` }}
+              style={{ background: isDark ? `linear-gradient(to bottom right, ${theme.accent}22, transparent)` : `linear-gradient(to bottom right, ${theme.accentLight}, white)` }}
             >
-              <div 
+              <div
                 className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 ${isDark ? 'shadow-lg' : 'shadow-md'}`}
-                style={isDark ? { 
-                  background: `linear-gradient(135deg, ${theme.primaryHex}, ${theme.secondaryHex})`,
-                  boxShadow: `0 4px 14px ${theme.primaryHex}40`
+                style={isDark ? {
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentSecondary})`,
+                  boxShadow: `0 4px 14px ${theme.accent}40`
                 } : {
-                  backgroundColor: theme.light,
-                  border: `2px solid ${theme.primaryHex}`
+                  backgroundColor: theme.accentLight,
+                  border: `2px solid ${theme.accent}`
                 }}
               >
-                <Mail 
+                <Mail
                   className={`w-8 h-8 ${isDark ? 'text-white' : ''}`}
                   strokeWidth={2}
-                  style={!isDark ? { color: theme.primaryHex } : {}}
+                  style={!isDark ? { color: theme.accent } : {}}
                 />
               </div>
               <h3 className={`text-xl font-semibold mb-2 ${textClass}`}>{t('help.contact.emailUs')}</h3>
               <p className={`mb-4 ${textMutedClass}`}>{t('help.contact.emailUsDesc')}</p>
-              <a href="mailto:support@LaundryLobby.com" className="font-semibold text-lg hover:opacity-80" style={{ color: theme.primaryHex }}>
+              <a href="mailto:support@LaundryLobby.com" className="font-semibold text-lg hover:opacity-80" style={{ color: theme.accent }}>
                 support@LaundryLobby.com
               </a>
             </div>
 
             {/* WhatsApp */}
-            <div 
+            <div
               className={`rounded-2xl p-8 text-center border hover:shadow-lg transition-all ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
-              style={{ background: isDark ? `linear-gradient(to bottom right, ${theme.primaryHex}22, transparent)` : `linear-gradient(to bottom right, ${theme.light}, white)` }}
+              style={{ background: isDark ? `linear-gradient(to bottom right, ${theme.accent}22, transparent)` : `linear-gradient(to bottom right, ${theme.accentLight}, white)` }}
             >
-              <div 
+              <div
                 className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 ${isDark ? 'shadow-lg' : 'shadow-md'}`}
-                style={isDark ? { 
-                  background: `linear-gradient(135deg, ${theme.primaryHex}, ${theme.secondaryHex})`,
-                  boxShadow: `0 4px 14px ${theme.primaryHex}40`
+                style={isDark ? {
+                  background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentSecondary})`,
+                  boxShadow: `0 4px 14px ${theme.accent}40`
                 } : {
-                  backgroundColor: theme.light,
-                  border: `2px solid ${theme.primaryHex}`
+                  backgroundColor: theme.accentLight,
+                  border: `2px solid ${theme.accent}`
                 }}
               >
-                <MessageCircle 
+                <MessageCircle
                   className={`w-8 h-8 ${isDark ? 'text-white' : ''}`}
                   strokeWidth={2}
-                  style={!isDark ? { color: theme.primaryHex } : {}}
+                  style={!isDark ? { color: theme.accent } : {}}
                 />
               </div>
               <h3 className={`text-xl font-semibold mb-2 ${textClass}`}>{t('help.contact.whatsapp')}</h3>
               <p className={`mb-4 ${textMutedClass}`}>{t('help.contact.whatsappDesc')}</p>
-              <a href="https://wa.me/911234567890" target="_blank" rel="noopener noreferrer" className="font-semibold text-lg hover:opacity-80" style={{ color: theme.primaryHex }}>
+              <a href="https://wa.me/911234567890" target="_blank" rel="noopener noreferrer" className="font-semibold text-lg hover:opacity-80" style={{ color: theme.accent }}>
                 {t('help.contact.chatNow')}
               </a>
             </div>
@@ -473,9 +470,9 @@ export default function HelpPage() {
       <section className={`py-20 ${sectionBgClass}`}>
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 max-w-screen-2xl">
           <div className="text-center mb-12">
-            <div 
+            <div
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-4"
-              style={{ backgroundColor: isDark ? `${theme.primaryHex}33` : theme.light, color: theme.primaryHex }}
+              style={{ backgroundColor: isDark ? `${theme.accent}33` : theme.accentLight, color: theme.accent }}
             >
               <HelpCircle className="w-4 h-4" />
               <span>{t('help.faq.badge')}</span>
@@ -497,23 +494,22 @@ export default function HelpPage() {
                   setActiveCategory(tab.id)
                   setOpenFAQ(null)
                 }}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg border-2 ${
-                  activeCategory === tab.id
-                    ? isDark 
-                      ? 'text-white border-transparent'
-                      : 'border-transparent'
-                    : isDark 
-                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-gray-600' 
-                      : 'bg-white text-gray-600 hover:bg-gray-100 border-gray-200'
-                }`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg border-2 ${activeCategory === tab.id
+                  ? isDark
+                    ? 'text-white border-transparent'
+                    : 'border-transparent'
+                  : isDark
+                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 border-gray-600'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border-gray-200'
+                  }`}
                 style={activeCategory === tab.id ? (
-                  isDark 
-                    ? { background: `linear-gradient(135deg, ${theme.primaryHex}, ${theme.secondaryHex})` }
-                    : { 
-                        backgroundColor: theme.light,
-                        borderColor: theme.primaryHex,
-                        color: theme.primaryHex
-                      }
+                  isDark
+                    ? { background: `linear-gradient(135deg, ${theme.accent}, ${theme.accentSecondary})` }
+                    : {
+                      backgroundColor: theme.accentLight,
+                      borderColor: theme.accent,
+                      color: theme.accent
+                    }
                 ) : {}}
               >
                 <tab.icon className="w-5 h-5" />
@@ -531,7 +527,7 @@ export default function HelpPage() {
                 answer={faq.answer}
                 isOpen={openFAQ === index}
                 onToggle={() => toggleFAQ(index)}
-                primaryColor={theme.primaryHex}
+                primaryColor={theme.accent}
                 isDark={isDark}
               />
             ))}
@@ -544,9 +540,9 @@ export default function HelpPage() {
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 max-w-screen-2xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ background: `linear-gradient(to bottom right, ${theme.primaryHex}, ${theme.secondaryHex})` }}
+                style={{ background: `linear-gradient(to bottom right, ${theme.accent}, ${theme.accentSecondary})` }}
               >
                 <Sparkles className="w-6 h-6 text-white" />
               </div>

@@ -2,14 +2,13 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
+import {
   Truck, Clock, Star, Phone, ArrowRight, Sparkles, Package, ChevronRight, Shield, Award, Zap, CheckCircle, Mail, Instagram, Facebook, Twitter, Linkedin, Youtube, MapPin, ChevronLeft, Shirt, Play, Users, Building2, Droplets, Wind, ArrowDown, Heart, Leaf, Timer, BadgeCheck, ChevronDown, User, LogOut, ShoppingBag, Menu, X, Settings, Sun, Moon, Monitor, RotateCcw
 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { ThemeColor } from '../ThemeCustomizer'
 import { Language, getTranslation } from '@/lib/translations'
 import { useAuthStore } from '@/store/authStore'
-import TemplateHeader from '@/components/layout/TemplateHeader'
 import { useLanguage } from '@/hooks/useLanguage'
 
 interface MinimalTemplateProps {
@@ -226,7 +225,7 @@ const getThemeColors = (colorName: ThemeColor, scheme: SchemeMode): ThemeColors 
 }
 
 // Settings Panel Component
-function SettingsPanel({ 
+function SettingsPanel({
   themeColor,
   currentLanguage,
   currentScheme,
@@ -235,7 +234,7 @@ function SettingsPanel({
   onLanguageChange,
   onSchemeChange,
   onTemplateChange
-}: { 
+}: {
   themeColor: ThemeColor
   currentLanguage: Language
   currentScheme: SchemeMode
@@ -283,15 +282,14 @@ function SettingsPanel({
       )}
 
       {/* Settings Panel */}
-      <div 
-        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      <div
+        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-bold text-gray-800">{getTranslation(currentLanguage, 'original.settings.title')}</h2>
-          <button 
+          <button
             onClick={() => setIsOpen(false)}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
           >
@@ -307,33 +305,30 @@ function SettingsPanel({
             <div className="flex gap-2">
               <button
                 onClick={() => onSchemeChange?.('auto')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${
-                  currentScheme === 'auto' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
-                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${currentScheme === 'auto'
+                  ? 'border-blue-500 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                  }`}
               >
                 <Monitor className="w-4 h-4" />
                 <span className="text-sm font-medium">Auto</span>
               </button>
               <button
                 onClick={() => onSchemeChange?.('dark')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${
-                  currentScheme === 'dark' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
-                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${currentScheme === 'dark'
+                  ? 'border-blue-500 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                  }`}
               >
                 <Moon className="w-4 h-4" />
                 <span className="text-sm font-medium">Dark</span>
               </button>
               <button
                 onClick={() => onSchemeChange?.('light')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${
-                  currentScheme === 'light' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
-                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${currentScheme === 'light'
+                  ? 'border-blue-500 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                  }`}
               >
                 <Sun className="w-4 h-4" />
                 <span className="text-sm font-medium">Light</span>
@@ -345,7 +340,7 @@ function SettingsPanel({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-700">{getTranslation(currentLanguage, 'original.settings.colorCustomizer')}</h3>
-              <button 
+              <button
                 onClick={resetColors}
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Reset to default"
@@ -357,9 +352,8 @@ function SettingsPanel({
               {/* Teal */}
               <button
                 onClick={() => onColorChange?.('teal')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'teal' ? 'border-gray-800 ring-2 ring-offset-2 ring-teal-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'teal' ? 'border-gray-800 ring-2 ring-offset-2 ring-teal-400' : 'border-gray-200'
+                  }`}
                 title="Teal Theme"
               >
                 <div className="w-full h-full flex">
@@ -367,13 +361,12 @@ function SettingsPanel({
                   <div className="w-1/2 h-full bg-cyan-400" />
                 </div>
               </button>
-              
+
               {/* Blue */}
               <button
                 onClick={() => onColorChange?.('blue')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'blue' ? 'border-gray-800 ring-2 ring-offset-2 ring-blue-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'blue' ? 'border-gray-800 ring-2 ring-offset-2 ring-blue-400' : 'border-gray-200'
+                  }`}
                 title="Blue Theme"
               >
                 <div className="w-full h-full flex">
@@ -381,13 +374,12 @@ function SettingsPanel({
                   <div className="w-1/2 h-full bg-indigo-500" />
                 </div>
               </button>
-              
+
               {/* Purple */}
               <button
                 onClick={() => onColorChange?.('purple')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'purple' ? 'border-gray-800 ring-2 ring-offset-2 ring-purple-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'purple' ? 'border-gray-800 ring-2 ring-offset-2 ring-purple-400' : 'border-gray-200'
+                  }`}
                 title="Purple Theme"
               >
                 <div className="w-full h-full flex">
@@ -395,13 +387,12 @@ function SettingsPanel({
                   <div className="w-1/2 h-full bg-pink-500" />
                 </div>
               </button>
-              
+
               {/* Orange */}
               <button
                 onClick={() => onColorChange?.('orange')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'orange' ? 'border-gray-800 ring-2 ring-offset-2 ring-orange-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'orange' ? 'border-gray-800 ring-2 ring-offset-2 ring-orange-400' : 'border-gray-200'
+                  }`}
                 title="Orange Theme"
               >
                 <div className="w-full h-full flex">
@@ -410,7 +401,7 @@ function SettingsPanel({
                 </div>
               </button>
             </div>
-            
+
             {/* Current Color Label */}
             <p className="text-xs text-gray-500 mt-2 capitalize">
               Current: {themeColor}
@@ -425,11 +416,10 @@ function SettingsPanel({
                 <button
                   key={lang.id}
                   onClick={() => onLanguageChange?.(lang.id as Language)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                    currentLanguage === lang.id 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${currentLanguage === lang.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <span className="text-2xl">{lang.flag}</span>
                   <span className={`font-medium ${currentLanguage === lang.id ? 'text-blue-600' : 'text-gray-700'}`}>
@@ -451,11 +441,10 @@ function SettingsPanel({
                 <button
                   key={template.id}
                   onClick={() => onTemplateChange?.(template.id)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                    currentTemplate === template.id 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${currentTemplate === template.id
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                    }`}
                 >
                   <span className={`font-medium ${currentTemplate === template.id ? 'text-blue-600' : 'text-gray-700'}`}>
                     {template.name}
@@ -474,13 +463,13 @@ function SettingsPanel({
   )
 }
 
-export default function MinimalTemplate({ 
-  themeColor, 
-  isAuthenticated, 
-  onBookNow, 
-  onColorChange, 
-  onLanguageChange, 
-  onTemplateChange, 
+export default function MinimalTemplate({
+  themeColor,
+  isAuthenticated,
+  onBookNow,
+  onColorChange,
+  onLanguageChange,
+  onTemplateChange,
   currentTemplate,
   user,
   isTenantPage,
@@ -501,7 +490,7 @@ export default function MinimalTemplate({
 
   // Get computed theme colors based on scheme
   const theme = getThemeColors(themeColor, scheme)
-  
+
   // Check if dark mode
   const isDark = scheme === 'dark' || (scheme === 'auto' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -558,7 +547,7 @@ export default function MinimalTemplate({
 
   const nextFeature = () => setActiveFeature((prev) => (prev + 1) % features.length)
   const prevFeature = () => setActiveFeature((prev) => (prev - 1 + features.length) % features.length)
-  
+
   // Get indices for the 3 visible boxes
   const getVisibleIndices = () => {
     const left = activeFeature
@@ -644,24 +633,24 @@ export default function MinimalTemplate({
   ]
 
   const whyLoveUs = [
-    { 
-      icon: Truck, 
-      title: t('minimal.whyLove.freePickup'), 
+    {
+      icon: Truck,
+      title: t('minimal.whyLove.freePickup'),
       desc: t('minimal.whyLove.freePickupDesc'),
     },
-    { 
-      icon: Timer, 
-      title: t('minimal.whyLove.turnaround'), 
+    {
+      icon: Timer,
+      title: t('minimal.whyLove.turnaround'),
       desc: t('minimal.whyLove.turnaroundDesc'),
     },
-    { 
-      icon: Shield, 
-      title: t('minimal.whyLove.quality'), 
+    {
+      icon: Shield,
+      title: t('minimal.whyLove.quality'),
       desc: t('minimal.whyLove.qualityDesc'),
     },
-    { 
-      icon: Leaf, 
-      title: t('minimal.whyLove.eco'), 
+    {
+      icon: Leaf,
+      title: t('minimal.whyLove.eco'),
       desc: t('minimal.whyLove.ecoDesc'),
     },
   ]
@@ -676,27 +665,24 @@ export default function MinimalTemplate({
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
-      {/* Shared Header Component */}
-      <TemplateHeader />
-
       {/* Hero Section - Increased Height for Full Video */}
-      <section className="relative h-[75vh] min-h-[500px] max-h-[700px] flex items-center overflow-hidden pt-16">
+      <section className="relative h-[75vh] min-h-[500px] max-h-[700px] flex items-center overflow-hidden">
         <div className="max-w-screen-2xl mx-auto w-full relative">
           {/* Video Background - Contained */}
           <div className="absolute inset-0 z-0 rounded-none lg:rounded-2xl overflow-hidden mx-0 lg:mx-8">
-            <video 
-              autoPlay 
-              muted 
-              loop 
+            <video
+              autoPlay
+              muted
+              loop
               playsInline
               className="w-full h-full object-cover"
             >
               <source src="/images/landingpage2.mp4" type="video/mp4" />
             </video>
             {/* Light Overlay - Only on right side for text readability */}
-            <div 
+            <div
               className="absolute inset-0"
-              style={{ 
+              style={{
                 background: `linear-gradient(270deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.6) 35%, rgba(255,255,255,0.1) 60%, transparent 100%)`
               }}
             />
@@ -706,16 +692,16 @@ export default function MinimalTemplate({
           <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-14 pb-8 h-[75vh] min-h-[500px] max-h-[700px] flex items-center">
             <div className="max-w-md ml-auto">
               {/* Badge */}
-              <div 
+              <div
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium mb-3"
                 style={{ backgroundColor: `${theme.accent}15`, color: theme.accent }}
               >
                 <span className="relative flex h-1.5 w-1.5">
-                  <span 
+                  <span
                     className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
                     style={{ backgroundColor: theme.accent }}
                   />
-                  <span 
+                  <span
                     className="relative inline-flex rounded-full h-1.5 w-1.5"
                     style={{ backgroundColor: theme.accent }}
                   />
@@ -724,10 +710,10 @@ export default function MinimalTemplate({
               </div>
 
               {/* Main Heading */}
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-3 text-gray-900">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-3" style={{ color: theme.textPrimary }}>
                 {t('minimal.hero.title')}
               </h1>
-              
+
               {/* Tagline Display */}
               {tenantTagline && (
                 <p className="text-xl md:text-2xl font-semibold mb-3 flex items-center gap-2" style={{ color: theme.accent }}>
@@ -735,15 +721,15 @@ export default function MinimalTemplate({
                   {tenantTagline}
                 </p>
               )}
-              
+
               {/* Subheading */}
-              <p className="text-sm md:text-base mb-5 leading-relaxed max-w-sm text-gray-600">
+              <p className="text-sm md:text-base mb-5 leading-relaxed max-w-sm" style={{ color: theme.textSecondary }}>
                 {t('minimal.hero.subtitle')}
               </p>
-              
+
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-2">
-                <Button 
+                <Button
                   onClick={onBookNow}
                   className="text-white px-5 py-2.5 text-sm rounded-full font-medium shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 hover:opacity-90"
                   style={{ backgroundColor: theme.accent }}
@@ -752,7 +738,7 @@ export default function MinimalTemplate({
                   <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
                 <Link href="/pricing">
-                  <Button 
+                  <Button
                     variant="outline"
                     className="px-5 py-2.5 text-sm rounded-full font-medium border-2 border-gray-400 hover:border-gray-600 bg-white/50 backdrop-blur-sm text-gray-800"
                   >
@@ -782,8 +768,8 @@ export default function MinimalTemplate({
             {/* All Services Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {allServices.map((service) => (
-                <div 
-                  key={service.id} 
+                <div
+                  key={service.id}
                   className="rounded-2xl p-6 transition-colors duration-300"
                   style={{ backgroundColor: theme.sectionBg }}
                 >
@@ -809,8 +795,8 @@ export default function MinimalTemplate({
 
             {/* View All Link */}
             <div className="text-center mt-10">
-              <Link 
-                href="/pricing" 
+              <Link
+                href="/pricing"
                 className="inline-flex items-center gap-2 font-medium hover:gap-3 transition-all"
                 style={{ color: theme.accent }}
               >
@@ -835,7 +821,7 @@ export default function MinimalTemplate({
           <div className="max-w-7xl mx-auto">
             {/* 3-Box Layout - Asymmetric sizes */}
             <div className="flex gap-6 items-start">
-              
+
               {/* Box 1 - Large Active Box (Left) - 45% width */}
               <div className="w-full lg:w-[45%] flex-shrink-0">
                 <div className="relative">
@@ -845,7 +831,7 @@ export default function MinimalTemplate({
                       const diff = idx - activeFeature
                       const normalizedDiff = ((diff % features.length) + features.length) % features.length
                       const translateX = normalizedDiff === 0 ? 0 : normalizedDiff === 1 ? 100 : -100
-                      
+
                       return (
                         <div
                           key={idx}
@@ -855,7 +841,7 @@ export default function MinimalTemplate({
                             opacity: normalizedDiff === 0 ? 1 : 0,
                           }}
                         >
-                          <img 
+                          <img
                             src={feature.image}
                             alt={feature.title}
                             className="w-full h-full object-cover"
@@ -864,17 +850,16 @@ export default function MinimalTemplate({
                       )
                     })}
                   </div>
-                  
+
                   {/* Content - Fixed height container */}
                   <div className="relative h-[160px] overflow-hidden">
                     {features.map((feature, idx) => (
                       <div
                         key={idx}
-                        className={`absolute inset-0 transition-all duration-500 ease-out ${
-                          idx === activeFeature 
-                            ? 'opacity-100 translate-y-0' 
-                            : 'opacity-0 translate-y-4 pointer-events-none'
-                        }`}
+                        className={`absolute inset-0 transition-all duration-500 ease-out ${idx === activeFeature
+                          ? 'opacity-100 translate-y-0'
+                          : 'opacity-0 translate-y-4 pointer-events-none'
+                          }`}
                       >
                         <h3 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: theme.textPrimary }}>
                           {feature.title}
@@ -885,9 +870,9 @@ export default function MinimalTemplate({
                       </div>
                     ))}
                   </div>
-                  
+
                   {/* Button - Outside content, fixed position */}
-                  <Button 
+                  <Button
                     onClick={onBookNow}
                     className="text-white px-6 py-3 rounded-full font-medium mt-4 hover:opacity-90 transition-opacity"
                     style={{ backgroundColor: theme.accent }}
@@ -905,7 +890,7 @@ export default function MinimalTemplate({
                     const diff = idx - targetIdx
                     const normalizedDiff = ((diff % features.length) + features.length) % features.length
                     const translateX = normalizedDiff === 0 ? 0 : normalizedDiff === 1 ? 100 : -100
-                    
+
                     return (
                       <div
                         key={idx}
@@ -915,7 +900,7 @@ export default function MinimalTemplate({
                           opacity: normalizedDiff === 0 ? 1 : 0,
                         }}
                       >
-                        <img 
+                        <img
                           src={feature.image}
                           alt={feature.title}
                           className="w-full h-full object-cover"
@@ -937,7 +922,7 @@ export default function MinimalTemplate({
                     const diff = idx - targetIdx
                     const normalizedDiff = ((diff % features.length) + features.length) % features.length
                     const translateX = normalizedDiff === 0 ? 0 : normalizedDiff === 1 ? 100 : -100
-                    
+
                     return (
                       <div
                         key={idx}
@@ -947,7 +932,7 @@ export default function MinimalTemplate({
                           opacity: normalizedDiff === 0 ? 1 : 0,
                         }}
                       >
-                        <img 
+                        <img
                           src={feature.image}
                           alt={feature.title}
                           className="w-full h-full object-cover"
@@ -962,14 +947,14 @@ export default function MinimalTemplate({
 
                 {/* Navigation Arrows - Square buttons */}
                 <div className="flex items-center gap-3 mt-5">
-                  <button 
+                  <button
                     onClick={prevFeature}
                     className="w-10 h-10 rounded-md border-2 flex items-center justify-center hover:opacity-80 transition-all group"
                     style={{ borderColor: theme.border }}
                   >
                     <ChevronLeft className="w-5 h-5" style={{ color: theme.textSecondary }} />
                   </button>
-                  <button 
+                  <button
                     onClick={nextFeature}
                     className="w-10 h-10 rounded-md border-2 flex items-center justify-center hover:opacity-80 transition-all group"
                     style={{ borderColor: theme.border }}
@@ -982,7 +967,7 @@ export default function MinimalTemplate({
 
             {/* Mobile Navigation */}
             <div className="flex lg:hidden items-center justify-center gap-3 mt-8">
-              <button 
+              <button
                 onClick={prevFeature}
                 className="w-10 h-10 rounded-md border-2 flex items-center justify-center hover:opacity-80 transition-all"
                 style={{ borderColor: theme.border }}
@@ -991,14 +976,14 @@ export default function MinimalTemplate({
               </button>
               <div className="flex gap-2">
                 {features.map((_, idx) => (
-                  <div 
+                  <div
                     key={idx}
                     className="w-2 h-2 rounded-full transition-all duration-300"
                     style={{ backgroundColor: idx === activeFeature ? theme.accent : theme.border }}
                   />
                 ))}
               </div>
-              <button 
+              <button
                 onClick={nextFeature}
                 className="w-12 h-12 rounded-full border-2 flex items-center justify-center hover:opacity-80 transition-all"
                 style={{ borderColor: theme.border }}
@@ -1016,7 +1001,7 @@ export default function MinimalTemplate({
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {whyLoveUs.map((item, idx) => (
               <div key={idx} className="text-center">
-                <div 
+                <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
                   style={{ backgroundColor: theme.accentLight }}
                 >
@@ -1045,33 +1030,33 @@ export default function MinimalTemplate({
           <div className="max-w-5xl mx-auto">
             <div className="grid md:grid-cols-3 gap-12">
               {[
-                { 
-                  step: '1', 
-                  title: t('minimal.howItWorks.step1.title'), 
+                {
+                  step: '1',
+                  title: t('minimal.howItWorks.step1.title'),
                   desc: t('minimal.howItWorks.step1.desc'),
                   image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80'
                 },
-                { 
-                  step: '2', 
-                  title: t('minimal.howItWorks.step2.title'), 
+                {
+                  step: '2',
+                  title: t('minimal.howItWorks.step2.title'),
                   desc: t('minimal.howItWorks.step2.desc'),
                   image: 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=400&q=80'
                 },
-                { 
-                  step: '3', 
-                  title: t('minimal.howItWorks.step3.title'), 
+                {
+                  step: '3',
+                  title: t('minimal.howItWorks.step3.title'),
                   desc: t('minimal.howItWorks.step3.desc'),
                   image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80'
                 },
               ].map((item, idx) => (
                 <div key={idx} className="text-center group">
                   <div className="relative mb-6 rounded-2xl overflow-hidden aspect-[4/3]">
-                    <img 
-                      src={item.image} 
+                    <img
+                      src={item.image}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div 
+                    <div
                       className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg"
                       style={{ backgroundColor: theme.accent }}
                     >
@@ -1098,33 +1083,33 @@ export default function MinimalTemplate({
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
-              { 
-                name: 'Priya Sharma', 
+              {
+                name: 'Priya Sharma',
                 role: 'Fashion Designer',
                 review: "I've been using LaundryLobby for 6 months now. The quality is consistently excellent, and the convenience is unmatched. My designer pieces always come back perfect!",
                 image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'
               },
-              { 
-                name: 'Rahul Verma', 
+              {
+                name: 'Rahul Verma',
                 role: 'Business Executive',
                 review: "As a busy professional, I don't have time for laundry. LaundryLobby has been a lifesaver. Pickup and delivery is always on time, and my shirts look brand new.",
                 image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'
               },
-              { 
-                name: 'Anita Desai', 
+              {
+                name: 'Anita Desai',
                 role: 'Working Mom',
                 review: "With two kids and a full-time job, laundry was my biggest headache. LaundryLobby changed that. Now I have more time for what matters - my family.",
                 image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face'
               },
             ].map((item, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="rounded-2xl p-8 shadow-sm transition-colors duration-300"
                 style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.border}` }}
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <img 
-                    src={item.image} 
+                  <img
+                    src={item.image}
                     alt={item.name}
                     className="w-14 h-14 rounded-full object-cover"
                   />
@@ -1149,11 +1134,11 @@ export default function MinimalTemplate({
       <section className="py-20 transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <div 
+            <div
               className="rounded-3xl p-10 md:p-16 text-center transition-colors duration-300"
               style={{ backgroundColor: theme.sectionBgAlt }}
             >
-              <div 
+              <div
                 className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
                 style={{ backgroundColor: theme.accentLight }}
               >
@@ -1165,7 +1150,7 @@ export default function MinimalTemplate({
               <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: theme.textSecondary }}>
                 {t('minimal.guarantee.desc')}
               </p>
-              
+
               <div className="flex flex-wrap justify-center gap-6">
                 {guarantees.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2" style={{ color: theme.textSecondary }}>
@@ -1181,7 +1166,7 @@ export default function MinimalTemplate({
 
       {/* CTA Section */}
       <section className="py-12 px-4" style={{ backgroundColor: theme.pageBg }}>
-        <div 
+        <div
           className="max-w-6xl mx-auto py-12 px-8 text-center"
           style={{ backgroundColor: theme.accent }}
         >
@@ -1192,7 +1177,7 @@ export default function MinimalTemplate({
             {t('minimal.cta.subtitle')}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button 
+            <Button
               size="lg"
               onClick={onBookNow}
               className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-5 text-base rounded-none font-semibold shadow-lg"
@@ -1201,7 +1186,7 @@ export default function MinimalTemplate({
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Link href="https://wa.me/919876543210" target="_blank">
-              <Button 
+              <Button
                 size="lg"
                 className="bg-green-500 hover:bg-green-600 text-white px-8 py-5 text-base rounded-none font-semibold"
               >
@@ -1220,7 +1205,7 @@ export default function MinimalTemplate({
             {/* Brand */}
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <div 
+                <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{ backgroundColor: theme.accent }}
                 >
@@ -1235,9 +1220,9 @@ export default function MinimalTemplate({
               </p>
               <div className="flex gap-4">
                 {tenantSocialMedia?.facebook && (
-                  <a 
-                    href={tenantSocialMedia.facebook} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.facebook}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20` }}
@@ -1246,9 +1231,9 @@ export default function MinimalTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.instagram && (
-                  <a 
-                    href={tenantSocialMedia.instagram} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.instagram}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20` }}
@@ -1257,9 +1242,9 @@ export default function MinimalTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.twitter && (
-                  <a 
-                    href={tenantSocialMedia.twitter} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.twitter}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20` }}
@@ -1268,9 +1253,9 @@ export default function MinimalTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.linkedin && (
-                  <a 
-                    href={tenantSocialMedia.linkedin} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.linkedin}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20` }}
@@ -1279,9 +1264,9 @@ export default function MinimalTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.youtube && (
-                  <a 
-                    href={tenantSocialMedia.youtube} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.youtube}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: `${theme.footerText}20` }}
@@ -1290,9 +1275,9 @@ export default function MinimalTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.whatsapp && (
-                  <a 
-                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`} 
-                    target="_blank" 
+                  <a
+                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: '#25D366' }}

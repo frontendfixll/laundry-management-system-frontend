@@ -27,6 +27,8 @@ interface TenantBranding {
     phone?: string
     whatsapp?: string
   }
+  branches?: any[]
+  tenancyId?: string
 }
 
 interface TenantContextType {
@@ -39,11 +41,11 @@ const TenantContext = createContext<TenantContextType>({
   isTenantPage: false,
 })
 
-export function TenantProvider({ 
-  children, 
+export function TenantProvider({
+  children,
   tenant,
-  isTenantPage = false 
-}: { 
+  isTenantPage = false
+}: {
   children: ReactNode
   tenant?: TenantBranding | null
   isTenantPage?: boolean

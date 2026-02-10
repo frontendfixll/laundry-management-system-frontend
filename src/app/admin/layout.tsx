@@ -20,6 +20,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [sidebarSearchQuery, setSidebarSearchQuery] = useState('')
 
   // Handle responsive behavior
   useEffect(() => {
@@ -38,13 +39,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     <div className="h-screen flex flex-col overflow-hidden bg-gray-50 admin-layout">
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <SimpleSidebar />
+        <SimpleSidebar searchQuery={sidebarSearchQuery} />
 
         {/* Right Side Area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden main-content-area">
           {/* Header - Stays at top */}
           <AdminHeader
             onMenuClick={() => setMobileOpen(true)}
+            onSearchChange={setSidebarSearchQuery}
           />
 
           {/* Page Content - Independent Scroll */}

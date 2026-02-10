@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
+import {
   Phone, Mail, Clock, Truck, Sparkles, CheckCircle, Shield, Award, Zap, Star,
   Instagram, Facebook, Twitter, Linkedin, Youtube, MapPin, ChevronLeft, ChevronRight, Package, Shirt,
   Users, Building2, ArrowRight, Play, User, LogOut, ShoppingBag, ChevronDown,
@@ -241,29 +241,29 @@ const getThemeColors = (colorName: ThemeColor, scheme: SchemeMode): ThemeColors 
 }
 
 const colorClasses = {
-  teal: { 
-    primary: 'bg-teal-500', hover: 'hover:bg-teal-600', text: 'text-teal-500', 
+  teal: {
+    primary: 'bg-teal-500', hover: 'hover:bg-teal-600', text: 'text-teal-500',
     light: 'bg-teal-50', border: 'border-teal-500', gradient: 'from-teal-500 to-cyan-500',
     darkGradient: 'from-teal-600 to-teal-800',
     accent: '#14b8a6', sectionBg: 'bg-teal-50/50', sectionBgAlt: 'bg-teal-100/40',
     testimonialBg: '#e0f2f1', darkBg: '#134e4a', footerBg: '#0f2928'
   },
-  blue: { 
-    primary: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-blue-500', 
+  blue: {
+    primary: 'bg-blue-500', hover: 'hover:bg-blue-600', text: 'text-blue-500',
     light: 'bg-blue-50', border: 'border-blue-500', gradient: 'from-blue-500 to-indigo-500',
     darkGradient: 'from-blue-600 to-blue-800',
     accent: '#3b82f6', sectionBg: 'bg-blue-50/50', sectionBgAlt: 'bg-blue-100/40',
     testimonialBg: '#dbeafe', darkBg: '#1e3a5f', footerBg: '#0f172a'
   },
-  purple: { 
-    primary: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-purple-500', 
+  purple: {
+    primary: 'bg-purple-500', hover: 'hover:bg-purple-600', text: 'text-purple-500',
     light: 'bg-purple-50', border: 'border-purple-500', gradient: 'from-purple-500 to-pink-500',
     darkGradient: 'from-purple-600 to-purple-800',
     accent: '#8b5cf6', sectionBg: 'bg-purple-50/50', sectionBgAlt: 'bg-purple-100/40',
     testimonialBg: '#ede9fe', darkBg: '#3b1f5f', footerBg: '#1e1033'
   },
-  orange: { 
-    primary: 'bg-orange-500', hover: 'hover:bg-orange-600', text: 'text-orange-500', 
+  orange: {
+    primary: 'bg-orange-500', hover: 'hover:bg-orange-600', text: 'text-orange-500',
     light: 'bg-orange-50', border: 'border-orange-500', gradient: 'from-orange-500 to-red-500',
     darkGradient: 'from-orange-600 to-orange-800',
     accent: '#f97316', sectionBg: 'bg-orange-50/50', sectionBgAlt: 'bg-orange-100/40',
@@ -305,43 +305,43 @@ function AnimatedCounter({ end, suffix = '', duration = 2000 }: { end: number; s
 function TestimonialsCarousel({ colors }: { colors: any }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const testimonials = [
-    { 
-      name: 'Thomas Williams', 
+    {
+      name: 'Thomas Williams',
       role: 'Restroom Cleaner',
-      review: 'The best dry clean company ever, they always come on time, very easy to place your order any time in the day, very trusted company. I would recommend digital dry clean for everyone.', 
-      rating: 5, 
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' 
+      review: 'The best dry clean company ever, they always come on time, very easy to place your order any time in the day, very trusted company. I would recommend digital dry clean for everyone.',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
     },
-    { 
-      name: 'Leslie Alexander', 
+    {
+      name: 'Leslie Alexander',
       role: 'Waste Collector',
-      review: 'Excellent service! My clothes always come back fresh and perfectly pressed. The pickup and delivery is so convenient for my busy schedule.', 
-      rating: 5, 
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face' 
+      review: 'Excellent service! My clothes always come back fresh and perfectly pressed. The pickup and delivery is so convenient for my busy schedule.',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face'
     },
-    { 
-      name: 'Darlene Robertson', 
+    {
+      name: 'Darlene Robertson',
       role: 'Laundry Attendant',
-      review: 'I have been using this service for 2 years now. Their quality is consistent and prices are very reasonable. Highly recommended!', 
-      rating: 5, 
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' 
+      review: 'I have been using this service for 2 years now. Their quality is consistent and prices are very reasonable. Highly recommended!',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
     },
-    { 
-      name: 'Jennifer Nguyen', 
+    {
+      name: 'Jennifer Nguyen',
       role: 'Commercial Cleaner',
-      review: 'Amazing experience every time! They handle my delicate fabrics with such care. The app makes booking so easy.', 
-      rating: 5, 
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face' 
+      review: 'Amazing experience every time! They handle my delicate fabrics with such care. The app makes booking so easy.',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
     },
-    { 
-      name: 'Alex Deo', 
+    {
+      name: 'Alex Deo',
       role: 'Laundry Attendant',
-      review: 'Professional service with great attention to detail. My suits always look brand new after their dry cleaning.', 
-      rating: 5, 
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face' 
+      review: 'Professional service with great attention to detail. My suits always look brand new after their dry cleaning.',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face'
     },
   ]
-  
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentIndex((prev) => (prev + 1) % testimonials.length), 5000)
     return () => clearInterval(timer)
@@ -355,12 +355,11 @@ function TestimonialsCarousel({ colors }: { colors: any }) {
           <button
             key={i}
             onClick={() => setCurrentIndex(i)}
-            className={`rounded-full overflow-hidden transition-all duration-300 ${
-              currentIndex === i 
-                ? 'w-16 h-16 ring-2 ring-offset-2 shadow-lg' 
+            className={`rounded-full overflow-hidden transition-all duration-300 ${currentIndex === i
+                ? 'w-16 h-16 ring-2 ring-offset-2 shadow-lg'
                 : 'w-12 h-12 opacity-60 hover:opacity-100'
-            }`}
-            style={{ 
+              }`}
+            style={{
               ringColor: currentIndex === i ? colors.accent || '#3b82f6' : 'transparent',
             }}
           >
@@ -368,7 +367,7 @@ function TestimonialsCarousel({ colors }: { colors: any }) {
           </button>
         ))}
       </div>
-      
+
       {/* Testimonial Content */}
       <div className="text-center bg-gray-50 rounded-2xl p-8 md:p-12">
         <p className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed">
@@ -388,11 +387,10 @@ function TestimonialsCarousel({ colors }: { colors: any }) {
           <button
             key={i}
             onClick={() => setCurrentIndex(i)}
-            className={`h-2 rounded-full transition-all ${
-              currentIndex === i 
-                ? `w-8 ${colors.primary}` 
+            className={`h-2 rounded-full transition-all ${currentIndex === i
+                ? `w-8 ${colors.primary}`
                 : 'w-2 bg-gray-300 hover:bg-gray-400'
-            }`}
+              }`}
           />
         ))}
       </div>
@@ -401,8 +399,8 @@ function TestimonialsCarousel({ colors }: { colors: any }) {
 }
 
 // Settings Panel Component
-function SettingsPanel({ 
-  colors, 
+function SettingsPanel({
+  colors,
   themeColor,
   currentLanguage,
   currentScheme,
@@ -411,7 +409,7 @@ function SettingsPanel({
   onSchemeChange,
   onTemplateChange,
   currentTemplate
-}: { 
+}: {
   colors: any
   themeColor: ThemeColor
   currentLanguage: Language
@@ -460,15 +458,14 @@ function SettingsPanel({
       )}
 
       {/* Settings Panel */}
-      <div 
-        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      <div
+        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-xl font-bold text-gray-800">Settings</h2>
-          <button 
+          <button
             onClick={() => setIsOpen(false)}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
           >
@@ -484,33 +481,30 @@ function SettingsPanel({
             <div className="flex gap-2">
               <button
                 onClick={() => onSchemeChange?.('auto')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${
-                  currentScheme === 'auto' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${currentScheme === 'auto'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600'
                     : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <Monitor className="w-4 h-4" />
                 <span className="text-sm font-medium">Auto</span>
               </button>
               <button
                 onClick={() => onSchemeChange?.('dark')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${
-                  currentScheme === 'dark' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${currentScheme === 'dark'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600'
                     : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <Moon className="w-4 h-4" />
                 <span className="text-sm font-medium">Dark</span>
               </button>
               <button
                 onClick={() => onSchemeChange?.('light')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${
-                  currentScheme === 'light' 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border-2 transition-all ${currentScheme === 'light'
+                    ? 'border-blue-500 bg-blue-50 text-blue-600'
                     : 'border-gray-200 hover:border-gray-300 text-gray-600'
-                }`}
+                  }`}
               >
                 <Sun className="w-4 h-4" />
                 <span className="text-sm font-medium">Light</span>
@@ -522,7 +516,7 @@ function SettingsPanel({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-700">Color Customizer</h3>
-              <button 
+              <button
                 onClick={resetColors}
                 className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Reset to default"
@@ -534,9 +528,8 @@ function SettingsPanel({
               {/* Teal */}
               <button
                 onClick={() => onColorChange?.('teal')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'teal' ? 'border-gray-800 ring-2 ring-offset-2 ring-teal-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'teal' ? 'border-gray-800 ring-2 ring-offset-2 ring-teal-400' : 'border-gray-200'
+                  }`}
                 title="Teal Theme"
               >
                 <div className="w-full h-full flex">
@@ -544,13 +537,12 @@ function SettingsPanel({
                   <div className="w-1/2 h-full bg-cyan-400" />
                 </div>
               </button>
-              
+
               {/* Blue */}
               <button
                 onClick={() => onColorChange?.('blue')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'blue' ? 'border-gray-800 ring-2 ring-offset-2 ring-blue-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'blue' ? 'border-gray-800 ring-2 ring-offset-2 ring-blue-400' : 'border-gray-200'
+                  }`}
                 title="Blue Theme"
               >
                 <div className="w-full h-full flex">
@@ -558,13 +550,12 @@ function SettingsPanel({
                   <div className="w-1/2 h-full bg-indigo-500" />
                 </div>
               </button>
-              
+
               {/* Purple */}
               <button
                 onClick={() => onColorChange?.('purple')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'purple' ? 'border-gray-800 ring-2 ring-offset-2 ring-purple-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'purple' ? 'border-gray-800 ring-2 ring-offset-2 ring-purple-400' : 'border-gray-200'
+                  }`}
                 title="Purple Theme"
               >
                 <div className="w-full h-full flex">
@@ -572,13 +563,12 @@ function SettingsPanel({
                   <div className="w-1/2 h-full bg-pink-500" />
                 </div>
               </button>
-              
+
               {/* Orange */}
               <button
                 onClick={() => onColorChange?.('orange')}
-                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${
-                  themeColor === 'orange' ? 'border-gray-800 ring-2 ring-offset-2 ring-orange-400' : 'border-gray-200'
-                }`}
+                className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all hover:scale-110 ${themeColor === 'orange' ? 'border-gray-800 ring-2 ring-offset-2 ring-orange-400' : 'border-gray-200'
+                  }`}
                 title="Orange Theme"
               >
                 <div className="w-full h-full flex">
@@ -587,7 +577,7 @@ function SettingsPanel({
                 </div>
               </button>
             </div>
-            
+
             {/* Current Color Label */}
             <p className="text-xs text-gray-500 mt-2 capitalize">
               Current: {themeColor}
@@ -602,11 +592,10 @@ function SettingsPanel({
                 <button
                   key={lang.id}
                   onClick={() => onLanguageChange?.(lang.id as Language)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                    currentLanguage === lang.id 
-                      ? 'border-blue-500 bg-blue-50' 
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${currentLanguage === lang.id
+                      ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   <span className="text-2xl">{lang.flag}</span>
                   <span className={`font-medium ${currentLanguage === lang.id ? 'text-blue-600' : 'text-gray-700'}`}>
@@ -628,11 +617,10 @@ function SettingsPanel({
                 <button
                   key={template.id}
                   onClick={() => onTemplateChange?.(template.id)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                    currentTemplate === template.id 
-                      ? 'border-blue-500 bg-blue-50' 
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${currentTemplate === template.id
+                      ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   <span className={`font-medium ${currentTemplate === template.id ? 'text-blue-600' : 'text-gray-700'}`}>
                     {template.name}
@@ -651,15 +639,15 @@ function SettingsPanel({
   )
 }
 
-export default function LaundryMasterTemplate({ 
-  themeColor, 
-  isAuthenticated, 
-  onBookNow, 
-  onColorChange, 
-  onLanguageChange, 
-  onTemplateChange, 
-  currentTemplate, 
-  isTenantPage, 
+export default function LaundryMasterTemplate({
+  themeColor,
+  isAuthenticated,
+  onBookNow,
+  onColorChange,
+  onLanguageChange,
+  onTemplateChange,
+  currentTemplate,
+  isTenantPage,
   tenantName,
   user,
   tenantLogo,
@@ -674,7 +662,7 @@ export default function LaundryMasterTemplate({
   const colors = colorClasses[themeColor]
   const [isScrolled, setIsScrolled] = useState(false)
   const [scheme, setScheme] = useState<SchemeMode>('light')
-  
+
   // Handle logout - redirect to tenant page if on tenant, otherwise to home
   const handleLogout = () => {
     useAuthStore.getState().logout()
@@ -687,7 +675,7 @@ export default function LaundryMasterTemplate({
     }
     window.location.href = '/'
   }
-  
+
   // Get login URL with tenant redirect if on tenant page
   const getLoginUrl = () => {
     if (isTenantPage) {
@@ -698,7 +686,7 @@ export default function LaundryMasterTemplate({
     }
     return '/auth/login'
   }
-  
+
   // Get computed theme colors based on scheme
   const theme = getThemeColors(themeColor, scheme)
 
@@ -758,146 +746,36 @@ export default function LaundryMasterTemplate({
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
-      {/* Fixed Header */}
-      <header 
-        className="fixed top-0 left-0 right-0 z-50 shadow-sm py-4 transition-colors duration-300"
-        style={{ backgroundColor: theme.headerBg, borderBottom: `1px solid ${theme.border}` }}
-      >
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <div 
-                className="w-10 h-10 rounded-lg flex items-center justify-center"
-                style={{ border: `2px solid ${theme.accent}` }}
-              >
-                <Sparkles className="w-5 h-5" style={{ color: theme.accent }} />
-              </div>
-              <span className="text-xl font-bold" style={{ color: theme.textPrimary }}>LaundryLobby</span>
-            </div>
-
-            {/* Navigation - Center */}
-            <nav className="hidden lg:flex items-center gap-8">
-              {[
-                { label: t('nav.home'), href: '/' },
-                { label: t('nav.services'), href: '/services' },
-                { label: t('nav.pricing'), href: '/pricing' },
-                { label: t('nav.help'), href: '/help' },
-              ].map((item) => (
-                <Link 
-                  key={item.label} 
-                  href={item.href}
-                  className="font-medium transition-colors hover:opacity-80"
-                  style={{ color: theme.textSecondary }}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-
-            {/* Right Side */}
-            <div className="flex items-center gap-4 flex-shrink-0">
-              {isAuthenticated ? (
-                <>
-                  <Button 
-                    className="px-5 py-2 rounded-md font-medium hidden sm:flex text-white transition-colors"
-                    style={{ backgroundColor: theme.accent }}
-                    onClick={onBookNow}
-                  >
-                    {t('hero.schedulePickup')}
-                  </Button>
-                  <div className="relative group">
-                    <button className="flex items-center gap-2 py-2" style={{ color: theme.textSecondary }}>
-                      <div 
-                        className="w-9 h-9 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: theme.accent }}
-                      >
-                        <span className="text-white text-sm font-medium">
-                          {useAuthStore.getState().user?.name?.charAt(0).toUpperCase() || 'U'}
-                        </span>
-                      </div>
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                    <div 
-                      className="absolute right-0 top-full mt-1 w-48 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50"
-                      style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.border}` }}
-                    >
-                      <div className="py-2">
-                        <Link href="/customer/dashboard" className="flex items-center px-4 py-2 hover:opacity-80" style={{ color: theme.textSecondary }}>
-                          <User className="w-4 h-4 mr-3" />{t('nav.dashboard')}
-                        </Link>
-                        <Link href="/customer/orders" className="flex items-center px-4 py-2 hover:opacity-80" style={{ color: theme.textSecondary }}>
-                          <ShoppingBag className="w-4 h-4 mr-3" />{t('nav.myOrders')}
-                        </Link>
-                        <Link href="/customer/addresses" className="flex items-center px-4 py-2 hover:opacity-80" style={{ color: theme.textSecondary }}>
-                          <MapPin className="w-4 h-4 mr-3" />{t('nav.addresses')}
-                        </Link>
-                        <hr style={{ borderColor: theme.border }} className="my-2" />
-                        <button 
-                          onClick={handleLogout} 
-                          className="flex items-center w-full px-4 py-2 text-red-500 hover:bg-red-50/10"
-                        >
-                          <LogOut className="w-4 h-4 mr-3" />{t('nav.logout')}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <Link href={getLoginUrl()}>
-                    <Button 
-                      variant="outline" 
-                      style={{ borderColor: theme.accent, color: theme.accentText }}
-                    >
-                      {t('nav.login')}
-                    </Button>
-                  </Link>
-                  <Link href="/auth/register">
-                    <Button 
-                      className="text-white"
-                      style={{ backgroundColor: theme.accent }}
-                    >
-                      {t('nav.signup')}
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section - Balanced Height */}
-      <section className="relative flex items-center overflow-hidden pt-16">
+      {/* Hero Section */}
+      <section className="relative h-[650px] flex items-center overflow-hidden pt-20">
         <div className="max-w-screen-2xl mx-auto w-full">
           {/* Background Image - Full width, increased height */}
           <div className="w-full h-[70vh] min-h-[500px] max-h-[700px] mx-0 lg:mx-8 rounded-none lg:rounded-2xl overflow-hidden">
             <div className="relative h-full">
-              <img 
-                src="/images/image.png" 
+              <img
+                src="/images/image.png"
                 alt="Laundry Service"
                 className="w-full h-full object-cover object-center"
               />
               {/* Overlay */}
               <div className="absolute inset-0 bg-black/40"></div>
-              
+
               {/* Content positioned over image */}
-              <div className="absolute inset-0 flex items-center">
+              <div className="absolute inset-0 flex items-end pb-16">
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="max-w-2xl">
-                    <div 
+                  <div className="max-w-2xl mt-12">
+                    <div
                       className="inline-flex items-center gap-2 text-white px-3 py-1.5 rounded-full text-xs font-medium mb-4"
                       style={{ backgroundColor: theme.accent }}
                     >
                       <Sparkles className="w-3 h-3" />
                       {t('hero.badge')}
                     </div>
-                    
-                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight italic" style={{ fontFamily: 'Georgia, serif' }}>
+
+                    <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight italic" style={{ fontFamily: 'Georgia, serif' }}>
                       {t('hero.title')}
                     </h1>
-                    
+
                     {/* Tagline Display */}
                     {tenantTagline && (
                       <p className="text-xl md:text-2xl font-semibold mb-4 flex items-center gap-2 text-white">
@@ -905,14 +783,14 @@ export default function LaundryMasterTemplate({
                         {tenantTagline}
                       </p>
                     )}
-                    
+
                     <p className="text-base md:text-lg text-white/90 mb-6 max-w-xl">
                       {t('hero.subtitle')}
                     </p>
 
                     <div className="flex flex-wrap gap-3">
-                      <Button 
-                        size="lg" 
+                      <Button
+                        size="lg"
                         className="text-white px-6 py-3 text-base rounded-full font-semibold transition-all hover:opacity-90"
                         style={{ backgroundColor: theme.accent }}
                         onClick={onBookNow}
@@ -921,8 +799,8 @@ export default function LaundryMasterTemplate({
                         {t('hero.schedulePickup')}
                       </Button>
                       <Link href="/services">
-                        <Button 
-                          size="lg" 
+                        <Button
+                          size="lg"
                           variant="outline"
                           className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-6 py-3 text-base rounded-full font-semibold bg-transparent"
                         >
@@ -940,7 +818,7 @@ export default function LaundryMasterTemplate({
       </section>
 
       {/* Process Section */}
-      <section 
+      <section
         className="py-24 relative transition-colors duration-300"
         style={{ backgroundColor: theme.sectionBg }}
       >
@@ -953,12 +831,12 @@ export default function LaundryMasterTemplate({
           <div className="grid md:grid-cols-3 gap-8">
             {processSteps.map((step, idx) => (
               <div key={idx} className="text-center group">
-                <div 
+                <div
                   className="w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform relative"
                   style={{ backgroundColor: theme.accentLight }}
                 >
                   <step.icon className="w-12 h-12" style={{ color: theme.accentText }} />
-                  <div 
+                  <div
                     className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold"
                     style={{ backgroundColor: theme.accent }}
                   >
@@ -986,13 +864,13 @@ export default function LaundryMasterTemplate({
           <div className="grid grid-cols-2 max-w-6xl mx-auto">
             {/* Row 1 */}
             <div className="aspect-[4/3]">
-              <img 
-                src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=600&q=80" 
+              <img
+                src="https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=600&q=80"
                 alt="Cloth Folding"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div 
+            <div
               className="aspect-[4/3] flex flex-col items-center justify-center p-8 text-center"
               style={{ backgroundColor: theme.accent }}
             >
@@ -1006,7 +884,7 @@ export default function LaundryMasterTemplate({
             </div>
 
             {/* Row 2 - Secondary Color */}
-            <div 
+            <div
               className="aspect-[4/3] flex flex-col items-center justify-center p-8 text-center"
               style={{ backgroundColor: theme.accentSecondary }}
             >
@@ -1019,8 +897,8 @@ export default function LaundryMasterTemplate({
               </p>
             </div>
             <div className="aspect-[4/3]">
-              <img 
-                src="https://images.unsplash.com/photo-1489274495757-95c7c837b101?w=600&q=80" 
+              <img
+                src="https://images.unsplash.com/photo-1489274495757-95c7c837b101?w=600&q=80"
                 alt="Cloth Ironing"
                 className="w-full h-full object-cover"
               />
@@ -1028,13 +906,13 @@ export default function LaundryMasterTemplate({
 
             {/* Row 3 */}
             <div className="aspect-[4/3]">
-              <img 
-                src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=600&q=80" 
+              <img
+                src="https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=600&q=80"
                 alt="Cloth Laundry"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div 
+            <div
               className="aspect-[4/3] flex flex-col items-center justify-center p-8 text-center"
               style={{ backgroundColor: theme.accent }}
             >
@@ -1048,7 +926,7 @@ export default function LaundryMasterTemplate({
             </div>
 
             {/* Row 4 - Secondary Color */}
-            <div 
+            <div
               className="aspect-[4/3] flex flex-col items-center justify-center p-8 text-center"
               style={{ backgroundColor: theme.accentSecondary }}
             >
@@ -1061,8 +939,8 @@ export default function LaundryMasterTemplate({
               </p>
             </div>
             <div className="aspect-[4/3]">
-              <img 
-                src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600&q=80" 
+              <img
+                src="https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600&q=80"
                 alt="Express Service"
                 className="w-full h-full object-cover"
               />
@@ -1083,7 +961,7 @@ export default function LaundryMasterTemplate({
             <div className="absolute top-1/2 right-64 w-20 h-20 rounded-full bg-white/5"></div>
             <div className="absolute top-1/2 right-52 w-12 h-12 rounded-full bg-white/5 -translate-y-4"></div>
             <div className="absolute bottom-4 right-80 w-6 h-6 rounded-full border border-white/10"></div>
-            
+
             <div className="flex flex-wrap items-center justify-between gap-8 relative z-10">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
@@ -1093,7 +971,7 @@ export default function LaundryMasterTemplate({
                   {t('cta.desc')}
                 </p>
               </div>
-              <Button 
+              <Button
                 className="text-white px-8 py-5 rounded-full font-medium flex items-center gap-2 transition-all hover:opacity-90"
                 style={{ backgroundColor: theme.accent }}
                 onClick={onBookNow}
@@ -1107,7 +985,7 @@ export default function LaundryMasterTemplate({
       </section>
 
       {/* Testimonials */}
-      <section 
+      <section
         className="py-16 transition-colors duration-300"
         style={{ backgroundColor: theme.sectionBgAlt }}
       >
@@ -1136,8 +1014,8 @@ export default function LaundryMasterTemplate({
                   className="w-14 h-14 rounded-full overflow-hidden border-2 shadow-lg"
                   style={{ backgroundColor: theme.cardBg, borderColor: theme.cardBg }}
                 >
-                  <img 
-                    src={item.image} 
+                  <img
+                    src={item.image}
                     alt="Customer"
                     className="w-full h-full object-cover"
                   />
@@ -1172,7 +1050,7 @@ export default function LaundryMasterTemplate({
       </section>
 
       {/* About Section */}
-      <section 
+      <section
         className="py-24 transition-colors duration-300"
         style={{ backgroundColor: theme.sectionBgAlt }}
       >
@@ -1180,17 +1058,17 @@ export default function LaundryMasterTemplate({
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Video */}
             <div className="relative">
-              <video 
-                autoPlay 
-                muted 
-                loop 
+              <video
+                autoPlay
+                muted
+                loop
                 playsInline
                 className="rounded-3xl shadow-2xl w-full"
               >
                 <source src="/images/hoodi.mp4" type="video/mp4" />
               </video>
               {/* Floating Card */}
-              <div 
+              <div
                 className="absolute -bottom-8 -right-8 text-white p-6 rounded-2xl shadow-xl"
                 style={{ backgroundColor: theme.accent }}
               >
@@ -1219,8 +1097,8 @@ export default function LaundryMasterTemplate({
                 ))}
               </div>
 
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="text-white px-8 py-4 rounded-full font-semibold transition-all hover:opacity-90"
                 style={{ backgroundColor: theme.accent }}
                 onClick={onBookNow}
@@ -1249,7 +1127,7 @@ export default function LaundryMasterTemplate({
             ></iframe>
 
             {/* Contact Card Overlay */}
-            <div 
+            <div
               className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 text-white p-6 md:p-8 rounded-lg shadow-2xl max-w-sm"
               style={{ backgroundColor: theme.footerBg }}
             >
@@ -1257,10 +1135,10 @@ export default function LaundryMasterTemplate({
               <p className="text-gray-300 text-sm mb-6">
                 Professional laundry services at your doorstep
               </p>
-              
+
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: theme.accent }}
                   >
@@ -1269,7 +1147,7 @@ export default function LaundryMasterTemplate({
                   <span className="text-sm text-gray-200">20+ Cities across India</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: theme.accent }}
                   >
@@ -1278,7 +1156,7 @@ export default function LaundryMasterTemplate({
                   <span className="text-sm text-gray-200">+91 98765 43210</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-8 h-8 rounded-full flex items-center justify-center"
                     style={{ backgroundColor: theme.accent }}
                   >
@@ -1299,7 +1177,7 @@ export default function LaundryMasterTemplate({
             {/* About */}
             <div>
               <div className="flex items-center gap-2 mb-6">
-                <div 
+                <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center"
                   style={{ backgroundColor: theme.accent }}
                 >
@@ -1314,9 +1192,9 @@ export default function LaundryMasterTemplate({
               </p>
               <div className="flex gap-3">
                 {tenantSocialMedia?.twitter && (
-                  <a 
-                    href={tenantSocialMedia.twitter} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.twitter}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                   >
@@ -1324,9 +1202,9 @@ export default function LaundryMasterTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.facebook && (
-                  <a 
-                    href={tenantSocialMedia.facebook} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.facebook}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                   >
@@ -1334,9 +1212,9 @@ export default function LaundryMasterTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.instagram && (
-                  <a 
-                    href={tenantSocialMedia.instagram} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.instagram}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                   >
@@ -1344,9 +1222,9 @@ export default function LaundryMasterTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.linkedin && (
-                  <a 
-                    href={tenantSocialMedia.linkedin} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.linkedin}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                   >
@@ -1354,9 +1232,9 @@ export default function LaundryMasterTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.youtube && (
-                  <a 
-                    href={tenantSocialMedia.youtube} 
-                    target="_blank" 
+                  <a
+                    href={tenantSocialMedia.youtube}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                   >
@@ -1364,9 +1242,9 @@ export default function LaundryMasterTemplate({
                   </a>
                 )}
                 {tenantSocialMedia?.whatsapp && (
-                  <a 
-                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`} 
-                    target="_blank" 
+                  <a
+                    href={`https://wa.me/${tenantSocialMedia.whatsapp.replace(/\D/g, '')}`}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-colors"
                     style={{ backgroundColor: '#25D366' }}

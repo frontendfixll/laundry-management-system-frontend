@@ -61,9 +61,9 @@ interface OrderScanResult {
 const ORDER_STATUSES = [
   { value: 'placed', label: 'Placed', color: 'blue' },
   { value: 'assigned_to_branch', label: 'Assigned to Branch', color: 'purple' },
-  { value: 'picked_up', label: 'Picked Up', color: 'yellow' },
-  { value: 'processing', label: 'Processing', color: 'orange' },
-  { value: 'ready_for_delivery', label: 'Ready for Delivery', color: 'teal' },
+  { value: 'picked', label: 'Picked Up', color: 'yellow' },
+  { value: 'in_process', label: 'Processing', color: 'orange' },
+  { value: 'ready', label: 'Ready for Delivery', color: 'teal' },
   { value: 'out_for_delivery', label: 'Out for Delivery', color: 'cyan' },
   { value: 'delivered', label: 'Delivered', color: 'green' },
   { value: 'cancelled', label: 'Cancelled', color: 'red' },
@@ -79,6 +79,30 @@ export default function BarcodeScannerPage() {
   const [statusNotes, setStatusNotes] = useState('');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Load scan history from localStorage on mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('centerAdminScanHistory');
+    if (savedHistory) {
+      try {
+        const parsed = JSON.parse(savedHistory);
+        const historyWithDates = parsed.map((item: any) => ({
+          ...item,
+          time: new Date(item.time)
+        }));
+        setScanHistory(historyWithDates);
+      } catch (err) {
+        console.error('Failed to load scan history:', err);
+      }
+    }
+  }, []);
+
+  // Save scan history to localStorage whenever it changes
+  useEffect(() => {
+    if (scanHistory.length > 0) {
+      localStorage.setItem('centerAdminScanHistory', JSON.stringify(scanHistory));
+    }
+  }, [scanHistory]);
 
   // Auto-focus input on mount
   useEffect(() => {
@@ -150,12 +174,18 @@ export default function BarcodeScannerPage() {
     const colors: Record<string, string> = {
       'placed': 'bg-blue-100 text-blue-800 border-blue-200',
       'assigned_to_branch': 'bg-purple-100 text-purple-800 border-purple-200',
-      'picked_up': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      'processing': 'bg-orange-100 text-orange-800 border-orange-200',
-      'ready_for_delivery': 'bg-teal-100 text-teal-800 border-teal-200',
+      'assigned_to_logistics_pickup': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      'picked': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'in_process': 'bg-orange-100 text-orange-800 border-orange-200',
+      'ready': 'bg-teal-100 text-teal-800 border-teal-200',
+      'assigned_to_logistics_delivery': 'bg-cyan-100 text-cyan-800 border-cyan-200',
       'out_for_delivery': 'bg-cyan-100 text-cyan-800 border-cyan-200',
       'delivered': 'bg-green-100 text-green-800 border-green-200',
-      'cancelled': 'bg-red-100 text-red-800 border-red-200'
+      'cancelled': 'bg-red-100 text-red-800 border-red-200',
+      // Legacy status support
+      'picked_up': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'processing': 'bg-orange-100 text-orange-800 border-orange-200',
+      'ready_for_delivery': 'bg-teal-100 text-teal-800 border-teal-200'
     };
     return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };

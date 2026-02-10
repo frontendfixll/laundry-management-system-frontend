@@ -32,8 +32,8 @@ const faqData = [
 function FAQItem({ question, answer, isOpen, onToggle, accentColor }: { question: string; answer: string; isOpen: boolean; onToggle: () => void; accentColor: string }) {
   return (
     <div className="overflow-hidden">
-      <button 
-        onClick={onToggle} 
+      <button
+        onClick={onToggle}
         className="w-full px-8 py-5 text-left flex items-center justify-between transition-colors duration-200"
         style={{ backgroundColor: isOpen ? accentColor : '#334155' }}
       >
@@ -80,7 +80,7 @@ function HowWeWorkSection({ isModalOpen, theme, t }: { isModalOpen?: boolean; th
             <h2 className="text-2xl sm:text-3xl font-bold mb-3" style={{ color: theme.textPrimary }}>{t('services.howWeWork.title')}</h2>
             <p className="text-sm sm:text-base" style={{ color: theme.textSecondary }}>{t('services.howWeWork.subtitle')}</p>
           </div>
-          
+
           <div className="space-y-8">
             {howWeWorkSteps.map((step, index) => (
               <div key={step.id} className="rounded-2xl shadow-lg overflow-hidden" style={{ backgroundColor: theme.cardBg }}>
@@ -99,7 +99,7 @@ function HowWeWorkSection({ isModalOpen, theme, t }: { isModalOpen?: boolean; th
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Content */}
                 <div className="p-5">
                   <p className="text-sm mb-4 leading-relaxed" style={{ color: theme.textSecondary }}>{step.description}</p>
@@ -129,7 +129,7 @@ function HowWeWorkSection({ isModalOpen, theme, t }: { isModalOpen?: boolean; th
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: theme.textPrimary }}>{t('services.howWeWork.title')}</h2>
           <p className="max-w-2xl mx-auto" style={{ color: theme.textSecondary }}>{t('services.howWeWork.subtitle')}</p>
         </div>
-        
+
         {/* Steps Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {howWeWorkSteps.map((step, index) => (
@@ -149,7 +149,7 @@ function HowWeWorkSection({ isModalOpen, theme, t }: { isModalOpen?: boolean; th
                   </div>
                 </div>
               </div>
-              
+
               {/* Content */}
               <div className="p-5">
                 <p className="text-sm mb-4 leading-relaxed" style={{ color: theme.textSecondary }}>{step.description}</p>
@@ -178,7 +178,7 @@ export default function ServicesPage() {
   const [themeColor, setThemeColor] = useState<ThemeColor>('teal')
   const [scheme, setScheme] = useState<SchemeMode>('light')
   const router = useRouter()
-  
+
   // Use language hook for reactive translations
   const { language, setLanguage, t } = useLanguage()
 
@@ -256,19 +256,19 @@ export default function ServicesPage() {
   }
 
   // Calculate top margin based on template (FreshSpin has top bar + header but sticky, not fixed)
-  const topMargin = 'pt-28'
+  const topMargin = 'pt-20'
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
       <TemplateHeader />
-      
+
       {/* Booking Modal */}
-      <BookingModal 
-        isOpen={showBookingModal} 
+      <BookingModal
+        isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
         onLoginRequired={handleLoginRequired}
       />
-      
+
       <section className={`relative h-[400px] overflow-hidden ${topMargin}`}>
         <video autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover">
           <source src="/images/pricing.mp4" type="video/mp4" />
@@ -306,15 +306,15 @@ export default function ServicesPage() {
               const Icon = service.icon
               const isAlt = index % 2 === 1
               return (
-                <div 
-                  key={service.id} 
+                <div
+                  key={service.id}
                   className="rounded-xl p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                  style={{ 
-                    backgroundColor: theme.cardBg, 
-                    border: `1px solid ${theme.border}` 
+                  style={{
+                    backgroundColor: theme.cardBg,
+                    border: `1px solid ${theme.border}`
                   }}
                 >
-                  <div 
+                  <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
                     style={{ backgroundColor: isAlt ? theme.accentSecondary : theme.accent }}
                   >
@@ -330,8 +330,8 @@ export default function ServicesPage() {
                       </li>
                     ))}
                   </ul>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     className="w-full text-white text-sm hover:opacity-90"
                     style={{ backgroundColor: theme.accent }}
                     onClick={handleBookNow}
@@ -397,7 +397,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section 
+      <section
         className="py-16 transition-colors duration-300"
         style={{ background: `linear-gradient(to right, ${theme.accent}, ${theme.accentSecondary})` }}
       >

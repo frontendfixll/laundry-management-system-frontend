@@ -4,7 +4,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { 
+import {
   Truck,
   ChevronDown,
   ChevronUp,
@@ -93,11 +93,11 @@ function PricingTable({ isAuthenticated, theme, t }: { isAuthenticated: boolean;
       if (data.success && data.items) {
         // Group items by category and aggregate prices by service
         const grouped: Record<string, Record<string, PriceItem>> = {}
-        
+
         data.items.forEach((item: any) => {
           const cat = item.category
           if (!grouped[cat]) grouped[cat] = {}
-          
+
           const itemName = item.name
           if (!grouped[cat][itemName]) {
             grouped[cat][itemName] = {
@@ -111,7 +111,7 @@ function PricingTable({ isAuthenticated, theme, t }: { isAuthenticated: boolean;
               premiumLaundry: 0
             }
           }
-          
+
           // Set price based on service type
           if (item.service === 'dry_clean' || item.service === 'premium_dry_clean') {
             grouped[cat][itemName].dryClean = item.basePrice
@@ -127,13 +127,13 @@ function PricingTable({ isAuthenticated, theme, t }: { isAuthenticated: boolean;
             grouped[cat][itemName].premiumLaundry = item.basePrice
           }
         })
-        
+
         // Convert to array format
         const result: Record<string, PriceItem[]> = {}
         Object.keys(grouped).forEach(cat => {
           result[cat] = Object.values(grouped[cat])
         })
-        
+
         setPricingData(result)
       }
     } catch (error) {
@@ -196,10 +196,10 @@ function PricingTable({ isAuthenticated, theme, t }: { isAuthenticated: boolean;
             <tbody>
               {pricingData[activeCategory]?.length > 0 ? (
                 pricingData[activeCategory].map((item, index) => (
-                  <tr 
-                    key={item._id || index} 
+                  <tr
+                    key={item._id || index}
                     className="border-b hover:opacity-80 transition-colors"
-                    style={{ 
+                    style={{
                       backgroundColor: index % 2 === 0 ? theme.cardBg : theme.sectionBg,
                       borderColor: theme.border
                     }}
@@ -241,9 +241,9 @@ export default function PricingPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [themeColor, setThemeColor] = useState<ThemeColor>('teal')
   const [scheme, setScheme] = useState<SchemeMode>('light')
-  
+
   // Use language hook for reactive translations
-  const { language, t } = useLanguage()
+  const { language, setLanguage, t } = useLanguage()
 
   // Get computed theme colors based on scheme
   const theme = getThemeColors(themeColor, scheme)
@@ -322,7 +322,7 @@ export default function PricingPage() {
   }
 
   // Calculate top padding based on template
-  const topPadding = 'pt-28'
+  const topPadding = 'pt-20'
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
@@ -339,9 +339,9 @@ export default function PricingPage() {
         >
           <source src="/images/pricing.mp4" type="video/mp4" />
         </video>
-        
+
         <div className="absolute inset-0 bg-gray-900/70"></div>
-        
+
         <div className="relative container mx-auto px-4 text-center max-w-screen-2xl">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             {t('pricing.hero.title')}
@@ -360,12 +360,12 @@ export default function PricingPage() {
       {/* Pricing Table Section */}
       <section className="py-16">
         <div className="container mx-auto px-4 max-w-screen-2xl">
-        <PricingTable isAuthenticated={isAuthenticated} theme={theme} t={t} />
-        
-        {/* Disclaimer */}
-        <p className="text-center text-lg font-medium mt-8" style={{ color: theme.textSecondary }}>
-          {t('pricing.disclaimer')}
-        </p>
+          <PricingTable isAuthenticated={isAuthenticated} theme={theme} t={t} />
+
+          {/* Disclaimer */}
+          <p className="text-center text-lg font-medium mt-8" style={{ color: theme.textSecondary }}>
+            {t('pricing.disclaimer')}
+          </p>
         </div>
       </section>
 
@@ -395,7 +395,7 @@ export default function PricingPage() {
       </section>
 
       {/* CTA Section */}
-      <section 
+      <section
         className="py-16 transition-colors duration-300"
         style={{ background: `linear-gradient(to right, ${theme.accent}, ${theme.accentSecondary})` }}
       >

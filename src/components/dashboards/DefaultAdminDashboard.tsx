@@ -324,67 +324,75 @@ export function DefaultAdminDashboard() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-lg transition-all duration-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Total Orders</p>
-              <p className="text-xl font-bold text-gray-900">{metrics?.totalOrders || 0}</p>
-              <p className="text-xs text-green-600 mt-1">
-                +{metrics?.todayOrders || 0} today
-              </p>
-            </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <ShoppingBag className="w-5 h-5 text-blue-600" />
+        <Link href="/admin/orders" className="block">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 cursor-pointer focus:outline-none">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Total Orders</p>
+                <p className="text-xl font-bold text-gray-900">{metrics?.totalOrders || 0}</p>
+                <p className="text-xs text-green-600 mt-1">
+                  +{metrics?.todayOrders || 0} today
+                </p>
+              </div>
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <ShoppingBag className="w-5 h-5 text-blue-600" />
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-lg transition-all duration-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Customers</p>
-              <p className="text-xl font-bold text-gray-900">{metrics?.totalCustomers || 0}</p>
-              <p className="text-xs text-blue-600 mt-1">
-                +{metrics?.newCustomers || 0} this week
-              </p>
-            </div>
-            <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-              <Users className="w-5 h-5 text-green-600" />
+        <Link href="/admin/customers" className="block">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all duration-200 cursor-pointer focus:outline-none">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Customers</p>
+                <p className="text-xl font-bold text-gray-900">{metrics?.totalCustomers || 0}</p>
+                <p className="text-xs text-blue-600 mt-1">
+                  +{metrics?.newCustomers || 0} this week
+                </p>
+              </div>
+              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <Users className="w-5 h-5 text-green-600" />
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-lg transition-all duration-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Revenue</p>
-              <p className="text-xl font-bold text-gray-900">
-                ₹{metrics?.totalRevenue?.toLocaleString() || '0'}
-              </p>
-              <p className="text-xs text-green-600 mt-1">
-                +{metrics?.revenueGrowth || 0}% this month
-              </p>
-            </div>
-            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-purple-600" />
+        <Link href="/admin/payments" className="block">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-200 cursor-pointer focus:outline-none">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Revenue</p>
+                <p className="text-xl font-bold text-gray-900">
+                  ₹{metrics?.totalRevenue?.toLocaleString() || '0'}
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  +{metrics?.revenueGrowth || 0}% this month
+                </p>
+              </div>
+              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <DollarSign className="w-5 h-5 text-purple-600" />
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-lg transition-all duration-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Pending</p>
-              <p className="text-xl font-bold text-gray-900">{metrics?.pendingOrders || 0}</p>
-              <p className="text-xs text-orange-600 mt-1">
-                Needs attention
-              </p>
-            </div>
-            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Clock className="w-4 h-4 text-orange-600" />
+        <Link href="/admin/orders?status=pending" className="block">
+          <div className="bg-white rounded-xl p-4 border border-gray-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer focus:outline-none">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Pending</p>
+                <p className="text-xl font-bold text-gray-900">{metrics?.pendingOrders || 0}</p>
+                <p className="text-xs text-orange-600 mt-1">
+                  Needs attention
+                </p>
+              </div>
+              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                <Clock className="w-4 h-4 text-orange-600" />
+              </div>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Enhanced Charts Section */}
