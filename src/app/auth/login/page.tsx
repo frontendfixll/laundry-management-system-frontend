@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import BaseLoginForm from '@/components/auth/BaseLoginForm'
@@ -19,7 +19,7 @@ const RESERVED_ROUTES = [
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
-export default function LoginPage() {
+function LoginPageContent() {
   const searchParams = useSearchParams()
   const [template, setTemplate] = useState<string>('original')
   const [isLoading, setIsLoading] = useState(true)
@@ -379,5 +379,13 @@ export default function LoginPage() {
       </div>
       {isGenericLogin && isCustomerIntent && <GenericLoginFooter />}
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   )
 }
