@@ -19,10 +19,65 @@ export default function ReleasesPage() {
 
         {/* Release Timeline */}
         <div className="space-y-8">
-          {/* Version 2.0.0 */}
+          {/* Version 1.0.6 */}
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">v1.0.6</h2>
+              <span className="text-sm text-gray-500">February 11, 2026</span>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-green-600 mb-2">✨ Added</h3>
+                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <li>Template-specific pages for Services, Pricing, and Help</li>
+                  <li>Cross-platform dropdown consistency using custom Select component</li>
+                  <li>Suspense boundary for login page</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-blue-600 mb-2">🐛 Fixed</h3>
+                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <li>Hero section header overlap issue</li>
+                  <li>Inventory page syntax errors (stray closing tags)</li>
+                  <li>Build errors for dynamic routes</li>
+                  <li>Starter template header navigation alignment</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-purple-600 mb-2">🔄 Changed</h3>
+                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <li>Hero section padding increased by 20px</li>
+                  <li>Hero carousel left arrow repositioned</li>
+                  <li>Replaced 56+ native select elements with custom Select component</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Version 1.0.5 */}
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">v2.0.0</h2>
+              <h2 className="text-2xl font-bold text-gray-900">v1.0.5</h2>
+              <span className="text-sm text-gray-500">January 12, 2026</span>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-green-600 mb-2">✨ Added</h3>
+                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                  <li>Previous features and improvements</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Version 1.0.0 */}
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">v1.0.0</h2>
               <span className="text-sm text-gray-500">January 9, 2026</span>
             </div>
 

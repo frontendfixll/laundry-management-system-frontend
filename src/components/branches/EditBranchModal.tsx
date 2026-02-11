@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, MapPin, Phone, Clock, Users, Loader2 } from 'lucide-react'
+import { X, MapPin, Phone, Clock, Users, Loader2, Plus, MapPinned } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -76,6 +76,7 @@ interface Branch {
     workingDays: string[]
   }
   serviceableRadius?: number
+  serviceAreas?: { pincode: string; area?: string; deliveryCharge?: number; isActive?: boolean }[]
   status: string
   isActive: boolean
 }
@@ -101,10 +102,36 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
   const [loading, setLoading] = useState(false)
   const [geocoding, setGeocoding] = useState(false)
   const [formData, setFormData] = useState<Branch>(branch)
+  const [newServicePincode, setNewServicePincode] = useState('')
 
   useEffect(() => {
     setFormData(branch)
   }, [branch])
+
+  const addServicePincode = () => {
+    const pin = newServicePincode.trim()
+    if (!pin || !/^\d{6}$/.test(pin)) {
+      toast.error('Enter a valid 6-digit pincode')
+      return
+    }
+    const existing = formData.serviceAreas || []
+    if (existing.some((a: { pincode: string }) => a.pincode === pin)) {
+      toast.error('This pincode is already added')
+      return
+    }
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: [...(prev.serviceAreas || []), { pincode: pin, deliveryCharge: 30, isActive: true }]
+    }))
+    setNewServicePincode('')
+  }
+
+  const removeServicePincode = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: (prev.serviceAreas || []).filter((_, i) => i !== index)
+    }))
+  }
 
   const handleInputChange = (section: string, field: string, value: any) => {
     if (section) {
@@ -422,6 +449,43 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
                       value={formData.address.landmark || ''}
                       onChange={(e) => handleInputChange('address', 'landmark', e.target.value)}
                     />
+                  </div>
+                </div>
+
+                {/* Serviceable Pincodes */}
+                <div className="pt-4 border-t">
+                  <Label className="text-base font-medium flex items-center gap-2 mb-2">
+                    <MapPinned className="h-4 w-4" />
+                    Serviceable Pincodes
+                  </Label>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Customers can only place orders if their address pincode matches one of these. Leave empty to use distance-based service.
+                  </p>
+                  <div className="flex gap-2 mb-3">
+                    <Input
+                      type="text"
+                      value={newServicePincode}
+                      onChange={(e) => setNewServicePincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="6-digit pincode (e.g. 324006)"
+                      maxLength={6}
+                      className="flex-1"
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={addServicePincode}>
+                      <Plus className="w-4 h-4 mr-1" /> Add
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(formData.serviceAreas || []).map((area, idx) => (
+                      <span key={idx} className="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm flex items-center gap-2">
+                        {area.pincode}
+                        <button type="button" onClick={() => removeServicePincode(idx)} className="hover:text-red-600" aria-label="Remove">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {(formData.serviceAreas || []).length === 0 && (
+                      <span className="text-sm text-gray-500">No pincodes added yet</span>
+                    )}
                   </div>
                 </div>
 

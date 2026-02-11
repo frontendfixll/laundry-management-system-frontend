@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, MapPin, Phone, Clock, Users, Loader2 } from 'lucide-react'
+import { X, MapPin, Phone, Clock, Users, Loader2, Plus, MapPinned } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -82,6 +82,7 @@ interface BranchFormData {
     workingDays: string[]
   }
   serviceableRadius: number
+  serviceAreas?: { pincode: string; area?: string; deliveryCharge?: number }[]
 }
 
 const WORKING_DAYS = [
@@ -130,10 +131,12 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
       closeTime: '21:00',
       workingDays: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
     },
-    serviceableRadius: 20
+    serviceableRadius: 20,
+    serviceAreas: []
   }
   
   const [formData, setFormData] = useState<BranchFormData>(initialFormData)
+  const [newServicePincode, setNewServicePincode] = useState('')
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -160,6 +163,31 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
         }
       }))
     }
+  }
+
+  const addServicePincode = () => {
+    const pin = newServicePincode.trim()
+    if (!pin || !/^\d{6}$/.test(pin)) {
+      toast.error('Enter a valid 6-digit pincode')
+      return
+    }
+    const existing = formData.serviceAreas || []
+    if (existing.some((a: { pincode: string }) => a.pincode === pin)) {
+      toast.error('This pincode is already added')
+      return
+    }
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: [...(prev.serviceAreas || []), { pincode: pin, deliveryCharge: 30 }]
+    }))
+    setNewServicePincode('')
+  }
+
+  const removeServicePincode = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: (prev.serviceAreas || []).filter((_, i) => i !== index)
+    }))
   }
 
   const handleWorkingDaysChange = (day: string, checked: boolean) => {
@@ -245,6 +273,16 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
     if (currentStep !== 4) {
       console.log('⚠️ Form submission blocked - not on final step')
       return
+    }
+
+    // Validate all required steps before submit
+    for (let s = 1; s <= 3; s++) {
+      const { valid, message } = validateStep(s)
+      if (!valid) {
+        toast.error(message || `Please complete step ${s} correctly`)
+        setCurrentStep(s)
+        return
+      }
     }
     
     setLoading(true)
@@ -411,7 +449,63 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
     }
   }
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 4))
+  // Validate current step before allowing Next - required fields must be filled
+  const validateStep = (step: number): { valid: boolean; message?: string } => {
+    if (step === 1) {
+      if (!formData.name?.trim() || formData.name.trim().length < 2) {
+        return { valid: false, message: 'Branch name is required (min 2 characters)' }
+      }
+      if (!formData.code?.trim() || formData.code.trim().length < 3) {
+        return { valid: false, message: 'Branch code is required (min 3 characters)' }
+      }
+      const codeValid = /^[a-zA-Z0-9]+$/.test(formData.code.trim())
+      if (!codeValid) {
+        return { valid: false, message: 'Branch code must be alphanumeric only' }
+      }
+      const phone = formData.contact?.phone?.replace(/\D/g, '') || ''
+      if (phone.length < 10) {
+        return { valid: false, message: 'Valid 10-digit phone number is required' }
+      }
+      return { valid: true }
+    }
+    if (step === 2) {
+      const addr = formData.address?.addressLine1?.trim() || ''
+      if (addr.length < 5) {
+        return { valid: false, message: 'Address line 1 is required (min 5 characters)' }
+      }
+      if (!formData.address?.city?.trim() || formData.address.city.trim().length < 2) {
+        return { valid: false, message: 'City is required' }
+      }
+      if (!formData.address?.state?.trim() || formData.address.state.trim().length < 2) {
+        return { valid: false, message: 'State is required' }
+      }
+      const pincode = formData.address?.pincode?.replace(/\D/g, '') || ''
+      if (pincode.length !== 6) {
+        return { valid: false, message: 'Valid 6-digit pincode is required' }
+      }
+      return { valid: true }
+    }
+    if (step === 3) {
+      if (!formData.operatingHours?.openTime || !formData.operatingHours?.closeTime) {
+        return { valid: false, message: 'Opening and closing times are required' }
+      }
+      if (!formData.operatingHours?.workingDays?.length) {
+        return { valid: false, message: 'Select at least one working day' }
+      }
+      return { valid: true }
+    }
+    return { valid: true }
+  }
+
+  const handleNextStep = () => {
+    const { valid, message } = validateStep(currentStep)
+    if (!valid) {
+      toast.error(message || 'Please fill all required fields')
+      return
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 4))
+  }
+
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1))
 
   if (!isOpen) return null
@@ -597,6 +691,43 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
                       placeholder="Near Metro Station"
                     />
                     <p className="text-xs text-gray-500 mt-1">Optional</p>
+                  </div>
+                </div>
+
+                {/* Serviceable Pincodes - Only these pincodes can order from this branch */}
+                <div className="pt-4 border-t">
+                  <Label className="text-base font-medium flex items-center gap-2 mb-2">
+                    <MapPinned className="h-4 w-4" />
+                    Serviceable Pincodes
+                  </Label>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Customers can only place orders if their address pincode matches one of these. Leave empty to use distance-based service.
+                  </p>
+                  <div className="flex gap-2 mb-3">
+                    <Input
+                      type="text"
+                      value={newServicePincode}
+                      onChange={(e) => setNewServicePincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="6-digit pincode (e.g. 324006)"
+                      maxLength={6}
+                      className="flex-1"
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={addServicePincode}>
+                      <Plus className="w-4 h-4 mr-1" /> Add
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(formData.serviceAreas || []).map((area, idx) => (
+                      <span key={idx} className="px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm flex items-center gap-2">
+                        {area.pincode}
+                        <button type="button" onClick={() => removeServicePincode(idx)} className="hover:text-red-600" aria-label="Remove">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                    {(formData.serviceAreas || []).length === 0 && (
+                      <span className="text-sm text-gray-500">No pincodes added yet</span>
+                    )}
                   </div>
                 </div>
 
@@ -838,7 +969,7 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
             </Button>
             
             {currentStep < 4 ? (
-              <Button type="button" onClick={nextStep}>
+              <Button type="button" onClick={handleNextStep}>
                 Next
               </Button>
             ) : (

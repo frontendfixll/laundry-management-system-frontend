@@ -272,7 +272,7 @@ export function SimpleSidebar({ searchQuery = '' }: SimpleSidebarProps) {
     setExpandedItems(prev =>
       prev.includes(itemName)
         ? prev.filter(name => name !== itemName)
-        : [...prev, itemName]
+        : [itemName] // Only one dropdown open at a time - close others when opening new one
     )
   }
 

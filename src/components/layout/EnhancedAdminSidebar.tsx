@@ -215,7 +215,7 @@ export function EnhancedSidebarProvider({ children }: EnhancedSidebarProviderPro
     setExpandedItems(prev => 
       prev.includes(itemName) 
         ? prev.filter(item => item !== itemName)
-        : [...prev, itemName]
+        : [itemName] // Only one dropdown open at a time
     )
   }
 

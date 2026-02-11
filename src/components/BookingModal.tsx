@@ -25,6 +25,7 @@ interface Branch {
   }
   contact?: { phone?: string }
   phone?: string
+  serviceAreas?: { pincode: string; isActive?: boolean }[]
   rating?: {
     average: number
     count: number
@@ -923,64 +924,87 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
           ) : (
             <>
               {/* Step 1: Select Branch */}
-              {step === 1 && (
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                    <Building2 className="w-5 h-5" style={getThemeStyles().primary} />
-                    Select Branch
-                  </h3>
-                  <p className="text-sm text-gray-500">Choose a branch near you</p>
+              {step === 1 && (() => {
+                // Customer's default area pincode (for sorting & "Not in your area" badge)
+                const defaultPincode = addresses.find(a => a.isDefault)?.pincode || addresses[0]?.pincode
+                const pincodeStr = defaultPincode ? String(defaultPincode).trim() : null
+                const branchServesPincode = (b: Branch) => {
+                  if (!pincodeStr) return true
+                  if (!b.serviceAreas?.length) return true
+                  return b.serviceAreas.some(sa => sa.isActive !== false && String(sa.pincode || '').trim() === pincodeStr)
+                }
+                const sortedBranches = [...branches].sort((a, b) => {
+                  const aIn = branchServesPincode(a)
+                  const bIn = branchServesPincode(b)
+                  if (aIn && !bIn) return -1
+                  if (!aIn && bIn) return 1
+                  return 0
+                })
+                return (
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                      <Building2 className="w-5 h-5" style={getThemeStyles().primary} />
+                      Select Branch
+                    </h3>
+                    <p className="text-sm text-gray-500">Choose a branch near you</p>
 
-                  {branches.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <Building2 className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                      <p>No branches available</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {branches.map((branch) => {
-                        const isSelected = selectedBranch?._id === branch._id
-                        return (
-                          <div
-                            key={branch._id}
-                            onClick={() => setSelectedBranch(branch)}
-                            className={`p-3 border-2 rounded-xl cursor-pointer transition-colors duration-150 ${isSelected
-                                ? 'border-current bg-current/10'
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                              }`}
-                            style={isSelected ? { borderColor: brandingColors.primaryColor, backgroundColor: getColorWithOpacity(brandingColors.primaryColor, 0.1) } : {}}
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex-1">
-                                <p className="font-medium text-gray-800">{branch.name}</p>
-                                <p className="text-sm text-gray-500">{branch.address?.city || branch.address?.addressLine1 || 'Location available'}</p>
-                                {/* Branch Rating */}
-                                {branch.rating && branch.rating.count > 0 && (
-                                  <div className="flex items-center gap-1 mt-1">
-                                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                                    <span className="text-sm font-medium text-gray-700">{branch.rating.average.toFixed(1)}</span>
-                                    <span className="text-xs text-gray-400">({branch.rating.count} reviews)</span>
+                    {branches.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500">
+                        <Building2 className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                        <p>No branches available</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {sortedBranches.map((branch) => {
+                          const isSelected = selectedBranch?._id === branch._id
+                          const inYourArea = branchServesPincode(branch)
+                          return (
+                            <div
+                              key={branch._id}
+                              onClick={() => setSelectedBranch(branch)}
+                              className={`p-3 border-2 rounded-xl cursor-pointer transition-colors duration-150 ${isSelected
+                                  ? 'border-current bg-current/10'
+                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                }`}
+                              style={isSelected ? { borderColor: brandingColors.primaryColor, backgroundColor: getColorWithOpacity(brandingColors.primaryColor, 0.1) } : {}}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <p className="font-medium text-gray-800">{branch.name}</p>
+                                    {!inYourArea && pincodeStr && (
+                                      <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-medium">Not in your area</span>
+                                    )}
                                   </div>
-                                )}
-                                {branch.rating && branch.rating.count === 0 && (
-                                  <p className="text-xs text-gray-400 mt-1">No reviews yet</p>
-                                )}
-                              </div>
-                              <div
-                                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 ${isSelected ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
-                                  }`}
-                                style={{ backgroundColor: brandingColors.primaryColor }}
-                              >
-                                <Check className="w-4 h-4 text-white" />
+                                  <p className="text-sm text-gray-500">{branch.address?.city || branch.address?.addressLine1 || 'Location available'}</p>
+                                  {/* Branch Rating */}
+                                  {branch.rating && branch.rating.count > 0 && (
+                                    <div className="flex items-center gap-1 mt-1">
+                                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                                      <span className="text-sm font-medium text-gray-700">{branch.rating.average.toFixed(1)}</span>
+                                      <span className="text-xs text-gray-400">({branch.rating.count} reviews)</span>
+                                    </div>
+                                  )}
+                                  {branch.rating && branch.rating.count === 0 && (
+                                    <p className="text-xs text-gray-400 mt-1">No reviews yet</p>
+                                  )}
+                                </div>
+                                <div
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 ${isSelected ? 'scale-100 opacity-100' : 'scale-0 opacity-0'
+                                    }`}
+                                  style={{ backgroundColor: brandingColors.primaryColor }}
+                                >
+                                  <Check className="w-4 h-4 text-white" />
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
 
               {/* Step 2: Service Type (Self Drop-off / Self Pickup) */}
               {step === 2 && (

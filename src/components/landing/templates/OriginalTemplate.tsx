@@ -517,7 +517,7 @@ function HeroCarousel({
   return (
     <div className="relative overflow-hidden group" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       {/* Navigation Arrows */}
-      <button onClick={prevSlide} className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 ${colors.primary} ${colors.hover} rounded-lg p-3 shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+      <button onClick={prevSlide} className={`absolute left-[-1px] top-1/2 -translate-y-1/2 z-30 ${colors.primary} ${colors.hover} rounded-lg p-3 shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
         <ChevronLeft className="w-6 h-6 text-white" />
       </button>
       <button onClick={nextSlide} className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 ${colors.primary} ${colors.hover} rounded-lg p-3 shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
@@ -568,7 +568,7 @@ function HeroCarousel({
                   <img
                     src={slide.image}
                     alt={slide.title}
-                    className="w-auto max-h-[520px] object-contain"
+                    className="w-auto max-h-[540px] object-contain"
                     style={{
                       mixBlendMode: 'multiply'
                     }}
@@ -966,7 +966,7 @@ export default function OriginalTemplate({
   return (
     <div className={`min-h-screen transition-colors duration-500`} style={{ backgroundColor: isDarkTheme ? '#111827' : theme.pageBg }}>
       {/* Hero Section */}
-      <section className="relative pt-0 pb-0 overflow-hidden transition-colors duration-300" style={{ backgroundColor: theme.heroBg }}>
+      <section className="relative pt-20 pb-0 overflow-hidden transition-colors duration-300" style={{ backgroundColor: theme.heroBg }}>
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <HeroCarousel
             isAuthenticated={isAuthenticated}

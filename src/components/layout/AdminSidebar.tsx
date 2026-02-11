@@ -284,7 +284,7 @@ export function AdminSidebarProvider({
   const toggleExpanded = (itemName: string) => {
     const newExpanded = expandedItems.includes(itemName)
       ? expandedItems.filter(item => item !== itemName)
-      : [...expandedItems, itemName]
+      : [itemName] // Only one dropdown open at a time
 
     setExpandedItems(newExpanded)
     localStorage.setItem('admin-sidebar-expanded', JSON.stringify(newExpanded))
