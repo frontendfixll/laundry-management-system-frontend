@@ -144,7 +144,7 @@ export default function TenantTicketDetailPage() {
     finally { setSubmittingFeedback(false) }
   }
 
-  const handleLogout = () => { logout(); router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/support/${ticketId}`)}`) }
+  const handleLogout = () => { logout(); router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/support/${ticketId}`)}`) }
 
   const formatTime = (date: string) => {
     const d = new Date(date)

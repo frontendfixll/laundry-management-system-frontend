@@ -115,7 +115,7 @@ export default function TenantSupportPage() {
     if (tenantInfo?.tenancyId) fetchTickets()
   }, [token, tenantInfo?.tenancyId, statusFilter])
 
-  const handleLogout = () => { logout(); router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/support`)}`) }
+  const handleLogout = () => { logout(); router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/support`)}`) }
 
   const getStatusIcon = (status: string) => {
     switch (status) {

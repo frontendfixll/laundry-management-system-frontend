@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import { usePermissions } from '@/hooks/usePermissions'
 import {
@@ -464,28 +465,33 @@ function AdminOrdersPage() {
             />
           </div>
           <div className="flex gap-2">
-            <select
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="placed">Pending</SelectItem>
+                <SelectItem value="assigned_to_branch">Assigned</SelectItem>
+                <SelectItem value="in_process">In Progress</SelectItem>
+                <SelectItem value="ready">Ready</SelectItem>
+                <SelectItem value="delivered">Delivered</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select 
+              value={filters.isExpress === undefined ? '' : filters.isExpress.toString()} 
+              onValueChange={(value) => handleFilterChange('isExpress', value === '' ? undefined : value === 'true')}
             >
-              <option value="">All Status</option>
-              <option value="placed">Pending</option>
-              <option value="assigned_to_branch">Assigned</option>
-              <option value="in_process">In Progress</option>
-              <option value="ready">Ready</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-            <select
-              value={filters.isExpress === undefined ? '' : filters.isExpress.toString()}
-              onChange={(e) => handleFilterChange('isExpress', e.target.value === '' ? undefined : e.target.value === 'true')}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Orders</option>
-              <option value="true">Express Only</option>
-              <option value="false">Regular Only</option>
-            </select>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Orders" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Orders</SelectItem>
+                <SelectItem value="true">Express Only</SelectItem>
+                <SelectItem value="false">Regular Only</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

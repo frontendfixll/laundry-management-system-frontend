@@ -14,6 +14,7 @@ interface BaseLoginFormProps {
   template: LandingPageTemplate
   tenantSlug?: string | null
   leftSideContent?: React.ReactNode
+  hideDemoCredentials?: boolean
   customStyling?: {
     containerClass?: string
     formCardClass?: string
@@ -25,6 +26,7 @@ export default function BaseLoginForm({
   template,
   tenantSlug,
   leftSideContent,
+  hideDemoCredentials = false,
   customStyling
 }: BaseLoginFormProps) {
   const [formData, setFormData] = useState({
@@ -46,7 +48,9 @@ export default function BaseLoginForm({
     setIsLoading(true);
 
     try {
-      const response = await authAPI.login(formData);
+      const credentials = { ...formData } as { email: string; password: string; tenantSlug?: string };
+      if (tenantSlug && tenantSlug.trim()) credentials.tenantSlug = tenantSlug.trim();
+      const response = await authAPI.login(credentials);
       console.log('Login response:', response);
 
       // Extract token and user from the correct location
@@ -78,29 +82,30 @@ export default function BaseLoginForm({
       if (user.role === 'customer') {
         // For customers, check if we have a redirect URL and tenant context
         if (redirectUrl && tenantSlug) {
-          // Check if redirect URL already starts with tenant slug to avoid duplication
-          if (redirectUrl.startsWith(`/${tenantSlug}`)) {
+          // If redirect is /customer/dashboard or /customer/*, map to tenant path
+          const decodedRedirect = decodeURIComponent(redirectUrl);
+          if (decodedRedirect.startsWith('/customer/')) {
+            const subPath = decodedRedirect.replace('/customer', '') || '/dashboard';
+            redirectPath = `/${tenantSlug}${subPath}`;
+            console.log(`🔄 Customer redirect (mapped /customer to tenant): ${redirectPath}`);
+          } else if (decodedRedirect.startsWith(`/${tenantSlug}`)) {
             // Redirect URL already contains tenant slug, use as-is
-            redirectPath = redirectUrl;
+            redirectPath = decodedRedirect;
             console.log(`🔄 Customer redirect (URL already has tenant): ${redirectPath}`);
-          } else if (redirectUrl.startsWith('/')) {
+          } else if (decodedRedirect.startsWith('/')) {
             // For subdomain-based tenants, redirect URL should be used as-is
-            // because the subdomain already provides the tenant context
             const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
             const isSubdomainTenant = hostname.includes('.') && !hostname.startsWith('localhost');
             
             if (isSubdomainTenant) {
-              // For subdomain tenants (e.g., tenacy.laundrylobby.com), use redirect URL as-is
-              redirectPath = redirectUrl;
+              redirectPath = decodedRedirect;
               console.log(`🔄 Customer redirect (subdomain tenant): ${redirectPath}`);
             } else {
-              // For path-based tenants (e.g., localhost:3000/tenant), prepend tenant slug
-              redirectPath = `/${tenantSlug}${redirectUrl}`;
+              redirectPath = `/${tenantSlug}${decodedRedirect}`;
               console.log(`🔄 Customer redirect with tenant context: ${redirectPath}`);
             }
           } else {
-            // Redirect URL is relative, build full path
-            redirectPath = `/${tenantSlug}/${redirectUrl}`;
+            redirectPath = `/${tenantSlug}/${decodedRedirect}`;
             console.log(`🔄 Customer redirect with relative URL: ${redirectPath}`);
           }
         } else if (tenantSlug) {
@@ -118,9 +123,10 @@ export default function BaseLoginForm({
             console.log(`🔄 Customer redirect to tenant dashboard: ${redirectPath}`);
           }
         } else {
-          // Fallback to regular customer dashboard
-          redirectPath = '/customer/dashboard';
-          console.log(`🔄 Customer redirect to regular dashboard: ${redirectPath}`);
+          // Multi-tenant: no tenant context - redirect to home (user must select a laundry first)
+          const lastTenant = typeof window !== 'undefined' ? sessionStorage.getItem('lastVisitedTenant') : null;
+          redirectPath = lastTenant ? `/${lastTenant}/dashboard` : '/';
+          console.log(`🔄 Customer redirect (multi-tenant): ${redirectPath}`);
         }
       } else {
         // For non-customers, use role-based routing
@@ -306,14 +312,12 @@ export default function BaseLoginForm({
               )}
             </div>
 
-            {/* Demo Accounts */}
+            {/* Demo Accounts - hide Customer option only on generic login with customer intent */}
             <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Demo Login:</h3>
               <div className="space-y-2">
-                {/* First row: 3 items (or 2 if no redirect parameter) */}
-                <div className={`grid ${redirectUrl ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
-                  {/* Only show Customer option if redirect parameter exists */}
-                  {redirectUrl && (
+                <div className={`grid ${redirectUrl && !hideDemoCredentials ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
+                  {redirectUrl && !hideDemoCredentials && (
                     <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
                       <input
                         type="radio"

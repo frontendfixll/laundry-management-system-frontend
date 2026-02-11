@@ -22,6 +22,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import toast from 'react-hot-toast'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
@@ -415,15 +416,16 @@ function AdminInventoryPage() {
               className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
             />
           </div>
-          <select 
-            value={filter} 
-            onChange={(e) => setFilter(e.target.value)} 
-            className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Items</option>
-            <option value="low">Low Stock</option>
-            <option value="expired">Expired</option>
-          </select>
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-full sm:w-auto">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Items</SelectItem>
+              <SelectItem value="low">Low Stock</SelectItem>
+              <SelectItem value="expired">Expired</SelectItem>
+            </SelectContent>
+          </Select>
           
           {/* Request New Item Button */}
           <Button
@@ -633,19 +635,21 @@ function AdminInventoryPage() {
                     Unit <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <select 
-                      value={newItem.unit} 
-                      onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })} 
-                      className="w-full px-3 py-2 pr-8 border-2 border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white cursor-pointer hover:border-blue-400 text-sm"
-                    >
-                      <option value="units">📦 Units</option>
-                      <option value="liters">💧 Liters</option>
-                      <option value="kg">⚖️ Kilograms</option>
-                      <option value="bottles">🍾 Bottles</option>
-                      <option value="boxes">📦 Boxes</option>
-                      <option value="pieces">🔢 Pieces</option>
-                      <option value="rolls">🎞️ Rolls</option>
-                      <option value="packs">📦 Packs</option>
+                    <Select value={newItem.unit} onValueChange={(value) => setNewItem({ ...newItem, unit: value })}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="units">📦 Units</SelectItem>
+                        <SelectItem value="liters">💧 Liters</SelectItem>
+                        <SelectItem value="kg">⚖️ Kilograms</SelectItem>
+                        <SelectItem value="bottles">🍾 Bottles</SelectItem>
+                        <SelectItem value="boxes">📦 Boxes</SelectItem>
+                        <SelectItem value="pieces">🔢 Pieces</SelectItem>
+                        <SelectItem value="rolls">🎞️ Rolls</SelectItem>
+                        <SelectItem value="packs">📦 Packs</SelectItem>
+                      </SelectContent>
+                    </Select>
                     </select>
                     <ChevronDown className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 pointer-events-none" />
                   </div>
@@ -1010,18 +1014,19 @@ function AdminInventoryPage() {
                 {/* Category */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <select
-                    value={requestItem.category}
-                    onChange={(e) => setRequestItem({...requestItem, category: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select Category</option>
-                    <option value="Cleaning Chemicals">Cleaning Chemicals</option>
-                    <option value="Dry Cleaning Chemicals">Dry Cleaning Chemicals</option>
-                    <option value="Packaging Materials">Packaging Materials</option>
-                    <option value="Equipment Supplies">Equipment Supplies</option>
-                    <option value="Other">Other</option>
-                  </select>
+                  <Select value={requestItem.category} onValueChange={(value) => setRequestItem({...requestItem, category: value})}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Select Category</SelectItem>
+                      <SelectItem value="Cleaning Chemicals">Cleaning Chemicals</SelectItem>
+                      <SelectItem value="Dry Cleaning Chemicals">Dry Cleaning Chemicals</SelectItem>
+                      <SelectItem value="Packaging Materials">Packaging Materials</SelectItem>
+                      <SelectItem value="Equipment Supplies">Equipment Supplies</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Description */}
@@ -1050,32 +1055,36 @@ function AdminInventoryPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Unit</label>
-                    <select
-                      value={requestItem.unit}
-                      onChange={(e) => setRequestItem({...requestItem, unit: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="units">Units</option>
-                      <option value="kg">Kilograms</option>
-                      <option value="liters">Liters</option>
-                      <option value="boxes">Boxes</option>
-                      <option value="bottles">Bottles</option>
-                      <option value="pieces">Pieces</option>
-                    </select>
+                    <Select value={requestItem.unit} onValueChange={(value) => setRequestItem({...requestItem, unit: value})}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="units">Units</SelectItem>
+                        <SelectItem value="kg">Kilograms</SelectItem>
+                        <SelectItem value="liters">Liters</SelectItem>
+                        <SelectItem value="boxes">Boxes</SelectItem>
+                        <SelectItem value="bottles">Bottles</SelectItem>
+                        <SelectItem value="pieces">Pieces</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
                 {/* Urgency */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Urgency Level</label>
-                  <select
-                    value={requestItem.urgency}
-                    onChange={(e) => setRequestItem({...requestItem, urgency: e.target.value as 'low' | 'normal' | 'high'})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="low">Low - Can wait 1-2 weeks</option>
-                    <option value="normal">Normal - Needed within a week</option>
-                    <option value="high">High - Urgent, needed ASAP</option>
+                  <Select value={requestItem.urgency} onValueChange={(value) => setRequestItem({...requestItem, urgency: value as 'low' | 'normal' | 'high'})}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low - Can wait 1-2 weeks</SelectItem>
+                      <SelectItem value="normal">Normal - Needed within a week</SelectItem>
+                      <SelectItem value="high">High - Urgent, needed ASAP</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                   </select>
                 </div>
 

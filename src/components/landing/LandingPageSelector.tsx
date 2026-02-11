@@ -6,7 +6,7 @@ import TemplateHeader from '@/components/layout/TemplateHeader'
 import { TenantProvider } from '@/contexts/TenantContext'
 import toast, { Toaster } from 'react-hot-toast'
 import { useAuthStore } from '@/store/authStore'
-import ThemeCustomizer, { TemplateType, ThemeColor } from './ThemeCustomizer'
+import { TemplateType, ThemeColor } from './ThemeCustomizer'
 import { Language } from '@/lib/translations'
 import MinimalTemplate from './templates/MinimalTemplate'
 import FreshSpinTemplate from './templates/FreshSpinTemplate'
@@ -189,21 +189,9 @@ export default function LandingPageSelector() {
           <TemplateHeader />
         )}
 
-        {/* Selected Template */}
+        {/* Selected Template - No theme/template selector; admin decides via branding */}
         <div className={needsHeader ? 'pt-16' : ''}>
           {renderTemplate()}
-        </div>
-
-        {/* Floating Theme Selector - Only for customization */}
-        <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
-          <ThemeCustomizer
-            onColorChange={handleColorChange}
-            onTemplateChange={(t) => handleTemplateChange(t as TemplateType)}
-            currentTemplate={currentTemplate}
-            currentColor={currentColor}
-            currentLanguage={currentLanguage}
-            onLanguageChange={handleLanguageChange}
-          />
         </div>
       </div>
 

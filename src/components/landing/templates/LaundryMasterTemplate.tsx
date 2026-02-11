@@ -398,7 +398,7 @@ function TestimonialsCarousel({ colors }: { colors: any }) {
   )
 }
 
-// Settings Panel Component
+// Settings Panel Component - Hidden on tenant pages (admin decides theme via branding)
 function SettingsPanel({
   colors,
   themeColor,
@@ -408,19 +408,22 @@ function SettingsPanel({
   onLanguageChange,
   onSchemeChange,
   onTemplateChange,
-  currentTemplate
+  currentTemplate,
+  isTenantPage
 }: {
   colors: any
   themeColor: ThemeColor
   currentLanguage: Language
   currentScheme: SchemeMode
   currentTemplate?: string
+  isTenantPage?: boolean
   onColorChange?: (color: ThemeColor) => void
   onLanguageChange?: (language: Language) => void
   onSchemeChange?: (scheme: SchemeMode) => void
   onTemplateChange?: (template: string) => void
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  if (isTenantPage) return null
 
   const languages = [
     { id: 'en', name: 'English', flag: '🇺🇸' },
@@ -676,12 +679,13 @@ export default function LaundryMasterTemplate({
     window.location.href = '/'
   }
 
-  // Get login URL with tenant redirect if on tenant page
+  // Get login URL - tenant-scoped for customers (must login from laundry page)
   const getLoginUrl = () => {
     if (isTenantPage) {
       const pathParts = window.location.pathname.split('/')
       if (pathParts.length > 1 && pathParts[1]) {
-        return `/auth/login?redirect=${encodeURIComponent(`/${pathParts[1]}`)}`
+        const tenantSlug = pathParts[1]
+        return `/${tenantSlug}/auth/login?redirect=${encodeURIComponent(`/${tenantSlug}`)}`
       }
     }
     return '/auth/login'
@@ -746,81 +750,83 @@ export default function LaundryMasterTemplate({
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
-      {/* Header Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm h-20 flex items-center" style={{ backgroundColor: theme.headerBg }}>
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              {tenantLogo ? (
-                <img src={tenantLogo} alt={tenantName || 'Logo'} className="h-10 w-auto" />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-8 h-8" style={{ color: theme.accent }} />
-                  <span className="text-xl font-bold" style={{ color: theme.textPrimary }}>
-                    {tenantBusinessName || tenantName || 'LaundryLobby'}
-                  </span>
-                </div>
-              )}
-            </Link>
+      {/* Header Navigation - Hide when isTenantPage: layout's TemplateHeader is used for consistent header across all pages */}
+      {!isTenantPage && (
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm h-20 flex items-center" style={{ backgroundColor: theme.headerBg }}>
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="flex items-center justify-between">
+              {/* Logo */}
+              <Link href="/" className="flex items-center gap-2">
+                {tenantLogo ? (
+                  <img src={tenantLogo} alt={tenantName || 'Logo'} className="h-10 w-auto" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-8 h-8" style={{ color: theme.accent }} />
+                    <span className="text-xl font-bold" style={{ color: theme.textPrimary }}>
+                      {tenantBusinessName || tenantName || 'LaundryLobby'}
+                    </span>
+                  </div>
+                )}
+              </Link>
 
-            {/* Navigation Links */}
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
-                Home
-              </Link>
-              <Link href="/services" className="text-gray-700 hover:text-gray-900 font-medium">
-                Services
-              </Link>
-              <Link href="/pricing" className="text-gray-700 hover:text-gray-900 font-medium">
-                Pricing
-              </Link>
-              <Link href="/help" className="text-gray-700 hover:text-gray-900 font-medium">
-                Help
-              </Link>
-            </nav>
+              {/* Navigation Links */}
+              <nav className="hidden md:flex items-center gap-6">
+                <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
+                  Home
+                </Link>
+                <Link href="/services" className="text-gray-700 hover:text-gray-900 font-medium">
+                  Services
+                </Link>
+                <Link href="/pricing" className="text-gray-700 hover:text-gray-900 font-medium">
+                  Pricing
+                </Link>
+                <Link href="/help" className="text-gray-700 hover:text-gray-900 font-medium">
+                  Help
+                </Link>
+              </nav>
 
-            {/* CTA Buttons */}
-            <div className="flex items-center gap-3">
-              {isAuthenticated ? (
-                <>
-                  <Link href="/customer/dashboard">
-                    <Button variant="outline" size="sm">
-                      Dashboard
+              {/* CTA Buttons */}
+              <div className="flex items-center gap-3">
+                {isAuthenticated ? (
+                  <>
+                    <Link href="/customer/dashboard">
+                      <Button variant="outline" size="sm">
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Button 
+                      size="sm"
+                      style={{ backgroundColor: theme.accent }}
+                      className="text-white"
+                      onClick={onBookNow}
+                    >
+                      Book Now
                     </Button>
-                  </Link>
-                  <Button 
-                    size="sm"
-                    style={{ backgroundColor: theme.accent }}
-                    className="text-white"
-                    onClick={onBookNow}
-                  >
-                    Book Now
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Link href="/auth/login">
-                    <Button variant="outline" size="sm">
-                      Login
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/login">
+                      <Button variant="outline" size="sm">
+                        Login
+                      </Button>
+                    </Link>
+                    <Button 
+                      size="sm"
+                      style={{ backgroundColor: theme.accent }}
+                      className="text-white"
+                      onClick={onBookNow}
+                    >
+                      Book Now
                     </Button>
-                  </Link>
-                  <Button 
-                    size="sm"
-                    style={{ backgroundColor: theme.accent }}
-                    className="text-white"
-                    onClick={onBookNow}
-                  >
-                    Book Now
-                  </Button>
-                </>
-              )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      {/* Hero Section */}
+      {/* Hero Section - pt-20 for fixed header (layout's TemplateHeader or template's own) */}
       <section className="relative h-[650px] flex items-center overflow-hidden pt-20">
         <div className="max-w-screen-2xl mx-auto w-full">
           {/* Background Image - Full width, increased height */}

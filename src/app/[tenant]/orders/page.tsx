@@ -165,7 +165,7 @@ export default function TenantOrders() {
 
   const handleLogout = () => {
     logout()
-    router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/orders`)}`)
+    router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/orders`)}`)
   }
 
   const filteredOrders = orders.filter(order => {

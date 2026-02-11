@@ -124,7 +124,7 @@ export default function TenantNewTicketPage() {
     }
   }
 
-  const handleLogout = () => { logout(); router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/support/new`)}`) }
+  const handleLogout = () => { logout(); router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/support/new`)}`) }
 
   if (!isAuthenticated) return null
 

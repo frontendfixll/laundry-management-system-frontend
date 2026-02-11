@@ -93,7 +93,7 @@ export default function TenantReviewsPage() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/reviews`)}`)
+      router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/reviews`)}`)
     }
   }, [isAuthenticated, tenant, router])
 

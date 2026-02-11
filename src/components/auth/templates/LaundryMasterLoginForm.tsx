@@ -9,7 +9,7 @@ import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Crown, Star, Award, Zap } from 'lucide-react'
 
-export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: string | null }) {
+export default function LaundryMasterLoginForm({ tenantSlug, hideDemoCredentials }: { tenantSlug?: string | null; hideDemoCredentials?: boolean }) {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -22,7 +22,9 @@ export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: st
     e.preventDefault()
     setIsLoading(true)
     try {
-      const response = await authAPI.login(formData)
+      const credentials = { ...formData } as { email: string; password: string; tenantSlug?: string }
+      if (tenantSlug?.trim()) credentials.tenantSlug = tenantSlug.trim()
+      const response = await authAPI.login(credentials)
 
       // Safe extraction
       const token = response.data?.token || response.data?.data?.token;
@@ -39,8 +41,11 @@ export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: st
 
       if (redirectUrl) {
         let finalRedirect = decodeURIComponent(redirectUrl)
-        if (tenantSlug && isLocalhost && !finalRedirect.startsWith(`/${tenantSlug}`)) {
-          finalRedirect = `/${tenantSlug}${finalRedirect}`;
+        if (finalRedirect.startsWith('/customer/')) {
+          const subPath = finalRedirect.replace('/customer', '') || '/dashboard'
+          finalRedirect = tenantSlug ? `/${tenantSlug}${subPath}` : '/'
+        } else if (tenantSlug && isLocalhost && !finalRedirect.startsWith(`/${tenantSlug}`)) {
+          finalRedirect = `/${tenantSlug}${finalRedirect}`
         }
         router.push(finalRedirect)
       } else {
@@ -51,12 +56,12 @@ export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: st
           center_admin: '/center-admin/dashboard',
           branch_manager: '/center_admin/dashboard',
           support: '/support/dashboard',
-          customer: '/customer/dashboard'
+          customer: tenantSlug ? `/${tenantSlug}/dashboard` : '/'
         }
 
         let redirectPath = routes[user.role] || '/'
-        if (tenantSlug && isLocalhost && !redirectPath.startsWith(`/${tenantSlug}`)) {
-          redirectPath = `/${tenantSlug}${redirectPath}`;
+        if (tenantSlug && isLocalhost && user.role !== 'customer' && !redirectPath.startsWith(`/${tenantSlug}`)) {
+          redirectPath = `/${tenantSlug}${redirectPath}`
         }
         router.push(redirectPath)
       }
@@ -177,12 +182,11 @@ export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: st
               </p>
             </div>
 
-            {/* Quick Demo Login */}
             <div className="mt-4 bg-purple-50 rounded-lg p-3 border border-purple-200">
               <h3 className="text-sm font-semibold text-gray-800 mb-2">Quick Demo Login:</h3>
               <div className="space-y-2">
-                {/* First row: 3 items */}
-                <div className="grid grid-cols-3 gap-1">
+                <div className={`grid ${hideDemoCredentials ? 'grid-cols-2' : 'grid-cols-3'} gap-1`}>
+                  {!hideDemoCredentials && (
                   <button
                     type="button"
                     onClick={() => setFormData({ email: 'testcustomer@demo.com', password: 'password123' })}
@@ -190,6 +194,7 @@ export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: st
                   >
                     <span className="text-xs font-medium text-gray-700">👤</span>
                   </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => setFormData({ email: 'admin@demo.com', password: 'password123' })}
@@ -205,10 +210,9 @@ export default function LaundryMasterLoginForm({ tenantSlug }: { tenantSlug?: st
                     <span className="text-xs font-medium text-gray-700">🎧</span>
                   </button>
                 </div>
-                {/* Labels row */}
                 <div className="space-y-1">
-                  <div className="grid grid-cols-3 gap-1 text-center">
-                    <span className="text-xs text-gray-600">Customer</span>
+                  <div className={`grid ${hideDemoCredentials ? 'grid-cols-2' : 'grid-cols-3'} gap-1 text-center`}>
+                    {!hideDemoCredentials && <span className="text-xs text-gray-600">Customer</span>}
                     <span className="text-xs text-gray-600">Admin</span>
                     <span className="text-xs text-gray-600">Support</span>
                   </div>

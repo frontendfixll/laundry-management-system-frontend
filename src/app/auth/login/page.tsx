@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import BaseLoginForm from '@/components/auth/BaseLoginForm'
 import MinimalLoginForm from '@/components/auth/templates/MinimalLoginForm'
 import FreshSpinLoginForm from '@/components/auth/templates/FreshSpinLoginForm'
 import LaundryMasterLoginForm from '@/components/auth/templates/LaundryMasterLoginForm'
 import { getCurrentTemplate, getTemplateTheme, getTemplateContent, LandingPageTemplate } from '@/utils/templateUtils'
-import { Sparkles, Truck, Clock, Shield, CheckCircle } from 'lucide-react'
+import { Sparkles, Truck, Clock, Shield, CheckCircle, Home } from 'lucide-react'
 
 const RESERVED_ROUTES = [
   'admin', 'auth', 'api', 'branch', 'center-admin', 'customer', 'debug-login',
@@ -18,6 +20,7 @@ const RESERVED_ROUTES = [
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
 export default function LoginPage() {
+  const searchParams = useSearchParams()
   const [template, setTemplate] = useState<string>('original')
   const [isLoading, setIsLoading] = useState(true)
   const [tenantSlug, setTenantSlug] = useState<string | null>(null)
@@ -55,25 +58,11 @@ export default function LoginPage() {
       // The path might be /[tenant]/auth/login
       const pathTenant = pathSegments.length >= 3 && pathSegments[1] === 'auth' ? pathSegments[0] : null
 
-      // Determine which tenant to use - try multiple fallbacks
-      let identifiedSlug = subdomain || pathTenant || tenantParam || lastTenant
-      
-      // If no tenant detected, try to get from URL or use test as final fallback
-      if (!identifiedSlug) {
-        // Check if URL has any tenant-like patterns
-        const urlPath = window.location.pathname
-        const pathParts = urlPath.split('/').filter(Boolean)
-        
-        // Look for tenant in path (e.g., /dgsfg/auth/login)
-        if (pathParts.length > 0 && pathParts[0] !== 'auth' && pathParts[0] !== 'admin') {
-          identifiedSlug = pathParts[0]
-        } else {
-          // Final fallback to test tenant
-          identifiedSlug = 'test'
-        }
-      }
-      
-      setTenantSlug(identifiedSlug)
+      // Option 1: Only use tenant when ON a tenant page (path/subdomain/param)
+      // Generic /auth/login → no tenantSlug → customer login fails: "Please login from a laundry's page"
+      // Don't derive from lastTenant or redirect param
+      const identifiedSlug = subdomain || pathTenant || tenantParam || null
+      setTenantSlug(identifiedSlug || null)
 
       console.log('🔍 Login Page - Hostname:', hostname)
       console.log('🔍 Login Page - Path detected slug:', pathTenant)
@@ -126,17 +115,57 @@ export default function LoginPage() {
     )
   }
 
+  // Generic login (no tenant) with customer intent - hide demo credentials, show notice at bottom
+  const isGenericLogin = !tenantSlug
+  const redirectParam = searchParams?.get('redirect') || ''
+  const isCustomerIntent = redirectParam.includes('openBooking') || redirectParam.includes('/customer')
+  const hideDemoCredentials = isGenericLogin && isCustomerIntent
+
+  // Notice at bottom - customers must use their laundry's page (subtle, not top banner)
+  const GenericLoginFooter = () => (
+    <div className="mt-8 text-center">
+      <p className="text-sm text-gray-500">
+        To book or login as a customer, visit your laundry&apos;s page.{' '}
+        <Link href="/" className="text-teal-600 hover:text-teal-700 font-medium inline-flex items-center gap-1">
+          <Home className="h-3.5 w-3.5" />
+          Go to Homepage
+        </Link>
+      </p>
+    </div>
+  )
+
   // Use template-specific login forms for templates 2, 3, and 4
   if (template === 'minimal') {
-    return <MinimalLoginForm tenantSlug={tenantSlug} />
+    return (
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <MinimalLoginForm tenantSlug={tenantSlug} hideDemoCredentials={hideDemoCredentials} />
+        </div>
+        {isGenericLogin && isCustomerIntent && <GenericLoginFooter />}
+      </div>
+    )
   }
 
   if (template === 'freshspin') {
-    return <FreshSpinLoginForm tenantSlug={tenantSlug} />
+    return (
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <FreshSpinLoginForm tenantSlug={tenantSlug} hideDemoCredentials={hideDemoCredentials} />
+        </div>
+        {isGenericLogin && isCustomerIntent && <GenericLoginFooter />}
+      </div>
+    )
   }
 
   if (template === 'starter') {
-    return <LaundryMasterLoginForm tenantSlug={tenantSlug} />
+    return (
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-1">
+          <LaundryMasterLoginForm tenantSlug={tenantSlug} hideDemoCredentials={hideDemoCredentials} />
+        </div>
+        {isGenericLogin && isCustomerIntent && <GenericLoginFooter />}
+      </div>
+    )
   }
 
   // Original template (template 1) - keep existing design
@@ -339,10 +368,16 @@ export default function LoginPage() {
   }
 
   return (
-    <BaseLoginForm
-      template={template}
-      tenantSlug={tenantSlug}
-      leftSideContent={getLeftContent()}
-    />
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1">
+        <BaseLoginForm
+          template={template}
+          tenantSlug={tenantSlug}
+          leftSideContent={getLeftContent()}
+          hideDemoCredentials={hideDemoCredentials}
+        />
+      </div>
+      {isGenericLogin && isCustomerIntent && <GenericLoginFooter />}
+    </div>
   )
 }

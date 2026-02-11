@@ -86,7 +86,7 @@ api.interceptors.response.use(
 
 // API endpoints
 export const authAPI = {
-  login: (credentials: { email: string; password: string }) =>
+  login: (credentials: { email: string; password: string; tenantSlug?: string }) =>
     api.post('/auth/login', credentials),
   
   register: (userData: {

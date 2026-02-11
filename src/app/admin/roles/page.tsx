@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { api } from '@/lib/api'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Shield, Search, Plus, Edit2, Trash2, AlertCircle, 
   RefreshCw, Loader2, Check, X, Users, UserCog
@@ -541,16 +542,17 @@ export default function AdminRolesPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
-                <select
-                  value={selectedRoleId}
-                  onChange={(e) => setSelectedRoleId(e.target.value)}
-                  className="w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">No Role (Remove Assignment)</option>
-                  {roles.map(role => (
-                    <option key={role._id} value={role._id}>{role.name}</option>
-                  ))}
-                </select>
+                <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="No Role (Remove Assignment)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No Role (Remove Assignment)</SelectItem>
+                    {roles.map(role => (
+                      <SelectItem key={role._id} value={role._id}>{role.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               {selectedRoleId && (
                 <div className="p-3 bg-blue-50 rounded-lg">

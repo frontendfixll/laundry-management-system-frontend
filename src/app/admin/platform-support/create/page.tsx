@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, AlertTriangle, Package, CreditCard, Calendar, DollarSign, Upload, X } from 'lucide-react'
 import { tenantTicketApi, CreateTicketData } from '@/services/tenantTicketApi'
 import { useUnifiedNotifications } from '@/hooks/useUnifiedNotifications'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const categories = [
   {
@@ -320,22 +321,23 @@ export default function CreateTicketPage() {
               {loadingSubcategories ? (
                 <div className="text-sm text-gray-500">Loading options...</div>
               ) : (
-                <select
-                  name="subcategory"
-                  value={formData.subcategory}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
+                <Select 
+                  value={formData.subcategory} 
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, subcategory: value }))}
                 >
-                  <option value="">Select specific issue type</option>
-                  {subcategories && subcategories.length > 0 ? (
-                    subcategories.map(sub => (
-                      <option key={sub} value={sub}>{sub}</option>
-                    ))
-                  ) : (
-                    <option disabled>No options available</option>
-                  )}
-                </select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select specific issue type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subcategories && subcategories.length > 0 ? (
+                      subcategories.map(sub => (
+                        <SelectItem key={sub} value={sub}>{sub}</SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="" disabled>No options available</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               )}
               
               {/* Show selected category info */}
@@ -380,16 +382,19 @@ export default function CreateTicketPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Priority (Your Assessment) *
               </label>
-              <select
-                name="perceivedPriority"
-                value={formData.perceivedPriority}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              <Select 
+                value={formData.perceivedPriority} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, perceivedPriority: value as 'low' | 'medium' | 'high' }))}
               >
-                <option value="low">Low - Minor issue, no business impact</option>
-                <option value="medium">Medium - Some impact on operations</option>
-                <option value="high">High - Significant business impact</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low - Minor issue, no business impact</SelectItem>
+                  <SelectItem value="medium">Medium - Some impact on operations</SelectItem>
+                  <SelectItem value="high">High - Significant business impact</SelectItem>
+                </SelectContent>
+              </Select>
               <div className={`mt-2 px-2 py-1 rounded text-xs font-medium border ${getPriorityColor(formData.perceivedPriority || 'medium')}`}>
                 Note: Final priority will be determined by our support team based on business impact
               </div>

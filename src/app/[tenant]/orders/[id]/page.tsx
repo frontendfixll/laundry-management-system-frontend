@@ -119,7 +119,7 @@ export default function TenantOrderDetail() {
 
   const handleLogout = () => {
     logout()
-    router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/orders/${orderId}`)}`)
+    router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/orders/${orderId}`)}`)
   }
 
   const canCancelOrder = () => {

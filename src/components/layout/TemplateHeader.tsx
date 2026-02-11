@@ -90,14 +90,16 @@ export default function TemplateHeader() {
   const effectiveTenantSlug = tenant?.slug || (isOnTenantRoute ? tenantFromUrl : null)
   const effectiveIsTenantPage = isTenantPage || isOnTenantRoute
 
-  // Get display name and logo from tenant or default
-  const displayName = tenant?.businessName || tenant?.name || 'LaundryLobby'
+  // Get display name and logo from tenant or default (avoid "LaundryLobby" on tenant pages)
+  const displayName = tenant?.businessName || tenant?.name || (effectiveTenantSlug && typeof window !== 'undefined' ? sessionStorage.getItem(`tenant_${effectiveTenantSlug}_name`) : null) || 'LaundryLobby'
   const logoUrl = tenant?.logo
 
-  // Use tenant template if on tenant page, otherwise use localStorage
-  const rawTemplate = (effectiveIsTenantPage && tenant?.landingPageTemplate)
-    ? tenant.landingPageTemplate
-    : (template || 'original')
+  // Use tenant template: context first, then sessionStorage fallback for consistency across Home/Services/Pricing/Help
+  const templateFromContext = effectiveIsTenantPage && tenant?.landingPageTemplate
+  const templateFromStorage = effectiveTenantSlug && typeof window !== 'undefined' ? sessionStorage.getItem(`tenant_${effectiveTenantSlug}_template`) : null
+  const rawTemplate = templateFromContext
+    ? (tenant?.landingPageTemplate ?? 'original')
+    : (templateFromStorage || template || 'original')
 
   // Normalization: convert to lowercase and remove spaces (e.g. "Fresh Spin" -> "freshspin")
   const activeTemplate = rawTemplate.toLowerCase().replace(/\s+/g, '') as TemplateType
@@ -112,26 +114,9 @@ export default function TemplateHeader() {
 
   // Helper to generate tenant-aware URLs
   const getLink = (path: string) => {
-    // Debug logging
-    console.log('🔗 getLink called:', {
-      path,
-      pathname,
-      tenantFromUrl,
-      isOnTenantRoute,
-      effectiveTenantSlug,
-      effectiveIsTenantPage,
-      contextTenant: tenant?.slug,
-      contextIsTenantPage: isTenantPage
-    });
-
-    // Use effective values (context or URL detection)
     if (effectiveIsTenantPage && effectiveTenantSlug) {
-      // For tenant pages, keep URLs within tenant space
-      const result = path === '/' ? `/${effectiveTenantSlug}` : `/${effectiveTenantSlug}${path}`;
-      console.log('✅ Returning tenant-aware URL:', result);
-      return result;
+      return path === '/' ? `/${effectiveTenantSlug}` : `/${effectiveTenantSlug}${path}`
     }
-    console.log('⚠️ Returning plain path:', path);
     return path
   }
 
@@ -151,6 +136,8 @@ export default function TemplateHeader() {
     }
   }
 
+  // Get tenant-scoped login URL - customers must login from tenant page
+
   // Handle Logout - redirect to tenant page if on tenant, otherwise to home
   const handleLogout = () => {
     useAuthStore.getState().logout()
@@ -161,10 +148,10 @@ export default function TemplateHeader() {
     }
   }
 
-  // Get login URL with tenant redirect if on tenant page
+  // Get login URL - tenant-scoped for customers (must login from laundry page)
   const getLoginUrl = () => {
     if (effectiveIsTenantPage && effectiveTenantSlug) {
-      return `/auth/login?redirect=${encodeURIComponent(`/${effectiveTenantSlug}`)}`
+      return `/${effectiveTenantSlug}/auth/login?redirect=${encodeURIComponent(`/${effectiveTenantSlug}`)}`
     }
     return '/auth/login'
   }
@@ -193,13 +180,14 @@ export default function TemplateHeader() {
       const savedLanguage = localStorage.getItem('landing_language') as Language
       const savedScheme = localStorage.getItem('landing_scheme')
 
-      if (savedColor && ['teal', 'blue', 'purple', 'orange'].includes(savedColor)) {
+      // On tenant pages: use admin-saved theme (tenant.primaryColor), don't override with localStorage
+      if (!(effectiveIsTenantPage && tenant?.primaryColor) && savedColor && ['teal', 'blue', 'purple', 'orange'].includes(savedColor)) {
         setThemeColor(savedColor)
       }
       if (savedScheme === 'dark') {
         setIsDarkMode(true)
       }
-      if (savedTemplate) {
+      if (!(effectiveIsTenantPage && tenant?.landingPageTemplate) && savedTemplate) {
         setTemplate(savedTemplate)
       }
       if (savedLanguage && ['en', 'es', 'hi'].includes(savedLanguage)) {
@@ -207,7 +195,7 @@ export default function TemplateHeader() {
       }
       setIsLoaded(true)
     }
-  }, [])
+  }, [effectiveIsTenantPage, tenant?.primaryColor, tenant?.landingPageTemplate])
 
   // Listen for theme color changes from PageThemeCustomizer
   useEffect(() => {
@@ -218,12 +206,14 @@ export default function TemplateHeader() {
     return () => window.removeEventListener('themeColorChange', handleThemeChange as EventListener)
   }, [])
 
-  // Sync with tenant primary color
+  // Sync with tenant primary color (context or sessionStorage fallback for consistency across routes)
   useEffect(() => {
-    if (tenant?.primaryColor) {
-      setThemeColor(mapHexToThemeColor(tenant.primaryColor))
+    const color = tenant?.primaryColor
+      || (effectiveTenantSlug && typeof window !== 'undefined' ? sessionStorage.getItem(`tenant_${effectiveTenantSlug}_theme`) : null)
+    if (color) {
+      setThemeColor(mapHexToThemeColor(color))
     }
-  }, [tenant?.primaryColor])
+  }, [tenant?.primaryColor, effectiveTenantSlug])
 
 
   // Listen for language changes
@@ -447,8 +437,8 @@ export default function TemplateHeader() {
     return (
       <header className={`fixed top-0 left-0 right-0 z-50 ${headerBg} shadow-sm h-20 flex items-center`}>
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
+          <div className="grid grid-cols-3 items-center w-full">
+            {/* Logo - Left */}
             <Link href={getLink('/')} className="flex items-center gap-3 flex-shrink-0">
               {logoUrl ? (
                 <img src={logoUrl} alt={displayName} className="w-10 h-10 rounded-lg object-contain" />
@@ -461,7 +451,7 @@ export default function TemplateHeader() {
             </Link>
 
             {/* Navigation - Center */}
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center justify-center gap-8">
               <Link href={getLink('/')} className={`font-medium ${pathname === '/' || pathname === `/${tenant?.slug}` ? colors.text : textMuted} ${colors.hoverText}`}>{t('nav.home')}</Link>
               <Link href={getLink('/services')} className={`font-medium ${pathname?.includes('/services') ? colors.text : textMuted} ${colors.hoverText}`}>{t('nav.services')}</Link>
               <Link href={getLink('/pricing')} className={`font-medium ${pathname?.includes('/pricing') ? colors.text : textMuted} ${colors.hoverText}`}>{t('nav.pricing')}</Link>
@@ -469,7 +459,7 @@ export default function TemplateHeader() {
             </nav>
 
             {/* Right Side */}
-            <div className="flex items-center gap-4 flex-shrink-0">
+            <div className="flex items-center justify-end gap-4 flex-shrink-0">
               {/* Dark Mode Toggle */}
               <button
                 onClick={toggleDarkMode}
@@ -557,7 +547,7 @@ export default function TemplateHeader() {
             </div>
 
             {/* Mobile: Dark Mode Toggle + Menu Button */}
-            <div className="lg:hidden flex items-center gap-2">
+            <div className="lg:hidden flex items-center justify-end gap-2">
               <button
                 onClick={toggleDarkMode}
                 className={`p-2 rounded-full ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'} transition-colors`}

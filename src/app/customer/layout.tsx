@@ -29,24 +29,29 @@ export default function CustomerLayout({
   useEffect(() => {
     // Wait a bit for store to initialize
     const timer = setTimeout(() => {
-      // Robust tenant detection for redirect
-      let tenantSlug = ''
-      if (typeof window !== 'undefined') {
-        const cookies = document.cookie.split('; ')
-        const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
-        tenantSlug = tenantCookie ? tenantCookie.split('=')[1] : ''
+      if (typeof window === 'undefined') return
 
-        if (!tenantSlug) {
-          const pathSegments = window.location.pathname.split('/').filter(Boolean)
-          const potentialSlug = pathSegments[0]
-          const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
-          if (potentialSlug && !reserved.includes(potentialSlug)) {
-            tenantSlug = potentialSlug
-          }
-        }
+      // Multi-tenant: /customer/* requires tenant context - redirect to tenant equivalent or home
+      const pathname = window.location.pathname
+      const lastTenant = sessionStorage.getItem('lastVisitedTenant')
+      const cookies = document.cookie.split('; ')
+      const tenantCookie = cookies.find(row => row.startsWith('tenant-slug='))
+      const tenantSlug = tenantCookie ? tenantCookie.split('=')[1] : lastTenant || ''
+
+      // If we have a known tenant, redirect /customer/* to /{tenant}/* (tenant-scoped customer pages)
+      if (tenantSlug && pathname.startsWith('/customer/')) {
+        const subPath = pathname.replace('/customer', '') || '/dashboard'
+        router.replace(`/${tenantSlug}${subPath}`)
+        return
       }
 
-      const loginPath = tenantSlug ? `/${tenantSlug}/auth/login` : '/auth/login'
+      // No tenant context - redirect to home (user must select a tenant first)
+      if (!tenantSlug) {
+        router.replace('/')
+        return
+      }
+
+      const loginPath = `/${tenantSlug}/auth/login`
 
       if (!isAuthenticated || !user) {
         router.push(loginPath)

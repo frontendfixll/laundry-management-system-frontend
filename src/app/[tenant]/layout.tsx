@@ -1,11 +1,14 @@
 'use client'
 
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import { TenantProvider } from '@/contexts/TenantContext'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { usePreviewStore } from '@/store/previewStore'
 import TemplateHeader from '@/components/layout/TemplateHeader'
+
+// Customer app routes - do NOT show landing TemplateHeader (they have their own layout)
+const CUSTOMER_APP_SEGMENTS = ['dashboard', 'orders', 'profile', 'addresses', 'loyalty', 'referrals', 'offers', 'reviews', 'all-reviews', 'wallet', 'support', 'auth']
 
 interface TenantBranding {
   name: string
@@ -46,11 +49,17 @@ interface TenantBranding {
 
 export default function TenantLayout({ children }: { children: React.ReactNode }) {
   const params = useParams()
-  const router = useRouter()
+  const pathname = usePathname()
   const tenant = params?.tenant as string
   const { user } = useAuthStore()
   const { isAdminPreviewMode } = usePreviewStore()
   const [tenantData, setTenantData] = useState<TenantBranding | null>(null)
+
+  // Show TemplateHeader only on landing pages (home, services, pricing, help) - not on customer dashboard/app pages
+  const pathSegments = (pathname || '').split('/').filter(Boolean)
+  const secondSegment = pathSegments[1] // e.g. 'dashboard' from /gaurav/dashboard
+  const isCustomerAppPage = secondSegment && CUSTOMER_APP_SEGMENTS.includes(secondSegment)
+  const showLandingHeader = !isCustomerAppPage
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -78,6 +87,15 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
         // Save tenant slug to sessionStorage for auth pages to use
         console.log('🏪 [TenantLayout] Saving tenant to sessionStorage:', tenant)
         sessionStorage.setItem('lastVisitedTenant', tenant as string)
+
+        // Persist template, theme & name for consistent header across all tenant pages (Home, Services, Pricing, Help)
+        const d = data.data
+        const tpl = (d.branding?.landingPageTemplate || d.landingPageTemplate || 'original').toLowerCase().replace(/\s+/g, '')
+        const primColor = d.branding?.theme?.primaryColor
+        const bizName = d.branding?.businessName || d.name
+        sessionStorage.setItem(`tenant_${tenant}_template`, tpl)
+        if (primColor) sessionStorage.setItem(`tenant_${tenant}_theme`, primColor)
+        if (bizName) sessionStorage.setItem(`tenant_${tenant}_name`, bizName)
       } catch (err) {
         console.error('🏪 [TenantLayout] Error fetching tenant branding:', err)
         setError('Failed to load')
@@ -151,7 +169,7 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
       }}
       isTenantPage={true}
     >
-      <TemplateHeader />
+      {showLandingHeader && <TemplateHeader />}
       {children}
     </TenantProvider>
   )

@@ -44,6 +44,7 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { Tag, FileText, ArrowRight, ExternalLink, ShieldAlert, AlertCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface AppNotification {
   id: string
@@ -419,18 +420,17 @@ export default function NotificationsPage() {
               </div>
               <div className="space-y-2">
                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Select Category</p>
-                <select
-                  className="w-full bg-gray-50 border-none text-[10px] font-bold rounded-lg p-1 px-2 focus:ring-1 focus:ring-blue-200"
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFilters(prev => ({ ...prev, type: val === 'all' ? [] : [val] }));
-                  }}
-                >
-                  <option value="all">Everywhere</option>
-                  {availableCategories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                <Select onValueChange={(val) => setFilters(prev => ({ ...prev, type: val === 'all' ? [] : [val] }))}>
+                  <SelectTrigger className="w-full bg-gray-50 border-none text-[10px] font-bold rounded-lg p-1 px-2 focus:ring-1 focus:ring-blue-200">
+                    <SelectValue placeholder="Everywhere" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Everywhere</SelectItem>
+                    {availableCategories.map(cat => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           )}

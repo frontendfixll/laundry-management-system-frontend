@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { tenantTicketApi, TenantTicket, TicketFilters } from '@/services/tenantTicketApi'
 import { ThemedSpinner } from '@/components/ui/ThemedSpinner'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const statusColors = {
   new: 'bg-blue-100 text-blue-800',
@@ -200,47 +201,50 @@ export default function TicketsPage() {
 
           {/* Filter Dropdowns */}
           <div className="flex space-x-3">
-            <select
-              value={filters.status || ''}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">All Status</option>
-              <option value="new">New</option>
-              <option value="acknowledged">Acknowledged</option>
-              <option value="in_progress">In Progress</option>
-              <option value="waiting_for_tenant">Waiting for You</option>
-              <option value="escalated">Escalated</option>
-              <option value="resolved">Resolved</option>
-              <option value="closed">Closed</option>
-            </select>
+            <Select value={filters.status || ''} onValueChange={(value) => handleFilterChange('status', value)}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Status</SelectItem>
+                <SelectItem value="new">New</SelectItem>
+                <SelectItem value="acknowledged">Acknowledged</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="waiting_for_tenant">Waiting for You</SelectItem>
+                <SelectItem value="escalated">Escalated</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <select
-              value={filters.priority || ''}
-              onChange={(e) => handleFilterChange('priority', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">All Priority</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="critical">Critical</option>
-            </select>
+            <Select value={filters.priority || ''} onValueChange={(value) => handleFilterChange('priority', value)}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Priority</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
 
-            <select
-              value={filters.category || ''}
-              onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">All Categories</option>
-              <option value="order_operations">Order & Operations</option>
-              <option value="payment_settlement">Payment & Settlement</option>
-              <option value="refunds">Refunds</option>
-              <option value="account_subscription">Account & Subscription</option>
-              <option value="technical_bug">Technical / Bug</option>
-              <option value="how_to_configuration">How-To / Configuration</option>
-              <option value="security_compliance">Security / Compliance</option>
-            </select>
+            <Select value={filters.category || ''} onValueChange={(value) => handleFilterChange('category', value)}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="order_operations">Order & Operations</SelectItem>
+                <SelectItem value="payment_settlement">Payment & Settlement</SelectItem>
+                <SelectItem value="refunds">Refunds</SelectItem>
+                <SelectItem value="account_subscription">Account & Subscription</SelectItem>
+                <SelectItem value="technical_bug">Technical / Bug</SelectItem>
+                <SelectItem value="how_to_configuration">How-To / Configuration</SelectItem>
+                <SelectItem value="security_compliance">Security / Compliance</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

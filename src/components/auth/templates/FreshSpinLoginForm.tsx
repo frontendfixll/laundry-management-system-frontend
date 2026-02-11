@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
 import { Eye, EyeOff, Mail, Lock, ArrowLeft, Sparkles, CheckCircle, Truck, Clock, Shield } from 'lucide-react'
 
-export default function FreshSpinLoginForm({ tenantSlug }: { tenantSlug?: string | null }) {
+export default function FreshSpinLoginForm({ tenantSlug, hideDemoCredentials }: { tenantSlug?: string | null; hideDemoCredentials?: boolean }) {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -23,7 +23,9 @@ export default function FreshSpinLoginForm({ tenantSlug }: { tenantSlug?: string
     e.preventDefault()
     setIsLoading(true)
     try {
-      const response = await authAPI.login(formData)
+      const credentials = { ...formData } as { email: string; password: string; tenantSlug?: string }
+      if (tenantSlug?.trim()) credentials.tenantSlug = tenantSlug.trim()
+      const response = await authAPI.login(credentials)
 
       // Safe extraction
       const token = response.data?.token || response.data?.data?.token;
@@ -40,8 +42,11 @@ export default function FreshSpinLoginForm({ tenantSlug }: { tenantSlug?: string
 
       if (redirectUrl) {
         let finalRedirect = decodeURIComponent(redirectUrl)
-        if (tenantSlug && isLocalhost && !finalRedirect.startsWith(`/${tenantSlug}`)) {
-          finalRedirect = `/${tenantSlug}${finalRedirect}`;
+        if (finalRedirect.startsWith('/customer/')) {
+          const subPath = finalRedirect.replace('/customer', '') || '/dashboard'
+          finalRedirect = tenantSlug ? `/${tenantSlug}${subPath}` : '/'
+        } else if (tenantSlug && isLocalhost && !finalRedirect.startsWith(`/${tenantSlug}`)) {
+          finalRedirect = `/${tenantSlug}${finalRedirect}`
         }
         router.push(finalRedirect)
       } else {
@@ -52,12 +57,12 @@ export default function FreshSpinLoginForm({ tenantSlug }: { tenantSlug?: string
           center_admin: '/center-admin/dashboard',
           branch_manager: '/center_admin/dashboard',
           support: '/support/dashboard',
-          customer: '/customer/dashboard'
+          customer: tenantSlug ? `/${tenantSlug}/dashboard` : '/'
         }
 
         let redirectPath = routes[user.role] || '/'
-        if (tenantSlug && isLocalhost && !redirectPath.startsWith(`/${tenantSlug}`)) {
-          redirectPath = `/${tenantSlug}${redirectPath}`;
+        if (tenantSlug && isLocalhost && user.role !== 'customer' && !redirectPath.startsWith(`/${tenantSlug}`)) {
+          redirectPath = `/${tenantSlug}${redirectPath}`
         }
         router.push(redirectPath)
       }
@@ -150,8 +155,8 @@ export default function FreshSpinLoginForm({ tenantSlug }: { tenantSlug?: string
             <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Demo Login:</h3>
               <div className="space-y-2">
-                {/* First row: 3 items */}
-                <div className="grid grid-cols-3 gap-2">
+                <div className={`grid ${hideDemoCredentials ? 'grid-cols-2' : 'grid-cols-3'} gap-2`}>
+                  {!hideDemoCredentials && (
                   <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
                     <input
                       type="radio"
@@ -163,6 +168,7 @@ export default function FreshSpinLoginForm({ tenantSlug }: { tenantSlug?: string
                     />
                     <span className="text-xs text-gray-600">Customer</span>
                   </label>
+                  )}
                   <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
                     <input
                       type="radio"

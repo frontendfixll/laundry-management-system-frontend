@@ -5,6 +5,7 @@ import { Bell, CheckCircle, AlertTriangle, Info, XCircle, Shield, Package, Credi
 import { cn } from '@/lib/utils'
 import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
 import { useRouter } from 'next/navigation'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface Notification {
   id: string
@@ -197,27 +198,29 @@ export default function AllNotificationsPage() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <label className="text-sm font-medium text-gray-700">Filter:</label>
-                <select
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value as any)}
-                  className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="all">All ({notifications.length})</option>
-                  <option value="unread">Unread ({unreadCount})</option>
-                  <option value="read">Read ({notifications.length - unreadCount})</option>
-                </select>
+                <Select value={filter} onValueChange={(value) => setFilter(value as any)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All ({notifications.length})</SelectItem>
+                    <SelectItem value="unread">Unread ({unreadCount})</SelectItem>
+                    <SelectItem value="read">Read ({notifications.length - unreadCount})</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="flex items-center space-x-2">
                 <label className="text-sm font-medium text-gray-700">Sort:</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="newest">Newest First</option>
-                  <option value="oldest">Oldest First</option>
-                </select>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value as any)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="oldest">Oldest First</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

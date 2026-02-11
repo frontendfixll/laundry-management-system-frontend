@@ -6,10 +6,16 @@ import { Truck, ChevronDown, Loader2, Phone } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { ThemeColor, SchemeMode, Language, getThemeColors } from '@/components/layout/SettingsPanel'
 import { translations } from '@/lib/translations'
 import { useTenant } from '@/contexts/TenantContext'
 import BookingModal from '@/components/BookingModal'
+
+// Dynamic imports for template-specific pricing pages
+const MinimalPricingTemplate = dynamic(() => import('@/components/pricing/MinimalPricingTemplate'), { ssr: false })
+const FreshSpinPricingTemplate = dynamic(() => import('@/components/pricing/FreshSpinPricingTemplate'), { ssr: false })
+const StarterPricingTemplate = dynamic(() => import('@/components/pricing/StarterPricingTemplate'), { ssr: false })
 
 interface PriceItem { _id: string; garment: string; dryClean: number; steamPress: number; washFold: number; washIron: number }
 
@@ -119,8 +125,9 @@ export default function TenantPricingPage() {
     }
   }, [tenantData])
 
+  // On tenant pages: use admin-saved theme (tenantData.primaryColor), avoid localStorage override
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !tenantData) {
       const c = localStorage.getItem('landing_color') as ThemeColor
       const s = localStorage.getItem('landing_scheme') as SchemeMode
       const l = localStorage.getItem('landing_language') as Language
@@ -128,7 +135,7 @@ export default function TenantPricingPage() {
       if (s) setScheme(s)
       if (l) setLanguage(l)
     }
-  }, [])
+  }, [tenantData])
 
   useEffect(() => {
     const h = (e: CustomEvent<{ scheme: string }>) => setScheme(e.detail.scheme as SchemeMode)
@@ -141,6 +148,59 @@ export default function TenantPricingPage() {
     setShowBookingModal(true)
   }
 
+  // Loading state
+  if (!tenantData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.pageBg }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 mx-auto mb-4" style={{ borderColor: theme.accent }}></div>
+          <p style={{ color: theme.textSecondary }}>Loading pricing...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Common pricing table component
+  const pricingTableComponent = <PricingTable theme={theme} t={t} />
+
+  // Template-specific props
+  const templateProps = {
+    theme,
+    t,
+    onBookNow: handleBookNow,
+    tenantTagline: tenantData.tagline,
+    pricingTable: pricingTableComponent,
+  }
+
+  // Render template-specific pricing page
+  if (template === 'minimal') {
+    return (
+      <>
+        <div className="pt-20"><MinimalPricingTemplate {...templateProps} /></div>
+        <BookingModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} onLoginRequired={() => router.push(`/${tenantSlug}`)} />
+      </>
+    )
+  }
+
+  if (template === 'freshspin') {
+    return (
+      <>
+        <div className="pt-20"><FreshSpinPricingTemplate {...templateProps} /></div>
+        <BookingModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} onLoginRequired={() => router.push(`/${tenantSlug}`)} />
+      </>
+    )
+  }
+
+  if (template === 'starter') {
+    return (
+      <>
+        <div className="pt-20"><StarterPricingTemplate {...templateProps} /></div>
+        <BookingModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} onLoginRequired={() => router.push(`/${tenantSlug}`)} />
+      </>
+    )
+  }
+
+  // Original template (default)
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ backgroundColor: theme.pageBg }}>
       <BookingModal isOpen={showBookingModal} onClose={() => setShowBookingModal(false)} onLoginRequired={() => router.push(`/${tenantSlug}`)} />

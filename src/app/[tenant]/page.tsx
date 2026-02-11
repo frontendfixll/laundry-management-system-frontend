@@ -152,9 +152,9 @@ export default function TenantLandingPage() {
     }
 
     if (!isAuthenticated) {
-      // Redirect to login with return URL (properly encoded)
+      // Redirect to tenant-scoped login (customers must login from tenant page)
       const returnUrl = encodeURIComponent(`/${tenantSlug}?openBooking=true`)
-      router.push(`/auth/login?redirect=${returnUrl}`)
+      router.push(`/${tenantSlug}/auth/login?redirect=${returnUrl}`)
       return
     }
     console.log('Opening booking modal')
@@ -164,7 +164,7 @@ export default function TenantLandingPage() {
   const handleLoginRequired = () => {
     setShowBookingModal(false)
     const returnUrl = encodeURIComponent(`/${tenantSlug}?openBooking=true`)
-    router.push(`/auth/login?redirect=${returnUrl}`)
+    router.push(`/${tenantSlug}/auth/login?redirect=${returnUrl}`)
   }
 
   // Loading state

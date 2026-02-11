@@ -103,7 +103,7 @@ export default function TenantAddressesPage() {
     catch (error) { console.error('Error setting default:', error) }
   }
 
-  const handleLogout = () => { logout(); router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/addresses`)}`) }
+  const handleLogout = () => { logout(); router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/addresses`)}`) }
 
   if (!isAuthenticated) return null
 

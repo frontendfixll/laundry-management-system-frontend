@@ -104,7 +104,7 @@ export default function AllReviewsPage() {
   const handleVote = async (reviewId: string, vote: 'helpful' | 'not_helpful') => {
     if (!isAuthenticated) {
       toast.error('Please login to vote')
-      router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/all-reviews`)}`)
+      router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/all-reviews`)}`)
       return
     }
     
@@ -122,7 +122,7 @@ export default function AllReviewsPage() {
   const openReportModal = (review: Review) => {
     if (!isAuthenticated) {
       toast.error('Please login to report')
-      router.push(`/auth/login?redirect=${encodeURIComponent(`/${tenant}/all-reviews`)}`)
+      router.push(`/${tenant}/auth/login?redirect=${encodeURIComponent(`/${tenant}/all-reviews`)}`)
       return
     }
     

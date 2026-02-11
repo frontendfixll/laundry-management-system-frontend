@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { usePermissions } from '@/hooks/usePermissions'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   DollarSign, 
   Search, 
@@ -251,24 +252,29 @@ function AdminRefundsPage() {
             />
           </div>
           <div className="flex gap-2">
-            <select
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map(option => (
+                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select 
+              value={filters.isEscalated === undefined ? '' : filters.isEscalated.toString()} 
+              onValueChange={(value) => handleFilterChange('isEscalated', value === '' ? undefined : value === 'true')}
             >
-              {statusOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            <select
-              value={filters.isEscalated === undefined ? '' : filters.isEscalated.toString()}
-              onChange={(e) => handleFilterChange('isEscalated', e.target.value === '' ? undefined : e.target.value === 'true')}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Refunds</option>
-              <option value="true">Escalated Only</option>
-              <option value="false">Not Escalated</option>
-            </select>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="All Refunds" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Refunds</SelectItem>
+                <SelectItem value="true">Escalated Only</SelectItem>
+                <SelectItem value="false">Not Escalated</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

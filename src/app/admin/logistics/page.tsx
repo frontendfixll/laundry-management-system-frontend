@@ -9,6 +9,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { usePermissions } from '@/hooks/usePermissions'
 import { Truck, Search, MapPin, Phone, User, Package, CheckCircle, Eye, AlertCircle, Star, Clock, TrendingUp, X, Plus, Edit, Trash2, Power } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const ITEMS_PER_PAGE = 8
 
@@ -106,7 +107,16 @@ function AdminLogisticsPage() {
       <div className="bg-white rounded-xl shadow-sm border p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative"><Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" /><input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-3 py-3 border rounded-lg" /></div>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-4 py-3 border rounded-lg"><option value="">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="bg-white rounded-xl shadow-sm border">
