@@ -1083,8 +1083,6 @@ function AdminInventoryPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                  </select>
-                </div>
 
                 {/* Justification */}
                 <div>
