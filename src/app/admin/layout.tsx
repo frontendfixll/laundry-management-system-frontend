@@ -3,13 +3,12 @@
 import { SimpleSidebar } from '@/components/layout/SimpleSidebar'
 import AdminHeader from '@/components/layout/AdminHeader'
 import NotificationContainer from '@/components/NotificationContainer'
-import { NotificationBell } from '@/components/notifications/NotificationBell'
 import ModernToaster from '@/components/ModernToast'
 import ProgressLoader from '@/components/ui/ProgressLoader'
 import { useLoadingProgress } from '@/hooks/useLoadingProgress'
 import { useAuthStore } from '@/store/authStore'
-import { useSocketIONotifications } from '@/hooks/useSocketIONotifications'
 import { useAdminTheme } from '@/hooks/useAdminTheme'
+import { SocketIOProvider } from '@/contexts/SocketIOContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import '@/styles/admin-layout-consolidated.css' // FINAL FIX - Consolidated all layout rules
@@ -116,10 +115,12 @@ export default function AdminLayout({
   }
 
   return (
-    <div>
-      <AdminLayoutContent>{children}</AdminLayoutContent>
-      {/* Smart Notification System - Both flash and bell notifications */}
-      <NotificationContainer />
-    </div>
+    <SocketIOProvider>
+      <div>
+        <AdminLayoutContent>{children}</AdminLayoutContent>
+        {/* Smart Notification System - Both flash and bell notifications */}
+        <NotificationContainer />
+      </div>
+    </SocketIOProvider>
   )
 }

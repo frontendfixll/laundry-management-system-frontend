@@ -329,7 +329,9 @@ export function PlatformSupportDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-green-900">Resolution Rate</p>
-                  <p className="text-2xl font-bold text-green-600">94.2%</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {metrics?.totalTickets ? `${Math.round(((metrics?.resolvedTickets ?? 0) / metrics.totalTickets) * 100)}%` : 'N/A'}
+                  </p>
                 </div>
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
@@ -339,7 +341,9 @@ export function PlatformSupportDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-blue-900">First Response</p>
-                  <p className="text-2xl font-bold text-blue-600">{metrics?.avgResponseTime || 1.2}h</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {metrics?.avgResponseTime != null ? `${metrics.avgResponseTime}h` : 'N/A'}
+                  </p>
                 </div>
                 <Clock className="w-8 h-8 text-blue-600" />
               </div>
@@ -349,7 +353,9 @@ export function PlatformSupportDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-purple-900">Customer Satisfaction</p>
-                  <p className="text-2xl font-bold text-purple-600">{metrics?.satisfactionScore || 4.6}/5</p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {metrics?.satisfactionScore != null ? `${metrics.satisfactionScore}/5` : 'N/A'}
+                  </p>
                 </div>
                 <Users className="w-8 h-8 text-purple-600" />
               </div>
@@ -359,7 +365,9 @@ export function PlatformSupportDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-orange-900">Escalation Rate</p>
-                  <p className="text-2xl font-bold text-orange-600">5.8%</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {metrics?.totalTickets ? `${Math.round(((metrics?.escalatedTickets ?? 0) / metrics.totalTickets) * 100)}%` : 'N/A'}
+                  </p>
                 </div>
                 <Activity className="w-8 h-8 text-orange-600" />
               </div>
