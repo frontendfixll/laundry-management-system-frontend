@@ -397,7 +397,6 @@ export function CompactAddOnPurchaseModal({ open, addOn, onClose, onSuccess }: C
             </Button>
           </div>
         )}
-        </div>
     </SlidePanel>
   )
 }
