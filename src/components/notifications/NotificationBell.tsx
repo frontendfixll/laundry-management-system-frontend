@@ -71,7 +71,12 @@ const formatTimeAgo = (dateString: string) => {
   return `${Math.floor(diffInSeconds / 86400)}d ago`
 }
 
-export function NotificationBell() {
+interface NotificationBellProps {
+  /** Path to full notifications page (e.g. /admin/notifications, /support/notifications) */
+  notificationsPagePath?: string
+}
+
+export function NotificationBell({ notificationsPagePath = '/admin/notifications' }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [showInbox, setShowInbox] = useState(false)
   const router = useRouter()
@@ -322,7 +327,7 @@ export function NotificationBell() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 markAsRead(notification.id);
-                                router.push('/admin/notifications');
+                                router.push(notificationsPagePath);
                                 setIsOpen(false);
                               }}
                               className="text-[10px] bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-bold border border-blue-100 hover:bg-blue-100 transition-colors"

@@ -735,7 +735,7 @@ export const TENANT_MENUS: Record<string, MenuSection[]> = {
           id: 'notifications',
           label: 'Notifications',
           icon: 'Bell',
-          path: '/admin/settings/notifications',
+          path: '/admin/notifications',
           requiredPermission: 'tenant_settings.update'
         },
         {

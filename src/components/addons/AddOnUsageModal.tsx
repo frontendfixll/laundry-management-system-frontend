@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { X, TrendingUp, Calendar, AlertCircle, RefreshCw, Download } from 'lucide-react'
+import { TrendingUp, Calendar, AlertCircle, RefreshCw, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ModalSelect, ModalSelectContent, ModalSelectItem, ModalSelectTrigger, ModalSelectValue } from '@/components/ui/modal-select'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { ModalPortal } from '@/components/ui/modal-portal'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { useAddOnUsageStats } from '@/hooks/useAddOns'
 import { formatNumber, formatDate, capitalize } from '@/lib/utils'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
@@ -31,42 +31,28 @@ export function AddOnUsageModal({ open, tenantAddOn, onClose }: AddOnUsageModalP
   const usagePercentage = totalCredits > 0 ? (usageTracking?.totalUsed / totalCredits) * 100 : 0
 
   return (
-    <ModalPortal isOpen={open}>
-      <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-          {/* Header - Fixed */}
-          <div className="flex items-center justify-between p-6 border-b bg-white rounded-t-lg flex-shrink-0">
-            <div>
-              <h2 className="text-xl font-semibold">Usage Statistics</h2>
-              <p className="text-sm text-muted-foreground">
-                {tenantAddOn.addOn.displayName} • {capitalize(tenantAddOn.addOn.category)}
-              </p>
-            </div>
+    <SlidePanel open={open} onClose={onClose} title={tenantAddOn?.addOn?.displayName ? `Usage: ${tenantAddOn.addOn.displayName}` : 'Usage Statistics'} width="2xl" accentBar="bg-purple-500">
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <ModalSelect value={period} onValueChange={setPeriod}>
+              <ModalSelectTrigger className="w-[120px]">
+                <ModalSelectValue />
+              </ModalSelectTrigger>
+              <ModalSelectContent>
+                <ModalSelectItem value="7d">Last 7 days</ModalSelectItem>
+                <ModalSelectItem value="30d">Last 30 days</ModalSelectItem>
+                <ModalSelectItem value="90d">Last 90 days</ModalSelectItem>
+              </ModalSelectContent>
+            </ModalSelect>
             <div className="flex items-center gap-2">
-              <ModalSelect value={period} onValueChange={setPeriod}>
-                <ModalSelectTrigger className="w-[120px]">
-                  <ModalSelectValue />
-                </ModalSelectTrigger>
-                <ModalSelectContent>
-                  <ModalSelectItem value="7d">Last 7 days</ModalSelectItem>
-                  <ModalSelectItem value="30d">Last 30 days</ModalSelectItem>
-                  <ModalSelectItem value="90d">Last 90 days</ModalSelectItem>
-                </ModalSelectContent>
-              </ModalSelect>
               <Button variant="outline" size="sm" onClick={refetch}>
                 <RefreshCw className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="sm">
                 <Download className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="sm" onClick={onClose}>
-                <X className="h-4 w-4" />
-              </Button>
             </div>
           </div>
-
-          {/* Content - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -327,8 +313,6 @@ export function AddOnUsageModal({ open, tenantAddOn, onClose }: AddOnUsageModalP
             </div>
           )}
           </div>
-        </div>
-      </div>
-    </ModalPortal>
+    </SlidePanel>
   )
 }

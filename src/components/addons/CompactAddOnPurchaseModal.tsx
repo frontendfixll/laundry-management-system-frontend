@@ -13,6 +13,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Separator } from '@/components/ui/separator'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { useTenantAddOns } from '@/hooks/useAddOns'
 import { formatCurrency, capitalize } from '@/lib/utils'
 
@@ -129,20 +130,7 @@ export function CompactAddOnPurchaseModal({ open, addOn, onClose, onSuccess }: C
   if (!open || !addOn) return null
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
-        {/* Fixed Header */}
-        <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
-          <div>
-            <h2 className="text-lg font-semibold">Purchase Add-on</h2>
-            <p className="text-sm text-muted-foreground">{addOn.displayName}</p>
-          </div>
-          <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Scrollable Content */}
+    <SlidePanel open={open} onClose={onClose} title={addOn?.displayName ? `Purchase: ${addOn.displayName}` : 'Purchase Add-on'} width="lg" accentBar="bg-purple-500">
         <div className="flex-1 overflow-y-auto min-h-0">
           {step === 'details' && (
             <form onSubmit={handleSubmit(handlePurchase)} className="p-4 space-y-4">
@@ -409,7 +397,7 @@ export function CompactAddOnPurchaseModal({ open, addOn, onClose, onSuccess }: C
             </Button>
           </div>
         )}
-      </div>
-    </div>
+        </div>
+    </SlidePanel>
   )
 }

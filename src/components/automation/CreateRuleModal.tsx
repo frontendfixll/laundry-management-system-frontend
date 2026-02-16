@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { SlidePanel } from '@/components/ui/slide-panel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -263,13 +263,8 @@ export default function CreateRuleModal({ open, onClose, onSuccess }: CreateRule
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create Automation Rule</DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <SlidePanel open={open} onClose={onClose} title="Create Automation Rule" width="2xl" accentBar="bg-indigo-500">
+      <form onSubmit={handleSubmit} className="space-y-6 p-4">
           {/* Basic Information */}
           <Card>
             <CardHeader>
@@ -442,7 +437,6 @@ export default function CreateRuleModal({ open, onClose, onSuccess }: CreateRule
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+    </SlidePanel>
   );
 }

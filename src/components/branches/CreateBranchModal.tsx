@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import toast from 'react-hot-toast'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
@@ -511,19 +512,8 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <div>
-            <h2 className="text-xl font-semibold">Create New Branch</h2>
-            <p className="text-sm text-gray-600">Step {currentStep} of 4</p>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
+    <SlidePanel open={isOpen} onClose={onClose} title="Create New Branch" width="2xl" accentBar="bg-blue-500">
+      <p className="text-sm text-gray-600 px-4 pb-2">Step {currentStep} of 4</p>
         {/* Progress Bar */}
         <div className="px-6 py-4 border-b">
           <div className="flex items-center justify-between mb-2">
@@ -979,7 +969,6 @@ export function CreateBranchModal({ isOpen, onClose, onSuccess }: CreateBranchMo
             )}
           </div>
         </form>
-      </div>
-    </div>
+    </SlidePanel>
   )
 }

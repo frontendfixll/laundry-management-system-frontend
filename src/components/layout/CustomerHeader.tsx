@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { useTenancyTheme } from '@/contexts/TenancyThemeContext'
-import NotificationBell from '@/components/NotificationBell'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import {
   Bell,
   Plus,
@@ -217,7 +217,7 @@ export default function CustomerHeader({ onMenuClick, sidebarCollapsed = false }
           </Link>
 
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <NotificationBell />
+            <NotificationBell notificationsPagePath="/customer/notifications" />
           </div>
 
           {/* New Order Button */}

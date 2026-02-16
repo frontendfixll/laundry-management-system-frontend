@@ -241,6 +241,15 @@ export function BranchNavbar({ onMenuClick }: { onMenuClick?: () => void }) {
                       ))
                     )}
                   </div>
+                  <div className="border-t border-gray-100 px-4 py-3 bg-gray-50">
+                    <Link
+                      href="/branch-admin/notifications"
+                      onClick={() => setIsNotificationOpen(false)}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                    >
+                      View all notifications →
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>

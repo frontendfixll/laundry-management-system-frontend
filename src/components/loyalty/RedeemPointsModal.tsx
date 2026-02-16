@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Gift, Star, AlertCircle } from 'lucide-react';
+import { Gift, Star, AlertCircle } from 'lucide-react';
+import { SlidePanel } from '@/components/ui/slide-panel';
 import { useRedeemPoints } from '@/hooks/useLoyalty';
 
 interface RedeemPointsModalProps {
@@ -31,21 +32,11 @@ export default function RedeemPointsModal({ isOpen, onClose, reward, currentPoin
     }
   };
 
-  if (!isOpen) return null;
-
-  const pointsRequired = reward.pointsRequired || reward.pointsCost || 0;
+  const pointsRequired = reward?.pointsRequired || reward?.pointsCost || 0;
   const remainingPoints = currentPoints - pointsRequired;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-900">Redeem Reward</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition">
-            <X size={20} />
-          </button>
-        </div>
-
+    <SlidePanel open={isOpen} onClose={onClose} title="Redeem Reward" width="md" accentBar="bg-purple-500">
         <div className="p-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -111,7 +102,6 @@ export default function RedeemPointsModal({ isOpen, onClose, reward, currentPoin
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </SlidePanel>
   );
 }

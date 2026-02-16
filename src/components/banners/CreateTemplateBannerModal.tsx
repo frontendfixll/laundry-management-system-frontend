@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Upload } from 'lucide-react';
+import { SlidePanel } from '@/components/ui/slide-panel';
 import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
 import toast from 'react-hot-toast';
@@ -320,15 +321,7 @@ export default function CreateTemplateBannerModal({ isOpen, onClose, onSuccess }
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b flex-shrink-0">
-          <h2 className="text-2xl font-bold text-gray-900">Create Banner</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition">
-            <X size={20} />
-          </button>
-        </div>
-
+    <SlidePanel open={isOpen} onClose={onClose} title="Create Banner" width="2xl" accentBar="bg-blue-500">
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-4">
           {/* Template Selection */}
@@ -579,7 +572,6 @@ export default function CreateTemplateBannerModal({ isOpen, onClose, onSuccess }
           </div>
           </div>
         </form>
-      </div>
-    </div>
+    </SlidePanel>
   );
 }

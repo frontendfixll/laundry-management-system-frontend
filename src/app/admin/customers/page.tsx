@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { RouteGuard } from '@/components/RouteGuard'
 import { usePermissions } from '@/hooks/usePermissions'
 import {
@@ -19,7 +19,6 @@ import {
   Calendar,
   AlertCircle,
   Loader2,
-  X,
   ShoppingBag,
   IndianRupee,
   Clock,
@@ -628,25 +627,19 @@ function AdminCustomersContent() {
         )}
       </div>
 
-      {/* View Profile Modal */}
-      {showProfileModal && selectedCustomer && typeof window !== 'undefined' && createPortal(
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
-          <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-              <h3 className="text-xl font-semibold text-gray-800">Customer Profile</h3>
-              <button
-                onClick={() => {
-                  setShowProfileModal(false)
-                  setCustomerDetails(null)
-                }}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-
-            {/* Modal Content */}
+      {/* View Profile SlidePanel */}
+      <SlidePanel
+        open={!!(showProfileModal && selectedCustomer)}
+        onClose={() => {
+          setShowProfileModal(false)
+          setSelectedCustomer(null)
+          setCustomerDetails(null)
+        }}
+        title={selectedCustomer ? `Customer: ${selectedCustomer.name || 'Profile'}` : 'Customer Profile'}
+        width="2xl"
+        accentBar="bg-blue-500"
+      >
+        {selectedCustomer && (
             <div className="p-6 space-y-6">
               {/* Profile Header */}
               <div className="flex items-center gap-4">
@@ -959,20 +952,8 @@ function AdminCustomersContent() {
                 </div>
               )}
             </div>
-
-            {/* Modal Footer */}
-            <div className="flex justify-end gap-3 p-6 border-t border-gray-200 sticky bottom-0 bg-white">
-              <Button variant="outline" onClick={() => {
-                setShowProfileModal(false)
-                setCustomerDetails(null)
-              }}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </SlidePanel>
     </div>
   )
 }

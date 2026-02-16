@@ -2,6 +2,6 @@
 
 import { NotificationsPageView } from '@/components/notifications/NotificationsPageView'
 
-export default function AdminNotificationsPage() {
+export default function BranchAdminNotificationsPage() {
   return <NotificationsPageView />
 }

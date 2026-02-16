@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -227,28 +227,21 @@ export default function SupportUsersPage() {
           <p className="text-gray-600">Manage support team members and their permissions</p>
         </div>
         
-        <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogTrigger asChild>
-            <Button onClick={resetForm}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Support User
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Create Support User</DialogTitle>
-            </DialogHeader>
-            <CreateEditForm
-              formData={formData}
-              setFormData={setFormData}
-              branches={branches}
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
-              onSubmit={handleCreateUser}
-              isEditing={false}
-            />
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => { resetForm(); setShowCreateModal(true) }}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add Support User
+        </Button>
+        <SlidePanel open={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create Support User" width="2xl" accentBar="bg-blue-500">
+          <CreateEditForm
+            formData={formData}
+            setFormData={setFormData}
+            branches={branches}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            onSubmit={handleCreateUser}
+            isEditing={false}
+          />
+        </SlidePanel>
       </div>
 
       {/* Search */}
@@ -356,23 +349,18 @@ export default function SupportUsersPage() {
         )}
       </div>
 
-      {/* Edit Modal */}
-      <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Edit Support User</DialogTitle>
-          </DialogHeader>
-          <CreateEditForm
-            formData={formData}
-            setFormData={setFormData}
-            branches={branches}
-            showPassword={showPassword}
-            setShowPassword={setShowPassword}
-            onSubmit={handleUpdateUser}
-            isEditing={true}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* Edit SlidePanel */}
+      <SlidePanel open={!!editingUser} onClose={() => setEditingUser(null)} title={editingUser ? `Edit: ${editingUser.name}` : 'Edit Support User'} width="2xl" accentBar="bg-blue-500">
+        <CreateEditForm
+          formData={formData}
+          setFormData={setFormData}
+          branches={branches}
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
+          onSubmit={handleUpdateUser}
+          isEditing={true}
+        />
+      </SlidePanel>
     </div>
   )
 }

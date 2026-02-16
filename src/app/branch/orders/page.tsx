@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import {
   Package,
   Search,
@@ -494,151 +495,127 @@ export default function BranchOrdersPage() {
         )}
       </div>
 
-      {/* Staff Assignment Modal */}
-      {showAssignModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Assign Staff Member</h3>
-              <button onClick={() => setShowAssignModal(false)} className="text-gray-500 hover:text-gray-700">
-                <X className="w-5 h-5" />
-              </button>
+      {/* Staff Assignment SlidePanel */}
+      <SlidePanel
+        open={!!(showAssignModal && selectedOrder)}
+        onClose={() => { setShowAssignModal(false); setSelectedOrder(null) }}
+        title={selectedOrder ? `Assign Staff: Order ${selectedOrder.orderNumber}` : 'Assign Staff Member'}
+        width="md"
+        accentBar="bg-green-500"
+      >
+        {selectedOrder && (
+          <div className="p-6 space-y-4">
+            <p className="text-sm text-gray-600">Order: {selectedOrder.orderNumber}</p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Staff Member</label>
+              <select
+                value={selectedStaffId}
+                onChange={(e) => setSelectedStaffId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">Choose staff member...</option>
+                {staff.filter(s => s.isActive).map((member) => (
+                  <option key={member._id} value={member._id}>
+                    {member.name} - {member.role}
+                  </option>
+                ))}
+              </select>
             </div>
-            <p className="text-sm text-gray-600 mb-4">Order: {selectedOrder.orderNumber}</p>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Staff Member
-                </label>
-                <select
-                  value={selectedStaffId}
-                  onChange={(e) => setSelectedStaffId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Choose staff member...</option>
-                  {staff.filter(s => s.isActive).map((member) => (
-                    <option key={member._id} value={member._id}>
-                      {member.name} - {member.role}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Estimated Completion Time
-                </label>
-                <select
-                  value={estimatedTime}
-                  onChange={(e) => setEstimatedTime(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="1">1 hour</option>
-                  <option value="2">2 hours</option>
-                  <option value="3">3 hours</option>
-                  <option value="4">4 hours</option>
-                  <option value="6">6 hours</option>
-                  <option value="24">24 hours</option>
-                </select>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-                  onClick={confirmAssignStaff}
-                  disabled={actionLoading === 'assign'}
-                >
-                  {actionLoading === 'assign' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Assign & Start
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowAssignModal(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Estimated Completion Time</label>
+              <select
+                value={estimatedTime}
+                onChange={(e) => setEstimatedTime(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="1">1 hour</option>
+                <option value="2">2 hours</option>
+                <option value="3">3 hours</option>
+                <option value="4">4 hours</option>
+                <option value="6">6 hours</option>
+                <option value="24">24 hours</option>
+              </select>
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button className="flex-1 bg-green-500 hover:bg-green-600 text-white" onClick={confirmAssignStaff} disabled={actionLoading === 'assign'}>
+                {actionLoading === 'assign' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Assign & Start
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => { setShowAssignModal(false); setSelectedOrder(null) }}>Cancel</Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </SlidePanel>
 
-      {/* View Order Modal */}
-      {showViewModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Order Details</h3>
-              <button onClick={() => setShowViewModal(false)} className="text-gray-500 hover:text-gray-700">
-                <X className="w-5 h-5" />
-              </button>
+      {/* View Order SlidePanel */}
+      <SlidePanel
+        open={!!(showViewModal && selectedOrder)}
+        onClose={() => { setShowViewModal(false); setSelectedOrder(null) }}
+        title={selectedOrder ? `Order: ${selectedOrder.orderNumber}` : 'Order Details'}
+        width="2xl"
+        accentBar="bg-teal-500"
+      >
+        {selectedOrder && (
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-bold">{selectedOrder.orderNumber}</span>
+              <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedOrder.status)}`}>
+                {getStatusText(selectedOrder.status)}
+              </span>
+              {selectedOrder.isExpress && (
+                <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Express</span>
+              )}
             </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="text-xl font-bold">{selectedOrder.orderNumber}</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedOrder.status)}`}>
-                  {getStatusText(selectedOrder.status)}
-                </span>
-                {selectedOrder.isExpress && (
-                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">Express</span>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-700 mb-2">Customer</h4>
+                <p className="text-gray-800">{selectedOrder.customer?.name || 'N/A'}</p>
+                <p className="text-sm text-gray-600">{selectedOrder.customer?.phone || 'N/A'}</p>
+                <p className="text-sm text-gray-600">{selectedOrder.customer?.email || 'N/A'}</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-700 mb-2">Pricing</h4>
+                <p className="text-gray-800">Subtotal: ₹{selectedOrder.pricing?.subtotal?.toLocaleString() || 0}</p>
+                <p className="text-lg font-bold text-green-600">Total: ₹{selectedOrder.pricing?.total?.toLocaleString() || 0}</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-gray-700 mb-2">Items ({selectedOrder.items?.length || 0})</h4>
+              <div className="space-y-2">
+                {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                  selectedOrder.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between text-sm">
+                      <span className="capitalize">
+                        {item.name || item.serviceType || 'Item'}
+                        {item.category && ` (${item.category})`}
+                        {item.quantity > 1 && ` x${item.quantity}`}
+                      </span>
+                      <span>₹{(item.totalPrice || 0).toLocaleString()}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No item details available</p>
                 )}
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-700 mb-2">Customer</h4>
-                  <p className="text-gray-800">{selectedOrder.customer?.name || 'N/A'}</p>
-                  <p className="text-sm text-gray-600">{selectedOrder.customer?.phone || 'N/A'}</p>
-                  <p className="text-sm text-gray-600">{selectedOrder.customer?.email || 'N/A'}</p>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-700 mb-2">Pricing</h4>
-                  <p className="text-gray-800">Subtotal: ₹{selectedOrder.pricing?.subtotal?.toLocaleString() || 0}</p>
-                  <p className="text-lg font-bold text-green-600">Total: ₹{selectedOrder.pricing?.total?.toLocaleString() || 0}</p>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-700 mb-2">Items ({selectedOrder.items?.length || 0})</h4>
-                <div className="space-y-2">
-                  {selectedOrder.items && selectedOrder.items.length > 0 ? (
-                    selectedOrder.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between text-sm">
-                        <span className="capitalize">
-                          {item.name || item.serviceType || 'Item'}
-                          {item.category && ` (${item.category})`}
-                          {item.quantity > 1 && ` x${item.quantity}`}
-                        </span>
-                        <span>₹{(item.totalPrice || 0).toLocaleString()}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500">No item details available</p>
-                  )}
-                </div>
-              </div>
-
-              {selectedOrder.processedBy && (
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-700 mb-2">Assignment</h4>
-                  <p className="text-gray-800">Assigned to: {selectedOrder.processedBy.name}</p>
-                  {selectedOrder.estimatedCompletionTime && (
-                    <p className="text-sm text-gray-600">Est. completion: {selectedOrder.estimatedCompletionTime}</p>
-                  )}
-                </div>
-              )}
-
-              <div className="text-sm text-gray-500">
-                Created: {new Date(selectedOrder.createdAt).toLocaleString()}
-              </div>
             </div>
-
-            <div className="mt-6 flex justify-end">
-              <Button variant="outline" onClick={() => setShowViewModal(false)}>Close</Button>
+            {selectedOrder.processedBy && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-medium text-gray-700 mb-2">Assignment</h4>
+                <p className="text-gray-800">Assigned to: {selectedOrder.processedBy.name}</p>
+                {selectedOrder.estimatedCompletionTime && (
+                  <p className="text-sm text-gray-600">Est. completion: {selectedOrder.estimatedCompletionTime}</p>
+                )}
+              </div>
+            )}
+            <div className="text-sm text-gray-500">
+              Created: {new Date(selectedOrder.createdAt).toLocaleString()}
+            </div>
+            <div className="flex justify-end pt-4">
+              <Button variant="outline" onClick={() => { setShowViewModal(false); setSelectedOrder(null) }}>Close</Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </SlidePanel>
     </div>
   )
 }

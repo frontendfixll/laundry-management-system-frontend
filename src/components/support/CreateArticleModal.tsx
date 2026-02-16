@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { api } from '@/lib/api'
 import { toast } from 'react-hot-toast'
 
@@ -163,18 +164,7 @@ export default function CreateArticleModal({ isOpen, onClose, onSuccess }: Creat
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Create New Article</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+    <SlidePanel open={isOpen} onClose={handleClose} title="Create New Article" width="2xl" accentBar="bg-blue-500">
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -367,7 +357,6 @@ export default function CreateArticleModal({ isOpen, onClose, onSuccess }: Creat
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </SlidePanel>
   )
 }
