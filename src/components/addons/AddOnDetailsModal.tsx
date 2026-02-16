@@ -418,7 +418,6 @@ export function AddOnDetailsModal({ open, addOn, onClose, onPurchase }: AddOnDet
               </TabsContent>
             </Tabs>
           </div>
-        </div>
 
         {/* Footer - Fixed */}
         <div className="flex items-center justify-between p-6 border-t bg-gray-50 rounded-b-lg flex-shrink-0">
