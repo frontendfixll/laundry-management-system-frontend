@@ -5,6 +5,7 @@ import { X, MapPin, Phone, Clock, Users, Loader2, Plus, MapPinned } from 'lucide
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import toast from 'react-hot-toast'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
@@ -312,20 +313,8 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <div>
-            <h2 className="text-xl font-semibold">Edit Branch</h2>
-            <p className="text-sm text-gray-600">{branch.name} ({branch.code})</p>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
+    <SlidePanel open={isOpen} onClose={onClose} title={`Edit Branch: ${branch.name}`} width="2xl" accentBar="bg-blue-500">
+      <form onSubmit={handleSubmit} className="flex flex-col min-h-0">
           <div className="p-6 space-y-6">
             {/* Basic Information */}
             <div>
@@ -720,7 +709,6 @@ export function EditBranchModal({ isOpen, onClose, onSuccess, branch }: EditBran
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </SlidePanel>
   )
 }

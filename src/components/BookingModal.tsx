@@ -5,6 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { X, MapPin, Sparkles, Package, Calendar, Clock, ChevronRight, ChevronLeft, Loader2, Check, Minus, Plus, Phone, CreditCard, Truck, CheckCircle, Building2, Home, Tag, Star, Wallet, Gift, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { useAuthStore } from '@/store/authStore'
 import toast from 'react-hot-toast'
 import { formatOrderNumber } from '@/utils/orderUtils'
@@ -799,9 +800,9 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
     const qrData = `${typeof window !== 'undefined' ? window.location.origin : ''}/customer/orders/${createdOrder?._id}`
 
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-center">
+      <SlidePanel open={isOpen} onClose={handleClose} title="Order Placed" width="md" accentBar="bg-green-500">
+        <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto mx-auto">
+          <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-center rounded-t-xl">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
@@ -866,12 +867,12 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
             </div>
           </div>
         </div>
-      </div>
+      </SlidePanel>
     )
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <SlidePanel open={isOpen} onClose={handleClose} hideHeader width="lg" accentBar="bg-teal-500">
       <div
         className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl quick-book-modal"
         style={{
@@ -1670,6 +1671,6 @@ export default function BookingModal({ isOpen, onClose, onLoginRequired, tenantB
           </div>
         </div>
       )}
-    </div>
+    </SlidePanel>
   )
 }

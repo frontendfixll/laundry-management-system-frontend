@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import toast from 'react-hot-toast'
-import { AlertTriangle, Calendar, X, CheckCircle, Clock, CreditCard } from 'lucide-react'
+import { AlertTriangle, Calendar, CheckCircle, Clock, CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,7 +14,7 @@ import { ModalSelect, ModalSelectContent, ModalSelectItem, ModalSelectTrigger, M
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { ModalPortal } from '@/components/ui/modal-portal'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { useTenantAddOns } from '@/hooks/useAddOns'
 import { formatCurrency, formatDate, capitalize } from '@/lib/utils'
 
@@ -220,30 +220,7 @@ export function AddOnCancelModal({ open, tenantAddOn, onClose, onSuccess }: AddO
   if (!tenantAddOn) return null
 
   return (
-    <ModalPortal isOpen={open}>
-      <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-          {/* Header - Fixed */}
-          <div className="flex items-center justify-between p-6 border-b bg-white rounded-t-lg flex-shrink-0">
-            <div className="flex items-center gap-3">
-              {step === 'success' ? (
-                <CheckCircle className="h-5 w-5 text-green-500" />
-              ) : (
-                <AlertTriangle className="h-5 w-5 text-red-500" />
-              )}
-              <div>
-                <h2 className="text-xl font-semibold">
-                  {step === 'success' ? 'Cancellation Successful' : 'Cancel Add-on'}
-                </h2>
-                <p className="text-sm text-muted-foreground">{tenantAddOn.addOn.displayName}</p>
-              </div>
-            </div>
-            <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Content - Scrollable */}
+    <SlidePanel open={open} onClose={onClose} title={tenantAddOn?.addOn?.displayName ? `Cancel: ${tenantAddOn.addOn.displayName}` : 'Cancel Add-on'} width="2xl" accentBar="bg-red-500">
           <div className="flex-1 overflow-y-auto">
           
           {/* SUCCESS STEP */}
@@ -619,8 +596,6 @@ export function AddOnCancelModal({ open, tenantAddOn, onClose, onSuccess }: AddO
             </div>
           )}
           </div>
-        </div>
-      </div>
-    </ModalPortal>
+    </SlidePanel>
   )
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { api } from '@/lib/api'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
@@ -518,61 +519,58 @@ export default function AdminRolesPage() {
         document.body
       )}
 
-      {/* Assign Role Modal */}
-      {showAssignModal && selectedUser && typeof window !== 'undefined' && createPortal(
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
-          <div className="bg-white rounded-xl w-full max-w-md">
-            <div className="border-b p-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Assign Role</h3>
-              <button onClick={() => setShowAssignModal(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">
-                    {selectedUser.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-800">{selectedUser.name}</h4>
-                  <p className="text-sm text-gray-500">{selectedUser.email}</p>
-                </div>
+      {/* Assign Role SlidePanel */}
+      <SlidePanel
+        open={!!(showAssignModal && selectedUser)}
+        onClose={() => { setShowAssignModal(false); setSelectedUser(null) }}
+        title={selectedUser ? `Assign Role: ${selectedUser.name || 'User'}` : 'Assign Role'}
+        width="md"
+        accentBar="bg-indigo-500"
+      >
+        {selectedUser && (
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-medium text-sm">
+                  {selectedUser.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                </span>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
-                <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="No Role (Remove Assignment)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">No Role (Remove Assignment)</SelectItem>
-                    {roles.map(role => (
-                      <SelectItem key={role._id} value={role._id}>{role.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <h4 className="font-medium text-gray-800">{selectedUser.name}</h4>
+                <p className="text-sm text-gray-500">{selectedUser.email}</p>
               </div>
-              {selectedRoleId && (
-                <div className="p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    User will get all permissions defined in the selected role.
-                  </p>
-                </div>
-              )}
             </div>
-            <div className="border-t p-4 flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setShowAssignModal(false)}>Cancel</Button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select Role</label>
+              <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="No Role (Remove Assignment)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">No Role (Remove Assignment)</SelectItem>
+                  {roles.map(role => (
+                    <SelectItem key={role._id} value={role._id}>{role.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {selectedRoleId && (
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  User will get all permissions defined in the selected role.
+                </p>
+              </div>
+            )}
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Button variant="outline" onClick={() => { setShowAssignModal(false); setSelectedUser(null) }}>Cancel</Button>
               <Button onClick={handleAssignRole} disabled={saving}>
                 {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Assign Role
               </Button>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </SlidePanel>
     </div>
   )
 }

@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { Plus, Search, MapPin, Users, Activity, Settings, Trash2, Edit, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -602,98 +602,65 @@ function BranchesPage() {
         />
       )}
 
-      {/* Services Management Modal */}
-      {showServicesModal && selectedBranchForServices && typeof window !== 'undefined' && createPortal(
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4 overflow-y-auto" style={{ zIndex: 999999 }}>
-          <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800">Manage Services</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Enable or disable services for {selectedBranchForServices.name}
-                </p>
+      {/* Services Management SlidePanel */}
+      <SlidePanel
+        open={!!(showServicesModal && selectedBranchForServices)}
+        onClose={() => { setShowServicesModal(false); setSelectedBranchForServices(null) }}
+        title={selectedBranchForServices ? `Services: ${selectedBranchForServices.name}` : 'Manage Services'}
+        width="2xl"
+        accentBar="bg-blue-500"
+      >
+        {selectedBranchForServices && (
+          <div className="p-6">
+            {servicesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-gray-600">Loading services...</span>
               </div>
-              <button
-                onClick={() => {
-                  setShowServicesModal(false)
-                  setSelectedBranchForServices(null)
-                }}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6">
-              {servicesLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-3 text-gray-600">Loading services...</span>
-                </div>
-              ) : services.length === 0 ? (
-                <div className="text-center py-12">
-                  <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">No services found</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {services.map((service) => {
-                    const isEnabled = isServiceEnabledForBranch(service._id)
-                    return (
-                      <div
-                        key={service._id}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-green-100' : 'bg-gray-200'
-                            }`}>
-                            <Package className={`w-5 h-5 ${isEnabled ? 'text-green-600' : 'text-gray-400'
-                              }`} />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-800">{service.name}</h4>
-                            <p className="text-sm text-gray-600">
-                              {service.category} • ₹{service.pricing?.standard || 0}
-                            </p>
-                          </div>
+            ) : services.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No services found</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {services.map((service) => {
+                  const isEnabled = isServiceEnabledForBranch(service._id)
+                  return (
+                    <div
+                      key={service._id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isEnabled ? 'bg-green-100' : 'bg-gray-200'}`}>
+                          <Package className={`w-5 h-5 ${isEnabled ? 'text-green-600' : 'text-gray-400'}`} />
                         </div>
-                        <button
-                          onClick={() => handleToggleServiceForBranch(service._id, !isEnabled)}
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isEnabled ? 'bg-green-500' : 'bg-gray-300'
-                            }`}
-                        >
-                          <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isEnabled ? 'translate-x-6' : 'translate-x-1'
-                              }`}
-                          />
-                        </button>
+                        <div>
+                          <h4 className="font-medium text-gray-800">{service.name}</h4>
+                          <p className="text-sm text-gray-600">
+                            {service.category} • ₹{service.pricing?.standard || 0}
+                          </p>
+                        </div>
                       </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex justify-end gap-3 p-6 border-t border-gray-200 sticky bottom-0 bg-white">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowServicesModal(false)
-                  setSelectedBranchForServices(null)
-                }}
-              >
+                      <button
+                        onClick={() => handleToggleServiceForBranch(service._id, !isEnabled)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isEnabled ? 'bg-green-500' : 'bg-gray-300'}`}
+                      >
+                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+            <div className="flex justify-end gap-3 pt-6 border-t mt-6">
+              <Button variant="outline" onClick={() => { setShowServicesModal(false); setSelectedBranchForServices(null) }}>
                 Close
               </Button>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </SlidePanel>
     </div>
   )
 }

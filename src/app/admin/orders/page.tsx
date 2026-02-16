@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import { usePermissions } from '@/hooks/usePermissions'
@@ -734,39 +735,16 @@ function AdminOrdersPage() {
         )}
       </div>
 
-      {/* View Order Modal */}
-      {showViewModal && selectedOrder && typeof window !== 'undefined' && createPortal(
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
-          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-            {/* Header - Fixed */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Package className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">Order Details</h3>
-                  <p className="text-sm text-gray-500 font-mono">{selectedOrder.orderNumber}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  onClick={() => window.print()}
-                  className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 hover:text-gray-800 transition-colors"
-                  title="Print Order"
-                >
-                  <Printer className="w-5 h-5" />
-                </button>
-                <button onClick={() => setShowViewModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-            </div>
-
-            {/* Scrollable Content */}
-            <div className="overflow-y-auto flex-1">
-
+      {/* View Order SlidePanel */}
+      <SlidePanel
+        open={!!(showViewModal && selectedOrder)}
+        onClose={() => { setShowViewModal(false); setSelectedOrder(null) }}
+        title={selectedOrder ? `Order: ${selectedOrder.orderNumber || 'Details'}` : 'Order Details'}
+        width="2xl"
+        accentBar="bg-teal-500"
+      >
+        {selectedOrder && (
+          <div className="space-y-0">
               <div className="p-6 space-y-6">
                 {/* Status & Badges */}
                 <div className="flex flex-wrap gap-2 mb-4">
@@ -1070,29 +1048,24 @@ function AdminOrdersPage() {
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Footer - Fixed */}
-            <div className="flex justify-end gap-3 p-6 border-t border-gray-200 flex-shrink-0 bg-white">
-              {/* Assign Logistics for Pickup - only when order uses logistics pickup */}
+            {/* Footer */}
+            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
               {selectedOrder.status === 'placed' && canAssign && selectedOrder.pickupType !== 'self' && (
-                <Button className="bg-purple-500 hover:bg-purple-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'pickup'); setShowViewModal(false) }}>
+                <Button className="bg-purple-500 hover:bg-purple-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'pickup'); setShowViewModal(false); setSelectedOrder(null) }}>
                   <Truck className="w-4 h-4 mr-2" />Assign Pickup Partner
                 </Button>
               )}
-
-              {/* Assign Logistics for Delivery - only when order uses logistics delivery */}
               {selectedOrder.status === 'ready' && canAssign && selectedOrder.deliveryType !== 'self' && (
-                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'delivery'); setShowViewModal(false) }}>
+                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'delivery'); setShowViewModal(false); setSelectedOrder(null) }}>
                   <Truck className="w-4 h-4 mr-2" />Assign Delivery Partner
                 </Button>
               )}
-              <Button variant="outline" onClick={() => setShowViewModal(false)}>Close</Button>
+              <Button variant="outline" onClick={() => { setShowViewModal(false); setSelectedOrder(null) }}>Close</Button>
             </div>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </SlidePanel>
 
       {/* Assignment Modal - Logistics Partner Only */}
       {showAssignModal && typeof window !== 'undefined' && createPortal(

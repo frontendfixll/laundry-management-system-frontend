@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import {
   Target,
-  X,
   Calendar,
   Users,
   DollarSign,
@@ -20,6 +19,7 @@ import {
   Building2
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import toast from 'react-hot-toast'
 
 interface Promotion {
@@ -350,21 +350,7 @@ export default function CreateAdminCampaignModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Target className="w-5 h-5 text-blue-600" />
-            {step === 'method' ? 'Create Campaign' : `Create ${creationMethod === 'template' ? 'from Template' : 'New'} Campaign`}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
+    <SlidePanel open={isOpen} onClose={onClose} title={step === 'method' ? 'Create Campaign' : `Create ${creationMethod === 'template' ? 'from Template' : 'New'} Campaign`} width="2xl" accentBar="bg-blue-500">
         {step === 'method' ? (
           <div className="p-6">
             <div className="mb-6">
@@ -1219,7 +1205,6 @@ export default function CreateAdminCampaignModal({
             </div>
           </form>
         )}
-      </div>
-    </div>
+    </SlidePanel>
   )
 }

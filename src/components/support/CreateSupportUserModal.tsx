@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { X, User, Mail, Phone, Lock, Building } from 'lucide-react'
+import { User, Mail, Phone, Lock, Building } from 'lucide-react'
+import { SlidePanel } from '@/components/ui/slide-panel'
 
 interface Branch {
   _id: string
@@ -106,23 +107,8 @@ export default function CreateSupportUserModal({ onClose, onSubmit }: CreateSupp
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">Create Support User</h2>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClose}
-              className="p-2"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Form */}
+    <SlidePanel open onClose={onClose} title="Create Support User" width="lg" accentBar="bg-blue-500">
+      <div className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
@@ -274,8 +260,7 @@ export default function CreateSupportUserModal({ onClose, onSubmit }: CreateSupp
               </Button>
             </div>
           </form>
-        </div>
-      </Card>
-    </div>
+      </div>
+    </SlidePanel>
   )
 }

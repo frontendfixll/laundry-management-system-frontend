@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/Pagination'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { api } from '@/lib/api'
 import { 
   Users, Search, Phone, Mail, Building2, AlertCircle, Shield, Calendar,
@@ -279,90 +279,80 @@ export default function AdminStaffPage() {
         )}
       </div>
 
-      {/* View Details Modal */}
-      {showDetailsModal && selectedStaff && typeof window !== 'undefined' && createPortal(
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
-          <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold">User Details</h3>
-              <button onClick={() => setShowDetailsModal(false)} className="text-gray-400 hover:text-gray-600">
-                <span className="text-2xl">&times;</span>
-              </button>
-            </div>
-            <div className="p-6 space-y-6">
-              {/* User Info */}
-              <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${selectedStaff.isActive ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-gray-400'}`}>
-                  <span className="text-white font-bold text-xl">{selectedStaff.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
-                </div>
-                <div>
-                  <h4 className="text-xl font-semibold text-gray-800">{selectedStaff.name}</h4>
-                  <div className="flex items-center gap-2 mt-1">
-                    {getRoleBadge(selectedStaff.role)}
-                    <span className={`px-2 py-0.5 rounded-full text-xs ${selectedStaff.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
-                      {selectedStaff.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                </div>
+      {/* View Details SlidePanel */}
+      <SlidePanel
+        open={!!(showDetailsModal && selectedStaff)}
+        onClose={() => { setShowDetailsModal(false); setSelectedStaff(null) }}
+        title={selectedStaff ? `Staff: ${selectedStaff.name || 'Details'}` : 'User Details'}
+        width="lg"
+        accentBar="bg-indigo-500"
+      >
+        {selectedStaff && (
+          <div className="p-6 space-y-6">
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${selectedStaff.isActive ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-gray-400'}`}>
+                <span className="text-white font-bold text-xl">{selectedStaff.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
               </div>
-
-              {/* Contact Info */}
-              <div className="space-y-3">
-                <h5 className="font-medium text-gray-700">Contact Information</h5>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                  <div className="flex items-center text-sm">
-                    <Mail className="w-4 h-4 mr-3 text-gray-400" />
-                    <span>{selectedStaff.email}</span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <Phone className="w-4 h-4 mr-3 text-gray-400" />
-                    <span>{selectedStaff.phone || 'Not provided'}</span>
-                  </div>
-                  {selectedStaff.assignedBranch && (
-                    <div className="flex items-center text-sm">
-                      <Building2 className="w-4 h-4 mr-3 text-gray-400" />
-                      <span>{selectedStaff.assignedBranch.name}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center text-sm">
-                    <Calendar className="w-4 h-4 mr-3 text-gray-400" />
-                    <span>Joined {new Date(selectedStaff.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Permissions Summary */}
-              <div className="space-y-3">
-                <h5 className="font-medium text-gray-700">Permissions ({countPermissions(selectedStaff.permissions)})</h5>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  {selectedStaff.permissions && Object.keys(selectedStaff.permissions).length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2">
-                      {Object.entries(selectedStaff.permissions).map(([module, perms]) => {
-                        const activePerms = Object.entries(perms).filter(([, v]) => v).map(([k]) => k)
-                        if (activePerms.length === 0) return null
-                        return (
-                          <div key={module} className="text-sm">
-                            <span className="font-medium capitalize">{module}:</span>
-                            <span className="text-gray-600 ml-1">{activePerms.join(', ')}</span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500">No specific permissions assigned</p>
-                  )}
+              <div>
+                <h4 className="text-xl font-semibold text-gray-800">{selectedStaff.name}</h4>
+                <div className="flex items-center gap-2 mt-1">
+                  {getRoleBadge(selectedStaff.role)}
+                  <span className={`px-2 py-0.5 rounded-full text-xs ${selectedStaff.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                    {selectedStaff.isActive ? 'Active' : 'Inactive'}
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-gray-50 border-t p-4">
-              <Button variant="outline" onClick={() => setShowDetailsModal(false)} className="w-full">
-                Close
-              </Button>
+            <div className="space-y-3">
+              <h5 className="font-medium text-gray-700">Contact Information</h5>
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                <div className="flex items-center text-sm">
+                  <Mail className="w-4 h-4 mr-3 text-gray-400" />
+                  <span>{selectedStaff.email}</span>
+                </div>
+                <div className="flex items-center text-sm">
+                  <Phone className="w-4 h-4 mr-3 text-gray-400" />
+                  <span>{selectedStaff.phone || 'Not provided'}</span>
+                </div>
+                {selectedStaff.assignedBranch && (
+                  <div className="flex items-center text-sm">
+                    <Building2 className="w-4 h-4 mr-3 text-gray-400" />
+                    <span>{selectedStaff.assignedBranch.name}</span>
+                  </div>
+                )}
+                <div className="flex items-center text-sm">
+                  <Calendar className="w-4 h-4 mr-3 text-gray-400" />
+                  <span>Joined {new Date(selectedStaff.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
             </div>
+            <div className="space-y-3">
+              <h5 className="font-medium text-gray-700">Permissions ({countPermissions(selectedStaff.permissions)})</h5>
+              <div className="bg-gray-50 rounded-lg p-4">
+                {selectedStaff.permissions && Object.keys(selectedStaff.permissions).length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(selectedStaff.permissions).map(([module, perms]) => {
+                      const activePerms = Object.entries(perms).filter(([, v]) => v).map(([k]) => k)
+                      if (activePerms.length === 0) return null
+                      return (
+                        <div key={module} className="text-sm">
+                          <span className="font-medium capitalize">{module}:</span>
+                          <span className="text-gray-600 ml-1">{activePerms.join(', ')}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No specific permissions assigned</p>
+                )}
+              </div>
+            </div>
+            <Button variant="outline" onClick={() => { setShowDetailsModal(false); setSelectedStaff(null) }} className="w-full">
+              Close
+            </Button>
           </div>
-        </div>,
-        document.body
-      )}
+        )}
+      </SlidePanel>
     </div>
   )
 }

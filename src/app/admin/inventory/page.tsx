@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { 
   Package2, 
   Plus, 
@@ -20,6 +19,7 @@ import {
   Eye
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import toast from 'react-hot-toast'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -477,35 +477,16 @@ function AdminInventoryPage() {
         </div>
       )}
 
-      {showAddModal && typeof window !== 'undefined' && createPortal(
-        <div 
-          className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4 overflow-y-auto"
-          style={{ zIndex: 999999 }}
-        >
-          <div className="bg-white rounded-xl w-full max-w-xl shadow-2xl my-8 max-h-[85vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Package className="w-4 h-4 text-blue-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Add Inventory Item</h3>
-                  <p className="text-xs text-gray-500">Add a new item to your inventory</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => {
-                  setShowAddModal(false);
-                  setNewItem({ itemName: '', currentStock: 0, minThreshold: 10, maxCapacity: 100, unit: 'units', unitCost: 0, supplier: '' });
-                }}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
+      <SlidePanel
+        open={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setNewItem({ itemName: '', currentStock: 0, minThreshold: 10, maxCapacity: 100, unit: 'units', unitCost: 0, supplier: '' });
+        }}
+        title="Add Inventory Item"
+        width="xl"
+        accentBar="bg-blue-500"
+      >
             <div className="p-4 space-y-4">
               {/* Item Selection Row - Select Dropdown and Request Button in same line */}
               <div>
@@ -730,8 +711,7 @@ function AdminInventoryPage() {
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="flex gap-2 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl sticky bottom-0">
+            <div className="flex gap-2 p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -761,21 +741,20 @@ function AdminInventoryPage() {
                 )}
               </Button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      </SlidePanel>
 
-      {showStockModal && selectedItem && typeof window !== 'undefined' && createPortal(
-        <div 
-          className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center p-4 overflow-y-auto"
-          style={{ zIndex: 999999 }}
-        >
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl my-8">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+      <SlidePanel
+        open={!!(showStockModal && selectedItem)}
+        onClose={() => { setShowStockModal(false); setSelectedItem(null) }}
+        title={selectedItem ? `Update Stock: ${selectedItem.itemName?.replace('_', ' ') || 'Item'}` : 'Update Stock'}
+        width="md"
+        accentBar={stockUpdate.action === 'add' ? 'bg-green-500' : 'bg-orange-500'}
+      >
+        {selectedItem && (
+          <>
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                   stockUpdate.action === 'add' ? 'bg-green-100' : 'bg-orange-100'
                 }`}>
                   {stockUpdate.action === 'add' ? (
@@ -804,8 +783,6 @@ function AdminInventoryPage() {
                 <X className="w-6 h-6" />
               </button>
             </div>
-
-            {/* Modal Body */}
             <div className="p-6 space-y-6">
               {/* Current Item Info */}
               <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border-2 border-gray-200">
@@ -934,7 +911,6 @@ function AdminInventoryPage() {
               )}
             </div>
 
-            {/* Modal Footer */}
             <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
               <Button 
                 variant="outline" 
@@ -979,24 +955,19 @@ function AdminInventoryPage() {
                 )}
               </Button>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </>
+        )}
+      </SlidePanel>
 
-      {/* Request Item Modal */}
-      {showRequestModal && createPortal(
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Request New Item</h2>
-                <button onClick={() => setShowRequestModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                  <X className="w-5 h-5 text-gray-500" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
+      {/* Request Item SlidePanel */}
+      <SlidePanel
+        open={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        title="Request New Item"
+        width="md"
+        accentBar="bg-green-500"
+      >
+            <div className="p-6 space-y-4">
                 {/* Item Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Item Name *</label>
@@ -1097,7 +1068,7 @@ function AdminInventoryPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 mt-6 pt-4 border-t">
                 <Button
                   variant="outline"
                   onClick={() => setShowRequestModal(false)}
@@ -1120,15 +1091,11 @@ function AdminInventoryPage() {
                     <>
                       <Plus className="w-4 h-4 mr-2" />
                       Send Request
-                    </>
-                  )}
+                  </>
+                )}
                 </Button>
               </div>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      </SlidePanel>
     </div>
   )
 }

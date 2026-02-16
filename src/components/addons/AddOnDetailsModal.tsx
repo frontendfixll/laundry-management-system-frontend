@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Star, Check, Clock, Users, TrendingUp, Shield, AlertCircle, ShoppingCart } from 'lucide-react'
+import { Star, Check, Clock, Users, TrendingUp, Shield, AlertCircle, ShoppingCart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { SlidePanel } from '@/components/ui/slide-panel'
 import { formatCurrency, capitalize } from '@/lib/utils'
 
 interface AddOnDetailsModalProps {
@@ -19,54 +20,18 @@ interface AddOnDetailsModalProps {
 export function AddOnDetailsModal({ open, addOn, onClose, onPurchase }: AddOnDetailsModalProps) {
   const [activeTab, setActiveTab] = useState('overview')
 
-  // Disable body scroll when modal is open
-  useEffect(() => {
-    if (open) {
-      // Disable body scroll
-      document.body.style.overflow = 'hidden'
-      document.documentElement.style.overflow = 'hidden'
-    } else {
-      // Re-enable body scroll
-      document.body.style.overflow = 'unset'
-      document.documentElement.style.overflow = 'unset'
-    }
-
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = 'unset'
-      document.documentElement.style.overflow = 'unset'
-    }
-  }, [open])
-
   if (!open || !addOn) return null
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/50 flex items-start justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl my-8 flex flex-col max-h-[calc(100vh-4rem)]">
-        {/* Header - Fixed */}
-        <div className="flex items-center justify-between p-6 border-b bg-white rounded-t-lg flex-shrink-0">
-          <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-lg bg-purple-100 border border-purple-200`}>
-              <div className="w-6 h-6 bg-purple-600 rounded" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">{addOn.displayName}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline">{capitalize(addOn.category)}</Badge>
-                {addOn.isPopular && <Badge variant="secondary">Popular</Badge>}
-                {addOn.isRecommended && <Badge variant="secondary">Recommended</Badge>}
-                {addOn.isFeatured && <Badge className="bg-purple-600 text-white">Featured</Badge>}
-              </div>
-            </div>
-          </div>
-          <Button variant="ghost" size="sm" onClick={onClose} className="flex-shrink-0">
-            <X className="h-4 w-4" />
-          </Button>
+    <SlidePanel open={open} onClose={onClose} title={addOn.displayName} width="2xl" accentBar="bg-purple-500">
+      <div className="p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Badge variant="outline">{capitalize(addOn.category)}</Badge>
+          {addOn.isPopular && <Badge variant="secondary">Popular</Badge>}
+          {addOn.isRecommended && <Badge variant="secondary">Recommended</Badge>}
+          {addOn.isFeatured && <Badge className="bg-purple-600 text-white">Featured</Badge>}
         </div>
-
-        {/* Content - Scrollable */}
         <div className="flex-1 overflow-y-auto">
-          <div className="p-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4 mb-6">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -511,6 +476,6 @@ export function AddOnDetailsModal({ open, addOn, onClose, onPurchase }: AddOnDet
           </div>
         </div>
       </div>
-    </div>
+    </SlidePanel>
   )
 }
