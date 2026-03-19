@@ -126,6 +126,15 @@ class AdminAPI {
   }
 
   // Customer Management
+  async createCustomer(data: { name: string; email: string; phone: string; password: string }) {
+    const response = await fetch(`${API_BASE_URL}/admin/customers`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(data)
+    })
+    return this.handleResponse(response)
+  }
+
   async getCustomers(params?: {
     page?: number
     limit?: number
