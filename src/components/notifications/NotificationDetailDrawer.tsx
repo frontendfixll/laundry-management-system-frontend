@@ -32,6 +32,8 @@ import { Button } from '@/components/ui/button'
 import { cleanNotificationTitle } from '@/lib/notificationUtils'
 import { cn } from '@/lib/utils'
 import { formatDistanceToNow } from 'date-fns'
+import { NotificationDetailRenderer } from './NotificationDetailRenderer'
+import { getNotificationRoute } from '@/lib/notificationRoutes'
 
 export interface NotificationDetailItem {
   id: string
@@ -161,13 +163,9 @@ export function NotificationDetailDrawer({
 
   const category = getNotificationCategory(notification.eventType || notification.type || '')
   const IconComponent = priorityConfig.icon
-  const data = { ...notification.metadata, ...notification.data } as Record<string, unknown>
-  const actionLink = (notification.data?.link || data?.link) as string | undefined
-  const metaEntries = Object.entries(data).filter(
-    ([key, value]) =>
-      !['link', 'permissions', 'isRead', 'isActioned', 'isSystem', 'isPersistent', 'icon', 'type', 'severity', 'priority', 'id', '_id', 'createdAt', 'updatedAt', '__v'].includes(key) &&
-      typeof value !== 'object'
-  )
+  const eventType = notification.eventType || notification.type || ''
+  const actionLink = (notification.data?.link || notification.metadata?.link ||
+    getNotificationRoute(eventType, notification.data || {})) as string | undefined
 
   return (
     <>
@@ -249,26 +247,8 @@ export function NotificationDetailDrawer({
             </span>
           </div>
 
-          {metaEntries.length > 0 && (
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                <FileText className="w-3.5 h-3.5" />
-                Metadata
-              </h4>
-              <div className="grid grid-cols-2 gap-2">
-                {metaEntries.map(([key, value]) => (
-                  <div key={key} className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider truncate">
-                      {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                    </p>
-                    <p className="text-xs font-medium text-gray-900 truncate" title={String(value)}>
-                      {String(value)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Type-specific detail content */}
+          <NotificationDetailRenderer notification={notification} />
 
           {/* Action & Delete */}
           <div className="pt-4 border-t border-gray-100 space-y-3">
