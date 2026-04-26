@@ -3,7 +3,6 @@
 import { SimpleSidebar } from '@/components/layout/SimpleSidebar'
 import AdminHeader from '@/components/layout/AdminHeader'
 import NotificationContainer from '@/components/NotificationContainer'
-import ModernToaster from '@/components/ModernToast'
 import ProgressLoader from '@/components/ui/ProgressLoader'
 import { useLoadingProgress } from '@/hooks/useLoadingProgress'
 import { useAuthStore } from '@/store/authStore'
@@ -56,9 +55,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
-
-      {/* Modern Toast Notifications */}
-      <ModernToaster />
     </div>
   )
 }
@@ -98,8 +94,18 @@ export default function AdminLayout({
   }, [isAuthenticated, user, router, _hasHydrated]);
 
   const { loading: themeLoading } = useAdminTheme() // Load tenant theme
-  const isComplete = _hasHydrated && !isLoading && isAuthenticated && !!user && !themeLoading;
-  const { progress, message, subMessage } = useLoadingProgress(isComplete)
+
+  // Signal-driven progress: each stage waits for a real readiness event,
+  // not an arbitrary timer. Loader animates up to the threshold of the
+  // next unfilled signal and pauses there until it flips true.
+  const signals = [
+    _hasHydrated,                         // 1. auth state hydrated from storage
+    isAuthenticated && !!user,            // 2. token + user object resolved
+    !themeLoading,                        // 3. tenant theme/branding fetched
+    !isLoading,                           // 4. role check + access decision made
+  ]
+  const { progress, message, subMessage } = useLoadingProgress({ signals })
+  const isComplete = signals.every(Boolean)
 
   if (accessDenied) {
     return (

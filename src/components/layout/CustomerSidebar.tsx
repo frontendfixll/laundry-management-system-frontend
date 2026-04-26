@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
 import { useTenancyTheme } from '@/contexts/TenancyThemeContext'
 import { useTenant } from '@/contexts/TenantContext'
+import { TENANT_RESERVED_SEGMENTS } from '@/constants/reservedRoutes'
 import { APP_VERSION } from '@/lib/version'
 import {
   LayoutDashboard,
@@ -84,7 +85,7 @@ export default function CustomerSidebar({
       // Check URL path
       const pathSegments = window.location.pathname.split('/').filter(Boolean)
       const potentialSlug = pathSegments[0]
-      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      const reserved = TENANT_RESERVED_SEGMENTS
       if (potentialSlug && !reserved.includes(potentialSlug)) {
         return potentialSlug
       }
@@ -115,7 +116,7 @@ export default function CustomerSidebar({
       if (!targetSlug) {
         const pathSegments = window.location.pathname.split('/').filter(Boolean)
         const potentialSlug = pathSegments[0]
-        const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+        const reserved = TENANT_RESERVED_SEGMENTS
         if (potentialSlug && !reserved.includes(potentialSlug)) {
           targetSlug = potentialSlug
         }

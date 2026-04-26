@@ -1,19 +1,61 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useAuthStore } from '@/store/authStore'
 import { usePermissions } from '@/hooks/usePermissions'
 import { useAdminTheme } from '@/hooks/useAdminTheme'
-import { SuperAdminDashboard } from './SuperAdminDashboard'
-import { PlatformSupportDashboard } from './PlatformSupportDashboard'
-import { PlatformFinanceDashboard } from './PlatformFinanceDashboard'
-import { PlatformAuditorDashboard } from './PlatformAuditorDashboard'
-import { TenantOwnerDashboard } from './TenantOwnerDashboard'
-import { TenantAdminDashboard } from './TenantAdminDashboard'
-import { TenantOpsManagerDashboard } from './TenantOpsManagerDashboard'
-import { TenantFinanceManagerDashboard } from './TenantFinanceManagerDashboard'
-import { TenantStaffDashboard } from './TenantStaffDashboard'
-import { DefaultAdminDashboard } from './DefaultAdminDashboard'
 import { AlertTriangle } from 'lucide-react'
+
+// Lazy-load every role dashboard. A logged-in user only renders one of them at
+// a time, but the previous static imports pulled all 11 into the initial
+// admin bundle (~70% wasted JS per user). `next/dynamic` splits each into its
+// own chunk fetched on demand. ssr:false is fine here — these are admin
+// surfaces gated by client auth, not SEO surfaces.
+//
+// NOTE: Next.js requires the options object to be a literal at every call
+// site (its SWC plugin scans the AST and won't follow a const reference).
+// Don't extract `{ ssr: false }` to a shared constant — it breaks the build.
+
+const SuperAdminDashboard = dynamic(
+    () => import('./SuperAdminDashboard').then(m => ({ default: m.SuperAdminDashboard })),
+    { ssr: false }
+)
+const PlatformSupportDashboard = dynamic(
+    () => import('./PlatformSupportDashboard').then(m => ({ default: m.PlatformSupportDashboard })),
+    { ssr: false }
+)
+const PlatformFinanceDashboard = dynamic(
+    () => import('./PlatformFinanceDashboard').then(m => ({ default: m.PlatformFinanceDashboard })),
+    { ssr: false }
+)
+const PlatformAuditorDashboard = dynamic(
+    () => import('./PlatformAuditorDashboard').then(m => ({ default: m.PlatformAuditorDashboard })),
+    { ssr: false }
+)
+const TenantOwnerDashboard = dynamic(
+    () => import('./TenantOwnerDashboard').then(m => ({ default: m.TenantOwnerDashboard })),
+    { ssr: false }
+)
+const TenantAdminDashboard = dynamic(
+    () => import('./TenantAdminDashboard').then(m => ({ default: m.TenantAdminDashboard })),
+    { ssr: false }
+)
+const TenantOpsManagerDashboard = dynamic(
+    () => import('./TenantOpsManagerDashboard').then(m => ({ default: m.TenantOpsManagerDashboard })),
+    { ssr: false }
+)
+const TenantFinanceManagerDashboard = dynamic(
+    () => import('./TenantFinanceManagerDashboard').then(m => ({ default: m.TenantFinanceManagerDashboard })),
+    { ssr: false }
+)
+const TenantStaffDashboard = dynamic(
+    () => import('./TenantStaffDashboard').then(m => ({ default: m.TenantStaffDashboard })),
+    { ssr: false }
+)
+const DefaultAdminDashboard = dynamic(
+    () => import('./DefaultAdminDashboard').then(m => ({ default: m.DefaultAdminDashboard })),
+    { ssr: false }
+)
 
 /**
  * Role-Based Dashboard Router

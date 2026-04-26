@@ -1,91 +1,104 @@
-import { useState, useEffect, useCallback } from 'react';
-import { api } from '@/lib/api';
-import toast from 'react-hot-toast';
+// Tenant branding hook — React Query.
+// `loading` reflects the read query; `saving` reflects whether ANY mutation
+// is currently in flight (preserves the original two-loading-state contract
+// since callers use them differently — e.g. show a skeleton on `loading`,
+// disable the Save button on `saving`).
 
-export type LandingPageTemplate = 'original' | 'minimal' | 'freshspin' | 'starter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { api } from '@/lib/api'
+import toast from 'react-hot-toast'
+
+export type LandingPageTemplate = 'original' | 'minimal' | 'freshspin' | 'starter'
 
 export interface BrandingData {
-  logo?: string;
-  logoUrl?: string;
-  businessName?: string;
-  tagline?: string;
-  slogan?: string;
-  secondaryLogo?: string;
+  logo?: string
+  logoUrl?: string
+  businessName?: string
+  tagline?: string
+  slogan?: string
+  secondaryLogo?: string
   socialMedia?: {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-    linkedin?: string;
-    youtube?: string;
-    whatsapp?: string;
-  };
-  primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
-  fontFamily: string;
-  landingPageTemplate?: LandingPageTemplate;
-  customCss?: string;
+    facebook?: string
+    instagram?: string
+    twitter?: string
+    linkedin?: string
+    youtube?: string
+    whatsapp?: string
+  }
+  primaryColor: string
+  secondaryColor: string
+  accentColor: string
+  fontFamily: string
+  landingPageTemplate?: LandingPageTemplate
+  customCss?: string
 }
 
 export interface TenancyBranding {
   branding: {
-    businessName?: string;
-    tagline?: string;
-    slogan?: string;
-    logo?: { url?: string; publicId?: string };
-    secondaryLogo?: { url?: string; publicId?: string };
-    favicon?: { url?: string; publicId?: string };
+    businessName?: string
+    tagline?: string
+    slogan?: string
+    logo?: { url?: string; publicId?: string }
+    secondaryLogo?: { url?: string; publicId?: string }
+    favicon?: { url?: string; publicId?: string }
     socialMedia?: {
-      facebook?: string;
-      instagram?: string;
-      twitter?: string;
-      linkedin?: string;
-      youtube?: string;
-      whatsapp?: string;
-    };
+      facebook?: string
+      instagram?: string
+      twitter?: string
+      linkedin?: string
+      youtube?: string
+      whatsapp?: string
+    }
     theme?: {
-      primaryColor?: string;
-      secondaryColor?: string;
-      accentColor?: string;
-      fontFamily?: string;
-      layout?: string;
-    };
-    landingPageTemplate?: LandingPageTemplate;
-    customCss?: string;
-  };
-  name: string;
-  slug: string;
-  subdomain: string;
-  customDomain?: string;
+      primaryColor?: string
+      secondaryColor?: string
+      accentColor?: string
+      fontFamily?: string
+      layout?: string
+    }
+    landingPageTemplate?: LandingPageTemplate
+    customCss?: string
+  }
+  name: string
+  slug: string
+  subdomain: string
+  customDomain?: string
+}
+
+const BRANDING_KEY = ['admin', 'branding'] as const
+
+async function fileToBase64(file: File): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
 }
 
 export function useBranding() {
-  const [branding, setBranding] = useState<TenancyBranding | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient()
 
-  const fetchBranding = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get('/admin/tenancy/branding');
-      setBranding(response.data.data);
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to fetch branding';
-      setError(message);
-      console.error('Error fetching branding:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const query = useQuery({
+    queryKey: BRANDING_KEY,
+    queryFn: async (): Promise<TenancyBranding | null> => {
+      const response = await api.get('/admin/tenancy/branding')
+      return response.data?.data ?? null
+    },
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    retry: (count, err: any) => {
+      const status = err?.response?.status
+      if (status >= 400 && status < 500) return false
+      return count < 2
+    },
+  })
 
-  const updateBranding = async (data: Partial<BrandingData>): Promise<boolean> => {
-    try {
-      setSaving(true);
-      setError(null);
-      // Transform frontend format to backend format
-      const payload = {
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: BRANDING_KEY })
+
+  const updateMutation = useMutation({
+    mutationFn: (data: Partial<BrandingData>) =>
+      api.put('/admin/tenancy/branding', {
         branding: {
           businessName: data.businessName,
           tagline: data.tagline,
@@ -99,125 +112,110 @@ export function useBranding() {
           },
           landingPageTemplate: data.landingPageTemplate || 'original',
           customCss: data.customCss || '',
-        }
-      };
-      console.log('Sending branding update:', payload);
-      const response = await api.put('/admin/tenancy/branding', payload);
-      console.log('Branding update response:', response.data);
-      await fetchBranding(); // Refresh to get updated data
-      toast.success('Branding updated successfully');
-      return true;
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to update branding';
-      setError(message);
-      toast.error(message);
-      return false;
-    } finally {
-      setSaving(false);
-    }
-  };
+        },
+      }),
+    onSuccess: () => {
+      invalidate()
+      toast.success('Branding updated successfully')
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to update branding')
+    },
+  })
 
-  const uploadLogo = async (file: File): Promise<string | null> => {
-    try {
-      setSaving(true);
-      setError(null);
-      
-      // Convert file to base64 for simple upload
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      
-      const base64 = await base64Promise;
-      
+  const uploadLogoMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const base64 = await fileToBase64(file)
       await api.patch('/admin/tenancy/branding/logo', {
         url: base64,
-        publicId: `logo_${Date.now()}`
-      });
-      
-      // Refresh branding data after logo upload
-      await fetchBranding();
-      toast.success('Logo uploaded successfully');
-      return base64;
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to upload logo';
-      setError(message);
-      toast.error(message);
-      return null;
-    } finally {
-      setSaving(false);
-    }
-  };
+        publicId: `logo_${Date.now()}`,
+      })
+      return base64
+    },
+    onSuccess: () => {
+      invalidate()
+      toast.success('Logo uploaded successfully')
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to upload logo')
+    },
+  })
 
-  const uploadSecondaryLogo = async (file: File): Promise<string | null> => {
-    try {
-      setSaving(true);
-      setError(null);
-      
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      
-      const base64 = await base64Promise;
-      
+  const uploadSecondaryLogoMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const base64 = await fileToBase64(file)
       await api.put('/admin/tenancy/branding', {
         branding: {
           secondaryLogo: {
             url: base64,
-            publicId: `secondary_logo_${Date.now()}`
-          }
-        }
-      });
-      
-      await fetchBranding();
-      toast.success('Secondary logo uploaded successfully');
-      return base64;
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to upload secondary logo';
-      setError(message);
-      toast.error(message);
-      return null;
-    } finally {
-      setSaving(false);
-    }
-  };
+            publicId: `secondary_logo_${Date.now()}`,
+          },
+        },
+      })
+      return base64
+    },
+    onSuccess: () => {
+      invalidate()
+      toast.success('Secondary logo uploaded successfully')
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to upload secondary logo')
+    },
+  })
 
-  const removeLogo = async (): Promise<boolean> => {
-    try {
-      setSaving(true);
-      setError(null);
-      await api.patch('/admin/tenancy/branding/logo', { url: '', publicId: '' });
-      await fetchBranding();
-      toast.success('Logo removed successfully');
-      return true;
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to remove logo';
-      setError(message);
-      toast.error(message);
-      return false;
-    } finally {
-      setSaving(false);
-    }
-  };
+  const removeLogoMutation = useMutation({
+    mutationFn: () =>
+      api.patch('/admin/tenancy/branding/logo', { url: '', publicId: '' }),
+    onSuccess: () => {
+      invalidate()
+      toast.success('Logo removed successfully')
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to remove logo')
+    },
+  })
 
-  useEffect(() => {
-    fetchBranding();
-  }, [fetchBranding]);
+  const saving =
+    updateMutation.isPending ||
+    uploadLogoMutation.isPending ||
+    uploadSecondaryLogoMutation.isPending ||
+    removeLogoMutation.isPending
 
   return {
-    branding,
-    loading,
+    branding: query.data ?? null,
+    loading: query.isPending,
     saving,
-    error,
-    updateBranding,
-    uploadLogo,
-    uploadSecondaryLogo,
-    removeLogo,
-    refetch: fetchBranding,
-  };
+    error: query.error ? (query.error.message ?? null) : null,
+    updateBranding: async (data: Partial<BrandingData>): Promise<boolean> => {
+      try {
+        await updateMutation.mutateAsync(data)
+        return true
+      } catch {
+        return false
+      }
+    },
+    uploadLogo: async (file: File): Promise<string | null> => {
+      try {
+        return await uploadLogoMutation.mutateAsync(file)
+      } catch {
+        return null
+      }
+    },
+    uploadSecondaryLogo: async (file: File): Promise<string | null> => {
+      try {
+        return await uploadSecondaryLogoMutation.mutateAsync(file)
+      } catch {
+        return null
+      }
+    },
+    removeLogo: async (): Promise<boolean> => {
+      try {
+        await removeLogoMutation.mutateAsync()
+        return true
+      } catch {
+        return false
+      }
+    },
+    refetch: async () => { await query.refetch() },
+  }
 }

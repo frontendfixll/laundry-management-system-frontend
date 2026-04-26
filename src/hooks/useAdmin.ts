@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { adminApi } from '@/lib/adminApi'
+import { api } from '@/lib/api'
 
 export interface DashboardMetrics {
   totalOrders: number
@@ -103,46 +105,42 @@ export interface LogisticsPartner {
 }
 
 export function useAdminDashboard() {
-  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null)
-  const [recentOrders, setRecentOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchDashboard = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await adminApi.getDashboard()
-      setMetrics(response.data.metrics)
-      setRecentOrders(response.data.recentOrders)
-    } catch (err: any) {
-      // Don't show error for permission denied - handle silently
-      if (err?.response?.status === 403) {
-        console.log('Dashboard: Permission denied, showing limited view')
-        setMetrics(null)
-        setRecentOrders([])
-      } else {
-        setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data')
+  const query = useQuery({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: async (): Promise<{ metrics: DashboardMetrics | null; recentOrders: Order[] }> => {
+      try {
+        const response = await api.get('/admin/dashboard')
+        return {
+          metrics: response.data.data?.metrics ?? response.data.metrics ?? null,
+          recentOrders: response.data.data?.recentOrders ?? response.data.recentOrders ?? [],
+        }
+      } catch (err: any) {
+        // Permission denied → show empty view, don't surface an error
+        if (err?.response?.status === 403) {
+          return { metrics: null, recentOrders: [] }
+        }
+        throw err
       }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchDashboard()
-  }, [])
+    },
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    retry: (failureCount, err: any) => {
+      const status = err?.response?.status
+      if (status >= 400 && status < 500) return false
+      return failureCount < 2
+    },
+  })
 
   return {
-    metrics,
-    recentOrders,
-    loading,
-    error,
-    refetch: fetchDashboard
+    metrics: query.data?.metrics ?? null,
+    recentOrders: query.data?.recentOrders ?? [],
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? 'Failed to fetch dashboard data') : null,
+    refetch: query.refetch,
   }
 }
 
-export function useAdminOrders(filters?: {
+interface OrderFilters {
   page?: number
   limit?: number
   status?: string
@@ -151,84 +149,96 @@ export function useAdminOrders(filters?: {
   search?: string
   startDate?: string
   endDate?: string
-}) {
-  const [orders, setOrders] = useState<Order[]>([])
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pages: 1,
-    total: 0,
-    limit: 8
+}
+
+interface OrderPagination {
+  current: number
+  pages: number
+  total: number
+  limit: number
+}
+
+const DEFAULT_PAGINATION: OrderPagination = { current: 1, pages: 1, total: 0, limit: 8 }
+
+export function useAdminOrders(filters?: OrderFilters) {
+  const queryClient = useQueryClient()
+
+  const query = useQuery({
+    queryKey: ['admin', 'orders', filters ?? {}],
+    queryFn: async (): Promise<{ orders: Order[]; pagination: OrderPagination }> => {
+      const response = await api.get('/admin/orders', { params: filters })
+      // Wire format: { success, data: { data: [orders], pagination: { currentPage, totalPages, totalItems, itemsPerPage } } }
+      const orders = response.data?.data?.data ?? []
+      const p = response.data?.data?.pagination ?? {}
+      return {
+        orders,
+        pagination: {
+          current: p.currentPage ?? DEFAULT_PAGINATION.current,
+          pages: p.totalPages ?? DEFAULT_PAGINATION.pages,
+          total: p.totalItems ?? DEFAULT_PAGINATION.total,
+          limit: p.itemsPerPage ?? DEFAULT_PAGINATION.limit,
+        },
+      }
+    },
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    retry: (failureCount, err: any) => {
+      const status = err?.response?.status
+      if (status >= 400 && status < 500) return false
+      return failureCount < 2
+    },
   })
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await adminApi.getOrders(filters)
-      setOrders(response.data.data)
-      // Map backend pagination keys to frontend format
-      const backendPagination = response.data.pagination
-      setPagination({
-        current: backendPagination.currentPage,
-        pages: backendPagination.totalPages,
-        total: backendPagination.totalItems,
-        limit: backendPagination.itemsPerPage
-      })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch orders')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] })
 
-  const assignToBranch = async (orderId: string, branchId: string) => {
-    try {
-      await adminApi.assignOrderToBranch(orderId, branchId)
-      await fetchOrders() // Refresh the list
-      return { success: true }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to assign order to branch'
-      throw new Error(errorMessage)
-    }
-  }
+  const assignToBranchMutation = useMutation({
+    mutationFn: ({ orderId, branchId }: { orderId: string; branchId: string }) =>
+      api.put(`/admin/orders/${orderId}/assign-branch`, { branchId }),
+    onSuccess: invalidate,
+  })
 
-  const assignToLogistics = async (orderId: string, logisticsPartnerId: string, type: 'pickup' | 'delivery') => {
-    try {
-      await adminApi.assignOrderToLogistics(orderId, logisticsPartnerId, type)
-      await fetchOrders() // Refresh the list
-      return { success: true }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to assign order to logistics'
-      throw new Error(errorMessage)
-    }
-  }
+  const assignToLogisticsMutation = useMutation({
+    mutationFn: ({ orderId, logisticsPartnerId, type }: { orderId: string; logisticsPartnerId: string; type: 'pickup' | 'delivery' }) =>
+      api.put(`/admin/orders/${orderId}/assign-logistics`, { logisticsPartnerId, type }),
+    onSuccess: invalidate,
+  })
 
-  const updateStatus = async (orderId: string, status: string, notes?: string) => {
-    try {
-      await adminApi.updateOrderStatus(orderId, status, notes)
-      await fetchOrders() // Refresh the list
-      return { success: true }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update order status'
-      throw new Error(errorMessage)
-    }
-  }
-
-  useEffect(() => {
-    fetchOrders()
-  }, [JSON.stringify(filters)])
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ orderId, status, notes }: { orderId: string; status: string; notes?: string }) =>
+      api.put(`/admin/orders/${orderId}/status`, { status, notes }),
+    onSuccess: invalidate,
+  })
 
   return {
-    orders,
-    pagination,
-    loading,
-    error,
-    assignToBranch,
-    assignToLogistics,
-    updateStatus,
-    refetch: fetchOrders
+    orders: query.data?.orders ?? [],
+    pagination: query.data?.pagination ?? DEFAULT_PAGINATION,
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? 'Failed to fetch orders') : null,
+    assignToBranch: async (orderId: string, branchId: string) => {
+      try {
+        await assignToBranchMutation.mutateAsync({ orderId, branchId })
+        return { success: true }
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : 'Failed to assign order to branch')
+      }
+    },
+    assignToLogistics: async (orderId: string, logisticsPartnerId: string, type: 'pickup' | 'delivery') => {
+      try {
+        await assignToLogisticsMutation.mutateAsync({ orderId, logisticsPartnerId, type })
+        return { success: true }
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : 'Failed to assign order to logistics')
+      }
+    },
+    updateStatus: async (orderId: string, status: string, notes?: string) => {
+      try {
+        await updateStatusMutation.mutateAsync({ orderId, status, notes })
+        return { success: true }
+      } catch (err) {
+        throw new Error(err instanceof Error ? err.message : 'Failed to update order status')
+      }
+    },
+    refetch: query.refetch,
   }
 }
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { cn } from '@/lib/utils'
+import { TENANT_RESERVED_SEGMENTS } from '@/constants/reservedRoutes'
 import {
   Menu,
   Search,
@@ -65,7 +66,7 @@ export default function AdminHeader({ onMenuClick, onSearchChange }: AdminHeader
       const pathSegments = window.location.pathname.split('/').filter(Boolean)
       const potentialSlug = pathSegments[0]
       // Check if the first segment is not a reserved route
-      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      const reserved = TENANT_RESERVED_SEGMENTS
       if (potentialSlug && !reserved.includes(potentialSlug)) {
         slug = potentialSlug
       }
