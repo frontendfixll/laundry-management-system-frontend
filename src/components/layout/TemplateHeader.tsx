@@ -439,15 +439,15 @@ export default function TemplateHeader() {
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid grid-cols-3 items-center w-full">
             {/* Logo - Left */}
-            <Link href={getLink('/')} className="flex items-center gap-3 flex-shrink-0">
+            <Link href={getLink('/')} className="flex items-center gap-2 lg:gap-3 min-w-0">
               {logoUrl ? (
-                <img src={logoUrl} alt={displayName} className="w-10 h-10 rounded-lg object-contain" />
+                <img src={logoUrl} alt={displayName} className="w-9 h-9 lg:w-10 lg:h-10 rounded-lg object-contain flex-shrink-0" />
               ) : (
-                <div className={`w-10 h-10 border-2 ${colors.border} rounded-lg flex items-center justify-center`}>
+                <div className={`w-9 h-9 lg:w-10 lg:h-10 border-2 ${colors.border} rounded-lg flex items-center justify-center flex-shrink-0`}>
                   <Sparkles className={`w-5 h-5 ${colors.text}`} />
                 </div>
               )}
-              <span className={`text-xl font-bold ${textColor}`}>{displayName}</span>
+              <span className={`text-base lg:text-xl font-bold ${textColor} truncate`}>{displayName}</span>
             </Link>
 
             {/* Navigation - Center */}
@@ -773,20 +773,20 @@ export default function TemplateHeader() {
   return (
     <nav className={`${headerBg} shadow-sm border-b ${headerBorder} fixed top-0 left-0 right-0 z-50 h-20 flex items-center transition-colors duration-500`}>
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex items-center justify-between w-full">
-          <Link href={getLink('/')} className="flex items-center space-x-2">
+        <div className="flex items-center justify-between w-full gap-2">
+          <Link href={getLink('/')} className="flex items-center gap-2 min-w-0 flex-1">
             {logoUrl ? (
-              <img src={logoUrl} alt={displayName} className="w-10 h-10 object-contain" />
+              <img src={logoUrl} alt={displayName} className="w-9 h-9 lg:w-10 lg:h-10 object-contain flex-shrink-0" />
             ) : (
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.accent }}>
-                <Sparkles className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: colors.accent }}>
+                <Sparkles className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
             )}
-            <span className={`text-2xl font-bold ${textColor}`}>{displayName}</span>
+            <span className={`text-base lg:text-2xl font-bold ${textColor} truncate`}>{displayName}</span>
           </Link>
 
           {/* Right Side */}
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center gap-2 md:gap-4 lg:space-x-8 flex-shrink-0">
             <div className="hidden md:flex items-center space-x-8">
               <Link href={getLink('/')} className={`${pathname === '/' || pathname === `/${effectiveTenantSlug}` ? `${colors.text} font-medium` : textMuted} ${colors.hoverText} transition-colors`}>{t('nav.home')}</Link>
               <Link href={getLink('/services')} className={`${pathname?.includes('/services') ? `${colors.text} font-medium` : textMuted} ${colors.hoverText} transition-colors`}>{t('nav.services')}</Link>
@@ -814,19 +814,19 @@ export default function TemplateHeader() {
 
               {/* Navigation Actions */}
               {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  <Link href={getDashboardUrl()}>
+                <div className="flex items-center gap-2 md:space-x-4">
+                  <Link href={getDashboardUrl()} className="hidden md:inline-block">
                     <Button className="text-white" style={{ backgroundColor: colors.accent }}>
                       <User className="w-4 h-4 mr-2" />{t('nav.dashboard')}
                     </Button>
                   </Link>
                   <div className="relative group">
-                    <button className={`flex items-center space-x-2 ${textMuted} py-2`}>
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.accent }}>
+                    <button className={`flex items-center gap-1 md:space-x-2 ${textMuted} py-2`}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: colors.accent }}>
                         <span className="text-white text-sm font-medium">{user?.name?.charAt(0).toUpperCase()}</span>
                       </div>
-                      <span className="font-medium">{user?.name?.split(' ')[0]}</span>
-                      <ChevronDown className="w-4 h-4" />
+                      <span className="hidden md:inline font-medium">{user?.name?.split(' ')[0]}</span>
+                      <ChevronDown className="w-4 h-4 hidden md:inline" />
                     </button>
                     <div className={`absolute right-0 top-full mt-1 w-48 rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 ${dropdownBg}`}>
                       <div className="py-2">
@@ -855,7 +855,7 @@ export default function TemplateHeader() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center space-x-3">
+                <div className="hidden md:flex items-center space-x-3">
                   <Link href={getLoginUrl()}><Button variant="outline" style={{ borderColor: colors.accent, color: colors.accent }}>{t('nav.login')}</Button></Link>
                   <Button className="text-white" style={{ backgroundColor: colors.accent }} onClick={handleBookNow}>{t('nav.bookNow')}</Button>
                 </div>
