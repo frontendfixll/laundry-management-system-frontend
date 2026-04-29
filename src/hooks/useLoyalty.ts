@@ -1,8 +1,23 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
+import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+const LOYALTY_TRANSACTIONS_KEY = ['customer', 'loyalty', 'transactions'] as const;
+const LOYALTY_BALANCE_KEY = ['customer', 'loyalty', 'balance'] as const;
+
+const loyaltyQueryDefaults = {
+  staleTime: 30_000,
+  gcTime: 5 * 60_000,
+  retry: (count: number, err: any) => {
+    const status = err?.response?.status;
+    if (status >= 400 && status < 500) return false;
+    return count < 2;
+  },
+} as const;
 
 interface LoyaltyBalance {
   enrolled: boolean;
@@ -76,120 +91,95 @@ export function useLoyaltyBalance() {
 
 export function useLoyaltyTransactions(page: number = 1, limit: number = 20) {
   const { token } = useAuthStore();
-  const [transactions, setTransactions] = useState<LoyaltyTransaction[]>([]);
-  const [pagination, setPagination] = useState({ current: 1, pages: 0, total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchTransactions = async () => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+  const query = useQuery({
+    queryKey: [...LOYALTY_TRANSACTIONS_KEY, { page, limit }],
+    queryFn: async () => {
+      const response = await api.get('/customer/loyalty/transactions', {
+        params: { page, limit },
+      });
+      return {
+        transactions: (response.data?.data?.transactions ?? []) as LoyaltyTransaction[],
+        pagination: response.data?.data?.pagination ?? { current: 1, pages: 0, total: 0 },
+      };
+    },
+    enabled: !!token,
+    ...loyaltyQueryDefaults,
+  });
 
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await fetch(
-        `${API_URL}/customer/loyalty/transactions?page=${page}&limit=${limit}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const data = await response.json();
-      
-      if (data.success) {
-        setTransactions(data.data.transactions);
-        setPagination(data.data.pagination);
-      } else {
-        setError(data.message || 'Failed to fetch transactions');
-      }
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch transactions');
-    } finally {
-      setLoading(false);
-    }
+  return {
+    transactions: query.data?.transactions ?? [],
+    pagination: query.data?.pagination ?? { current: 1, pages: 0, total: 0 },
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? null) : null,
+    refetch: async () => { await query.refetch(); },
   };
-
-  useEffect(() => {
-    fetchTransactions();
-  }, [token, page, limit]);
-
-  return { transactions, pagination, loading, error, refetch: fetchTransactions };
 }
 
 export function useEnrollLoyalty() {
   const { token } = useAuthStore();
-  const [enrolling, setEnrolling] = useState(false);
+  const queryClient = useQueryClient();
 
-  const enroll = async () => {
-    if (!token) {
-      toast.error('Please login to enroll');
-      return { success: false };
-    }
+  const mutation = useMutation({
+    mutationFn: () => api.post('/customer/loyalty/enroll'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LOYALTY_BALANCE_KEY });
+      toast.success('Successfully enrolled in loyalty program!');
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to enroll');
+    },
+  });
 
-    try {
-      setEnrolling(true);
-      const response = await fetch(`${API_URL}/customer/loyalty/enroll`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      
-      if (data.success) {
-        toast.success('Successfully enrolled in loyalty program!');
-        return { success: true, data: data.data };
-      } else {
-        toast.error(data.message || 'Failed to enroll');
-        return { success: false, message: data.message };
+  return {
+    enroll: async () => {
+      if (!token) {
+        toast.error('Please login to enroll');
+        return { success: false };
       }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to enroll');
-      return { success: false, message: err.message };
-    } finally {
-      setEnrolling(false);
-    }
+      try {
+        const response = await mutation.mutateAsync();
+        return { success: true, data: response.data?.data };
+      } catch (err: any) {
+        return { success: false, message: err?.response?.data?.message ?? err?.message };
+      }
+    },
+    enrolling: mutation.isPending,
   };
-
-  return { enroll, enrolling };
 }
 
 export function useRedeemPoints() {
   const { token } = useAuthStore();
-  const [redeeming, setRedeeming] = useState(false);
+  const queryClient = useQueryClient();
 
-  const redeem = async (points: number, redemptionType: string, value: number) => {
-    if (!token) {
-      toast.error('Please login to redeem points');
-      return { success: false };
-    }
+  const mutation = useMutation({
+    mutationFn: ({ points, redemptionType, value }: { points: number; redemptionType: string; value: number }) =>
+      api.post('/customer/loyalty/redeem', { points, redemptionType, value }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: LOYALTY_BALANCE_KEY });
+      queryClient.invalidateQueries({ queryKey: LOYALTY_TRANSACTIONS_KEY });
+      toast.success('Points redeemed successfully!');
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to redeem points');
+    },
+  });
 
-    try {
-      setRedeeming(true);
-      const response = await fetch(`${API_URL}/customer/loyalty/redeem`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ points, redemptionType, value }),
-      });
-      const data = await response.json();
-      
-      if (data.success) {
-        toast.success('Points redeemed successfully!');
-        return { success: true, data: data.data };
-      } else {
-        toast.error(data.message || 'Failed to redeem points');
-        return { success: false, message: data.message };
+  return {
+    redeem: async (points: number, redemptionType: string, value: number) => {
+      if (!token) {
+        toast.error('Please login to redeem points');
+        return { success: false };
       }
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to redeem points');
-      return { success: false, message: err.message };
-    } finally {
-      setRedeeming(false);
-    }
+      try {
+        const response = await mutation.mutateAsync({ points, redemptionType, value });
+        return { success: true, data: response.data?.data };
+      } catch (err: any) {
+        return { success: false, message: err?.response?.data?.message ?? err?.message };
+      }
+    },
+    redeeming: mutation.isPending,
   };
-
-  return { redeem, redeeming };
 }
 
 export function useAvailableRewards() {

@@ -45,6 +45,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { useState, useEffect } from 'react'
 import { useBranding } from '@/hooks/useBranding'
 import { APP_VERSION } from '@/lib/version'
+import { TENANT_RESERVED_SEGMENTS } from '@/constants/reservedRoutes'
 
 interface NavigationItem {
   name: string;
@@ -259,7 +260,7 @@ export function SimpleSidebar({ searchQuery = '' }: SimpleSidebarProps) {
       const pathSegments = window.location.pathname.split('/').filter(Boolean)
       const potentialSlug = pathSegments[0]
       // Check if the first segment is not a reserved route
-      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      const reserved = TENANT_RESERVED_SEGMENTS
       if (potentialSlug && !reserved.includes(potentialSlug)) {
         slug = potentialSlug
       }

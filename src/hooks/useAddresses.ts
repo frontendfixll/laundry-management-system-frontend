@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react'
+// Customer addresses hook — React Query (auto-fetch + mutations).
+// Each mutation invalidates the addresses cache instead of patching local
+// state by hand, so any other component reading the same query stays in sync.
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { customerAPI } from '@/lib/api'
 import toast from 'react-hot-toast'
 
-interface Address {
+export interface Address {
   _id: string
   name: string
   phone: string
@@ -15,98 +19,92 @@ interface Address {
   addressType?: 'home' | 'office'
 }
 
+const ADDRESSES_KEY = ['customer', 'addresses'] as const
+
 export function useAddresses() {
-  const [addresses, setAddresses] = useState<Address[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const fetchAddresses = async () => {
-    try {
-      setLoading(true)
+  const query = useQuery({
+    queryKey: ADDRESSES_KEY,
+    queryFn: async (): Promise<Address[]> => {
       const response = await customerAPI.getAddresses()
-      setAddresses(response.data.data.addresses || [])
-      setError(null)
-    } catch (err: any) {
-      console.error('Error fetching addresses:', err)
-      setError(err.response?.data?.message || 'Failed to fetch addresses')
-    } finally {
-      setLoading(false)
-    }
-  }
+      return response.data?.data?.addresses ?? []
+    },
+    staleTime: 60_000,
+    gcTime: 5 * 60_000,
+    retry: (count, err: any) => {
+      const status = err?.response?.status
+      if (status >= 400 && status < 500) return false
+      return count < 2
+    },
+  })
 
-  const addAddress = async (addressData: Omit<Address, '_id'>) => {
-    try {
-      const response = await customerAPI.addAddress(addressData)
-      const newAddress = response.data.data.address
-      setAddresses(prev => [...prev, newAddress])
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ADDRESSES_KEY })
+
+  const addMutation = useMutation({
+    mutationFn: (data: Omit<Address, '_id'>) => customerAPI.addAddress(data),
+    onSuccess: () => {
+      invalidate()
       toast.success('Address added successfully')
-      return newAddress
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to add address'
-      toast.error(message)
-      throw err
-    }
-  }
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to add address')
+    },
+  })
 
-  const updateAddress = async (addressId: string, addressData: Partial<Address>) => {
-    try {
-      const response = await customerAPI.updateAddress(addressId, addressData)
-      const updatedAddress = response.data.data.address
-      setAddresses(prev => 
-        prev.map(addr => addr._id === addressId ? updatedAddress : addr)
-      )
+  const updateMutation = useMutation({
+    mutationFn: ({ addressId, data }: { addressId: string; data: Partial<Address> }) =>
+      customerAPI.updateAddress(addressId, data),
+    onSuccess: () => {
+      invalidate()
       toast.success('Address updated successfully')
-      return updatedAddress
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to update address'
-      toast.error(message)
-      throw err
-    }
-  }
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to update address')
+    },
+  })
 
-  const deleteAddress = async (addressId: string) => {
-    try {
-      await customerAPI.deleteAddress(addressId)
-      setAddresses(prev => prev.filter(addr => addr._id !== addressId))
+  const deleteMutation = useMutation({
+    mutationFn: (addressId: string) => customerAPI.deleteAddress(addressId),
+    onSuccess: () => {
+      invalidate()
       toast.success('Address deleted successfully')
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to delete address'
-      toast.error(message)
-      throw err
-    }
-  }
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to delete address')
+    },
+  })
 
-  const setDefaultAddress = async (addressId: string) => {
-    try {
-      const response = await customerAPI.setDefaultAddress(addressId)
-      const updatedAddress = response.data.data.address
-      setAddresses(prev => 
-        prev.map(addr => ({
-          ...addr,
-          isDefault: addr._id === addressId
-        }))
-      )
+  const setDefaultMutation = useMutation({
+    mutationFn: (addressId: string) => customerAPI.setDefaultAddress(addressId),
+    onSuccess: () => {
+      invalidate()
       toast.success('Default address updated')
-      return updatedAddress
-    } catch (err: any) {
-      const message = err.response?.data?.message || 'Failed to set default address'
-      toast.error(message)
-      throw err
-    }
-  }
-
-  useEffect(() => {
-    fetchAddresses()
-  }, [])
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? 'Failed to set default address')
+    },
+  })
 
   return {
-    addresses,
-    loading,
-    error,
-    addAddress,
-    updateAddress,
-    deleteAddress,
-    setDefaultAddress,
-    refetch: fetchAddresses
+    addresses: query.data ?? [],
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? null) : null,
+    addAddress: async (data: Omit<Address, '_id'>): Promise<Address> => {
+      const response = await addMutation.mutateAsync(data)
+      return response.data?.data?.address
+    },
+    updateAddress: async (addressId: string, data: Partial<Address>): Promise<Address> => {
+      const response = await updateMutation.mutateAsync({ addressId, data })
+      return response.data?.data?.address
+    },
+    deleteAddress: async (addressId: string): Promise<void> => {
+      await deleteMutation.mutateAsync(addressId)
+    },
+    setDefaultAddress: async (addressId: string): Promise<Address> => {
+      const response = await setDefaultMutation.mutateAsync(addressId)
+      return response.data?.data?.address
+    },
+    refetch: async () => { await query.refetch() },
   }
 }

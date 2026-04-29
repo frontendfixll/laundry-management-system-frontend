@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import TemplateHeader from '@/components/layout/TemplateHeader'
 import { TenantProvider } from '@/contexts/TenantContext'
-import toast, { Toaster } from 'react-hot-toast'
 import { useAuthStore } from '@/store/authStore'
 import { TemplateType, ThemeColor } from './ThemeCustomizer'
 import { Language } from '@/lib/translations'
@@ -180,8 +179,6 @@ export default function LandingPageSelector() {
   return (
     <TenantProvider tenant={null} isTenantPage={false}>
       <div className="relative">
-        <Toaster position="top-right" />
-
         {/* Public Header - Only show for templates that don't have their own */}
         {needsHeader ? (
           <PublicHeader />

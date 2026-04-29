@@ -1,6 +1,6 @@
 'use client'
 
-import { toast, Toaster } from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import {
   CheckCircle,
   AlertTriangle,
@@ -155,46 +155,7 @@ export const showToast = {
   }
 }
 
-// Modern Toaster component
-export default function ModernToaster() {
-  return (
-    <Toaster
-      position="top-center"
-      reverseOrder={false}
-      gutter={8}
-      containerClassName=""
-      containerStyle={{
-        top: 20,
-      }}
-      toastOptions={{
-        // Default options
-        duration: 4000,
-        style: {
-          background: '#ffffff',
-          color: '#374151',
-          border: '1px solid #E5E7EB',
-          borderRadius: '12px',
-          padding: '16px',
-          fontSize: '14px',
-          fontWeight: '500',
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          maxWidth: '380px', // Fixed width to prevent full screen
-          width: '380px', // Enforce consistent width
-        },
-        // Individual toast type styles
-        success: {
-          iconTheme: {
-            primary: '#10B981',
-            secondary: '#ffffff',
-          },
-        },
-        error: {
-          iconTheme: {
-            primary: '#EF4444',
-            secondary: '#ffffff',
-          },
-        },
-      }}
-    />
-  )
-}
+// The <Toaster /> component lives in src/components/providers.tsx as a
+// single global instance. Do not export another Toaster from this file —
+// react-hot-toast uses a singleton store and mounting more than one renders
+// every toast multiple times. Use the `showToast` helpers above.

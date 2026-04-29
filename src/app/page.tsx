@@ -1,7 +1,7 @@
 'use client'
 
-import LandingPageSelector from '@/components/landing/LandingPageSelector'
+import FindYourLaundry from '@/components/find/FindYourLaundry'
 
 export default function HomePage() {
-  return <LandingPageSelector />
+  return <FindYourLaundry />
 }

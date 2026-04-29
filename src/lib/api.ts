@@ -1,3 +1,12 @@
+// CANONICAL API CLIENT — use this for all new code.
+// Other clients (lib/adminApi.ts, lib/superAdminApi.ts, lib/centerAdminApi.ts,
+// lib/tenantApi.ts, services/api.ts) are being migrated here. See
+// docs/REACT_QUERY_MIGRATION.md for the pattern.
+//
+// Wrap data fetches with React Query (`useQuery`/`useMutation`) — do not
+// roll new useState+useEffect hooks. Retry, dedup, and caching are handled
+// by React Query, not by this client.
+
 import axios from 'axios'
 import { useAuthStore } from '@/store/authStore'
 import { useSuperAdminStore } from '@/store/superAdminStore'
