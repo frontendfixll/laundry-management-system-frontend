@@ -21,6 +21,10 @@ const RESERVED_ROUTES = [
   'preview-templates',
   '_next',
   'favicon.ico',
+  'icon',
+  'icon.svg',
+  'apple-icon',
+  'apple-icon.png',
   'images',
   'public',
   'www',
@@ -255,6 +259,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|icon|icon.svg|apple-icon|apple-icon.png).*)',
   ],
 }
