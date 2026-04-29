@@ -517,10 +517,10 @@ function HeroCarousel({
   return (
     <div className="relative overflow-hidden group" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       {/* Navigation Arrows */}
-      <button onClick={prevSlide} className={`absolute left-[-1px] top-1/2 -translate-y-1/2 z-30 ${colors.primary} ${colors.hover} rounded-lg p-3 shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+      <button onClick={prevSlide} className={`hidden lg:block absolute left-[-1px] top-1/2 -translate-y-1/2 z-30 ${colors.primary} ${colors.hover} rounded-lg p-3 shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
         <ChevronLeft className="w-6 h-6 text-white" />
       </button>
-      <button onClick={nextSlide} className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 ${colors.primary} ${colors.hover} rounded-lg p-3 shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+      <button onClick={nextSlide} className={`hidden lg:block absolute right-4 top-1/2 -translate-y-1/2 z-30 ${colors.primary} ${colors.hover} rounded-lg p-3 shadow-lg transition-all duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
         <ChevronRight className="w-6 h-6 text-white" />
       </button>
 
@@ -533,7 +533,7 @@ function HeroCarousel({
           {slides.map((slide, index) => (
             <div key={index} className="w-full flex-shrink-0">
               <div className="grid lg:grid-cols-2 gap-4 pt-8 pb-0">
-                <div className="px-4 lg:pl-16 flex flex-col justify-center">
+                <div className="px-4 lg:pl-16 flex flex-col justify-center order-2 lg:order-1">
                   <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 leading-tight" style={{ color: theme.textPrimary }}>{slide.title}</h1>
 
                   {/* Tagline Display */}
@@ -554,17 +554,21 @@ function HeroCarousel({
                     ))}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Button size="lg" className={`${colors.primary} ${colors.hover} text-white px-6`} onClick={onBookNow}>
+                    <Button size="lg" className={`w-full sm:w-auto ${colors.primary} ${colors.hover} text-white px-6`} onClick={onBookNow}>
                       <Truck className="w-5 h-5 mr-2" />{t('nav.bookNow')}
                     </Button>
-                    <Link href="https://wa.me/919876543210" target="_blank">
-                      <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-6">
+                    <Link
+                      href="https://wa.me/919876543210"
+                      target="_blank"
+                      className="block w-full sm:inline-block sm:w-auto"
+                    >
+                      <Button size="lg" className="w-full bg-green-500 hover:bg-green-600 text-white px-6">
                         <Phone className="w-5 h-5 mr-2" />{t('cta.whatsapp')}
                       </Button>
                     </Link>
                   </div>
                 </div>
-                <div className="relative flex justify-center items-end h-full">
+                <div className="relative flex justify-center items-end h-full order-1 lg:order-2">
                   <img
                     src={slide.image}
                     alt={slide.title}

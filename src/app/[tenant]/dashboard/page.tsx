@@ -497,8 +497,8 @@ export default function TenantDashboard() {
           </div>
         </header>
 
-        {/* Dashboard Content - Add margin-top for fixed header */}
-        <main className="flex-1 p-4 lg:p-8 space-y-6 overflow-y-auto mt-16">
+        {/* Dashboard Content - Add margin-top for fixed header (header is ~80px tall: greeting + subtitle + py-4) */}
+        <main className="flex-1 p-4 lg:p-8 space-y-6 overflow-y-auto mt-24 lg:mt-20">
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
