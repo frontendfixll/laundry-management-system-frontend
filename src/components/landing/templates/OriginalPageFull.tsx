@@ -162,7 +162,7 @@ function HeroCarousel({
               }`}
           >
             <div className="grid lg:grid-cols-2 gap-4 items-center">
-              <div className="px-4 lg:pl-16">
+              <div className="px-4 lg:pl-16 order-2 lg:order-1">
                 <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
                   {previousSlideData.title}
                 </h1>
@@ -176,17 +176,17 @@ function HeroCarousel({
                   ))}
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button size="lg" className="bg-teal-500 hover:bg-teal-600 text-white px-6">
+                  <Button size="lg" className="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-white px-6">
                     <Truck className="w-5 h-5 mr-2" />
                     {previousSlideData.primaryButton.text}
                   </Button>
-                  <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-6">
+                  <Button size="lg" className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-6">
                     <Phone className="w-5 h-5 mr-2" />
                     Chat on Whatsapp
                   </Button>
                 </div>
               </div>
-              <div className="relative flex justify-center items-end overflow-visible">
+              <div className="relative flex justify-center items-end overflow-visible order-1 lg:order-2">
                 {previousSlideData.video ? (
                   <video
                     src={previousSlideData.video}
@@ -241,14 +241,18 @@ function HeroCarousel({
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   size="lg"
-                  className="bg-teal-500 hover:bg-teal-600 text-white px-6"
+                  className="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-white px-6"
                   onClick={onBookNow}
                 >
                   <Truck className="w-5 h-5 mr-2" />
                   {currentSlideData.primaryButton.text}
                 </Button>
-                <Link href="https://wa.me/919876543210" target="_blank">
-                  <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white px-6">
+                <Link
+                  href="https://wa.me/919876543210"
+                  target="_blank"
+                  className="block w-full sm:inline-block sm:w-auto"
+                >
+                  <Button size="lg" className="w-full bg-green-500 hover:bg-green-600 text-white px-6">
                     <Phone className="w-5 h-5 mr-2" />
                     Chat on Whatsapp
                   </Button>
