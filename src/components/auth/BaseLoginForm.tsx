@@ -189,15 +189,17 @@ export default function BaseLoginForm({
 
       {/* Main Content - Two Column Layout */}
       <div className="min-h-screen flex items-center justify-center">
-        {/* Left Side - Custom Content */}
+        {/* Left Side - Custom Content (anchored to inner edge with breathing gap toward center) */}
         {leftSideContent && (
-          <div className="hidden lg:flex lg:w-[45%] flex-col justify-center px-12 xl:px-16">
-            {leftSideContent}
+          <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-end pl-8 pr-16 xl:pl-12 xl:pr-24">
+            <div className="w-full max-w-lg">
+              {leftSideContent}
+            </div>
           </div>
         )}
 
-        {/* Right Side - Login Form */}
-        <div className={`w-full ${leftSideContent ? 'lg:w-[45%]' : 'max-w-md'} flex items-start justify-start px-6 pt-24 lg:px-12`}>
+        {/* Right Side - Login Form (anchored to inner edge with breathing gap toward center) */}
+        <div className={`w-full ${leftSideContent ? 'lg:w-1/2' : 'max-w-md'} flex items-center ${leftSideContent ? 'justify-start' : 'justify-center'} px-6 pt-24 lg:pt-0 lg:pl-16 lg:pr-8 xl:pl-24 xl:pr-12`}>
           <div className="w-full max-w-md">
             {/* Login Form Card */}
             <div className={formCardClass}>
