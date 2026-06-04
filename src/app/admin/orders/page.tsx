@@ -162,17 +162,25 @@ function AdminOrdersPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Deep linking support
+  // Deep linking: auto-open panel once per URL ?id=, reset when URL clears it.
+  // Using a ref (not showViewModal) avoids reopening during the close transition,
+  // when state has flushed but searchParams hasn't yet caught up to the URL change.
+  const handledOrderIdRef = useRef<string | null>(null)
   useEffect(() => {
     const orderId = searchParams.get('id')
-    if (orderId && orders.length > 0 && !showViewModal) {
-      const found = orders.find(o => o._id === orderId)
-      if (found) {
-        setSelectedOrder(found)
-        setShowViewModal(true)
-      }
+    if (!orderId) {
+      handledOrderIdRef.current = null
+      return
     }
-  }, [searchParams, orders, showViewModal])
+    if (handledOrderIdRef.current === orderId) return
+    if (orders.length === 0) return
+    const found = orders.find(o => o._id === orderId)
+    if (found) {
+      handledOrderIdRef.current = orderId
+      setSelectedOrder(found)
+      setShowViewModal(true)
+    }
+  }, [searchParams, orders])
 
   const handleFilterChange = (key: string, value: any) => {
     const newFilters = { ...filters, [key]: value, page: 1 }
@@ -187,6 +195,17 @@ function AdminOrdersPage() {
     if (newFilters.search) params.set('search', newFilters.search)
     const queryString = params.toString()
     router.push(queryString ? `?${queryString}` : '/admin/orders', { scroll: false })
+  }
+
+  const closeOrderPanel = () => {
+    setShowViewModal(false)
+    setSelectedOrder(null)
+    if (searchParams?.get('id')) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('id')
+      const queryString = params.toString()
+      router.replace(queryString ? `?${queryString}` : '/admin/orders', { scroll: false })
+    }
   }
 
   const handlePageChange = (page: number) => {
@@ -738,7 +757,7 @@ function AdminOrdersPage() {
       {/* View Order SlidePanel */}
       <SlidePanel
         open={!!(showViewModal && selectedOrder)}
-        onClose={() => { setShowViewModal(false); setSelectedOrder(null) }}
+        onClose={closeOrderPanel}
         title={selectedOrder ? `Order: ${selectedOrder.orderNumber || 'Details'}` : 'Order Details'}
         width="2xl"
         accentBar="bg-teal-500"
@@ -1052,16 +1071,16 @@ function AdminOrdersPage() {
             {/* Footer */}
             <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
               {selectedOrder.status === 'placed' && canAssign && selectedOrder.pickupType !== 'self' && (
-                <Button className="bg-purple-500 hover:bg-purple-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'pickup'); setShowViewModal(false); setSelectedOrder(null) }}>
+                <Button className="bg-purple-500 hover:bg-purple-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'pickup'); closeOrderPanel() }}>
                   <Truck className="w-4 h-4 mr-2" />Assign Pickup Partner
                 </Button>
               )}
               {selectedOrder.status === 'ready' && canAssign && selectedOrder.deliveryType !== 'self' && (
-                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'delivery'); setShowViewModal(false); setSelectedOrder(null) }}>
+                <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={() => { handleAssignLogistics(selectedOrder._id, 'delivery'); closeOrderPanel() }}>
                   <Truck className="w-4 h-4 mr-2" />Assign Delivery Partner
                 </Button>
               )}
-              <Button variant="outline" onClick={() => { setShowViewModal(false); setSelectedOrder(null) }}>Close</Button>
+              <Button variant="outline" onClick={closeOrderPanel}>Close</Button>
             </div>
           </div>
         )}
