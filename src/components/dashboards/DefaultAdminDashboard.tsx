@@ -598,7 +598,11 @@ export function DefaultAdminDashboard() {
 
           <div className="space-y-2">
             {recentOrders?.slice(0, 5).map((order) => (
-              <div key={order._id} className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100">
+              <Link
+                key={order._id}
+                href={`/admin/orders?id=${order._id}`}
+                className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100"
+              >
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${order.status === 'completed' ? 'bg-green-100' :
                     order.status === 'processing' ? 'bg-blue-100' :
@@ -623,7 +627,7 @@ export function DefaultAdminDashboard() {
                   <p className="text-sm font-semibold text-gray-900">₹{order.pricing?.total?.toLocaleString() || '0'}</p>
                   <p className="text-[10px] text-gray-500 capitalize">{order.status}</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
