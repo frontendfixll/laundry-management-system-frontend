@@ -79,9 +79,11 @@ export function middleware(request: NextRequest) {
   if (tenantIdentifier) {
     console.log('🏢 Tenant detected:', tenantIdentifier)
 
-    // Check if the next segment is a reserved route (e.g., /dgsfg/admin)
+    // Check if the next segment is a reserved route — ONLY strip prefix when
+    // the first path segment IS the tenant slug (path-based tenant routing).
+    // When tenant comes from subdomain, do NOT strip path segments.
     const secondSegment = pathSegments[1]
-    if (secondSegment && RESERVED_ROUTES.includes(secondSegment)) {
+    if (firstSegment === tenantIdentifier && secondSegment && RESERVED_ROUTES.includes(secondSegment)) {
       // Rewrite to the global route but keep the tenant context
       const newPathname = '/' + pathSegments.slice(1).join('/')
       const url = request.nextUrl.clone()
