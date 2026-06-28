@@ -326,6 +326,7 @@ export default function BaseLoginForm({
                   {[
                     { role: 'Admin',          label: 'Full Dashboard',    email: 'admin@demo.com',     badge: 'bg-violet-100 text-violet-700' },
                     { role: 'Branch Manager', label: 'Branch Operations', email: 'branch@demo.com',    badge: 'bg-amber-100 text-amber-700' },
+                    { role: 'Support',        label: 'Support Panel',     email: 'support@demo.com',   badge: 'bg-blue-100 text-blue-700' },
                     { role: 'Customer',       label: 'Order & Track',     email: 'customer1@demo.com', badge: 'bg-emerald-100 text-emerald-700' },
                   ].map(({ role, label, email, badge }) => (
                     <button
