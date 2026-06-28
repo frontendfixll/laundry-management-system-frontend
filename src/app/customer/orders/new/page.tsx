@@ -241,7 +241,9 @@ export default function NewOrderPage() {
     const fetchBranches = async () => {
       try {
         setBranchesLoading(true)
-        const response = await fetch(`${API_URL}/services/branches`)
+        const tenantSlug = document.cookie.split('; ').find(c => c.startsWith('tenant-slug='))?.split('=')[1]
+        const branchUrl = tenantSlug ? `${API_URL}/services/branches?tenantSlug=${tenantSlug}` : `${API_URL}/services/branches`
+        const response = await fetch(branchUrl)
         const data = await response.json()
         if (data.success) {
           setBranches(data.data.branches || [])
