@@ -39,17 +39,10 @@ export function middleware(request: NextRequest) {
   // Extract subdomain from hostname
   const subdomain = extractSubdomain(hostname)
 
-  // Enhanced logging for production troubleshooting
-  // Always log in development, and log important transitions in production (especially for admin routes)
-  if (process.env.NODE_ENV === 'development' || (pathname.includes('admin') && !pathname.includes('_next'))) {
-    console.log(`🌐 [Middleware] Host: ${hostname} | Sub: ${subdomain} | Path: ${pathname} | Seg1: ${firstSegment} | Seg2: ${secondSegment}`)
-  }
-
   // CRITICAL FIX: If path starts with a reserved route, treat it as a global route immediately.
   // This ensures /admin/* is NEVER rewritten to a tenant-specific path like /services.
   if (RESERVED_ROUTES.includes(firstSegment)) {
     if (subdomain) {
-      console.log(`🔧 [Middleware] Reserved route '${firstSegment}' on subdomain '${subdomain}' -> Passing as global route with tenant context`)
       const response = NextResponse.next()
       // Set tenant headers for components to use (branding, etc.)
       response.headers.set('x-tenant-slug', subdomain)
@@ -77,7 +70,6 @@ export function middleware(request: NextRequest) {
 
   // If we have a tenant identifier, handle tenant routing/context
   if (tenantIdentifier) {
-    console.log('🏢 Tenant detected:', tenantIdentifier)
 
     // Check if the next segment is a reserved route — ONLY strip prefix when
     // the first path segment IS the tenant slug (path-based tenant routing).

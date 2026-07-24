@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { withRouteGuard } from '@/components/withRouteGuard'
 
 interface Review {
   _id: string
@@ -80,7 +81,7 @@ interface Stats {
   avgRating: number
 }
 
-export default function AdminReviewsPage() {
+function AdminReviewsPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
@@ -481,6 +482,12 @@ export default function AdminReviewsPage() {
     </div>
   )
 }
+
+export default withRouteGuard(AdminReviewsPage, {
+  module: 'customers',
+  action: 'view',
+  feature: 'reviews'
+})
 
 // Review Detail Modal
 function ReviewDetailModal({

@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button'
 import { SlidePanel } from '@/components/ui/slide-panel'
 import { api } from '@/lib/api'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { 
-  Shield, Search, Plus, Edit2, Trash2, AlertCircle, 
+import { withRouteGuard } from '@/components/withRouteGuard'
+import {
+  Shield, Search, Plus, Edit2, Trash2, AlertCircle,
   RefreshCw, Loader2, Check, X, Users, UserCog
 } from 'lucide-react'
 
@@ -49,7 +50,7 @@ interface PermissionModule {
 
 const PERMISSION_ACTIONS = ['view', 'create', 'edit', 'delete'] as const
 
-export default function AdminRolesPage() {
+function AdminRolesPage() {
   const [activeTab, setActiveTab] = useState<'roles' | 'users'>('roles')
   const [roles, setRoles] = useState<Role[]>([])
   const [users, setUsers] = useState<User[]>([])
@@ -574,3 +575,9 @@ export default function AdminRolesPage() {
     </div>
   )
 }
+
+export default withRouteGuard(AdminRolesPage, {
+  module: 'settings',
+  action: 'view',
+  feature: 'roles'
+})

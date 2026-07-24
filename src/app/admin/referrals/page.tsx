@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuthStore } from '@/store/authStore'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import {
   Users2,
   Plus,
@@ -112,7 +113,7 @@ const STATUS_COLORS = {
   cancelled: 'bg-gray-100 text-gray-800'
 }
 
-export default function ReferralsPage() {
+function ReferralsPage() {
   const { token } = useAuthStore()
   const [activeTab, setActiveTab] = useState<'programs' | 'referrals'>('programs')
   const [programs, setPrograms] = useState<ReferralProgram[]>([])
@@ -327,7 +328,7 @@ export default function ReferralsPage() {
   const getRewardDisplay = (reward: ReferralReward) => {
     switch (reward.type) {
       case 'credit':
-        return `$${reward.value} credit`
+        return `₹${reward.value} credit`
       case 'coupon':
         return `${reward.value}% coupon`
       case 'discount':
@@ -545,7 +546,7 @@ export default function ReferralsPage() {
                               <div className="text-sm text-gray-500">{program.description}</div>
                             )}
                             <div className="text-xs text-gray-400 mt-1">
-                              Min order: ${program.minOrderValue} • Expires: {program.referralCodeExpiry} days
+                              Min order: ₹{program.minOrderValue} • Expires: {program.referralCodeExpiry} days
                             </div>
                           </div>
                         </td>
@@ -715,7 +716,7 @@ export default function ReferralsPage() {
                           <div>Conversions: <span className="font-medium">{referral.conversions}</span></div>
                           {referral.firstOrderValue && (
                             <div className="text-xs text-green-600">
-                              First order: ${referral.firstOrderValue}
+                              First order: ₹{referral.firstOrderValue}
                             </div>
                           )}
                         </div>
@@ -826,7 +827,7 @@ export default function ReferralsPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {formData.referrerReward.type === 'credit' ? 'Amount ($)' : 
+                        {formData.referrerReward.type === 'credit' ? 'Amount (₹)' :
                          formData.referrerReward.type === 'points' ? 'Points' : 'Value'}
                       </label>
                       <input
@@ -869,7 +870,7 @@ export default function ReferralsPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {formData.refereeReward.type === 'credit' ? 'Amount ($)' : 
+                        {formData.refereeReward.type === 'credit' ? 'Amount (₹)' :
                          formData.refereeReward.type === 'points' ? 'Points' : 'Value'}
                       </label>
                       <input
@@ -892,7 +893,7 @@ export default function ReferralsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Min Order Value ($)
+                    Min Order Value (₹)
                   </label>
                   <input
                     type="number"
@@ -1001,3 +1002,9 @@ export default function ReferralsPage() {
     </div>
   )
 }
+
+export default withRouteGuard(ReferralsPage, {
+  module: 'customers',
+  action: 'view',
+  feature: 'referrals'
+})

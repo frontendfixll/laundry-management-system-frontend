@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
+import toast from 'react-hot-toast'
 import { 
   HelpCircle, 
   Book,
@@ -19,7 +21,7 @@ interface FAQ {
   answer: string
 }
 
-export default function AdminSupportPage() {
+function AdminSupportPage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -79,7 +81,7 @@ export default function AdminSupportPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Documentation</h3>
           <p className="text-sm text-gray-600 mb-4">Read the complete admin guide and documentation</p>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => toast('Documentation coming soon')}>
             <ExternalLink className="w-4 h-4 mr-2" />
             View Docs
           </Button>
@@ -91,7 +93,7 @@ export default function AdminSupportPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Live Chat</h3>
           <p className="text-sm text-gray-600 mb-4">Chat with our support team for immediate help</p>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => toast('Live chat coming soon')}>
             <MessageCircle className="w-4 h-4 mr-2" />
             Start Chat
           </Button>
@@ -103,7 +105,7 @@ export default function AdminSupportPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">Phone Support</h3>
           <p className="text-sm text-gray-600 mb-4">Call us for urgent issues and escalations</p>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => toast('Call 1800-123-4567 for urgent support')}>
             <Phone className="w-4 h-4 mr-2" />
             1800-123-4567
           </Button>
@@ -220,3 +222,9 @@ export default function AdminSupportPage() {
     </div>
   )
 }
+
+export default withRouteGuard(AdminSupportPage, {
+  module: 'settings',
+  action: 'view',
+  feature: 'support'
+})

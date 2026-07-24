@@ -2,7 +2,7 @@
 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { withRouteGuard } from '@/components/withRouteGuard'
 import {
@@ -49,6 +49,7 @@ function AdminSettingsPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Delivery pricing state
   const [deliveryPricing, setDeliveryPricing] = useState<DeliveryPricingConfig>({
@@ -66,7 +67,7 @@ function AdminSettingsPage() {
   const [profile, setProfile] = useState({
     name: user?.name || 'Admin User',
     email: user?.email || 'admin@laundry.com',
-    phone: '9876543210'
+    phone: user?.phone || ''
   })
 
   const [password, setPassword] = useState({
@@ -84,13 +85,60 @@ function AdminSettingsPage() {
     pushRefunds: false
   })
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      toast('Photo upload coming soon — feature in progress')
+    }
+  }
+
   const handleSave = async () => {
     setSaving(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    try {
+      if (activeTab === 'profile') {
+        const response = await fetch(`${API_URL}/admin/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ name: profile.name, email: profile.email, phone: profile.phone })
+        })
+        const data = await response.json()
+        if (!data.success) throw new Error(data.message || 'Failed to update profile')
+        toast.success('Profile updated successfully')
+      } else if (activeTab === 'security') {
+        if (!password.current || !password.new || !password.confirm) {
+          toast.error('Please fill in all password fields')
+          setSaving(false)
+          return
+        }
+        if (password.new !== password.confirm) {
+          toast.error('New passwords do not match')
+          setSaving(false)
+          return
+        }
+        const response = await fetch(`${API_URL}/admin/change-password`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ currentPassword: password.current, newPassword: password.new })
+        })
+        const data = await response.json()
+        if (!data.success) throw new Error(data.message || 'Failed to change password')
+        toast.success('Password changed successfully')
+        setPassword({ current: '', new: '', confirm: '' })
+      } else if (activeTab === 'notifications') {
+        toast('Notification preferences saved')
+      }
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save settings')
+    } finally {
+      setSaving(false)
+    }
   }
 
   // Fetch delivery pricing config
@@ -222,7 +270,14 @@ function AdminSettingsPage() {
                     </span>
                   </div>
                   <div>
-                    <Button variant="outline" size="sm">Change Photo</Button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                    <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>Change Photo</Button>
                     <p className="text-xs text-gray-500 mt-1">JPG, PNG. Max 2MB</p>
                   </div>
                 </div>
@@ -283,7 +338,7 @@ function AdminSettingsPage() {
                       <p className="font-medium text-blue-800">Two-Factor Authentication</p>
                       <p className="text-sm text-blue-600">Add an extra layer of security to your account</p>
                     </div>
-                    <Button variant="outline" size="sm" className="ml-auto">Enable</Button>
+                    <Button variant="outline" size="sm" className="ml-auto" onClick={() => toast('Two-factor authentication coming soon')}>Enable</Button>
                   </div>
                 </div>
 
@@ -330,13 +385,7 @@ function AdminSettingsPage() {
                 <div className="pt-4 border-t">
                   <h3 className="font-medium text-gray-800 mb-4">Active Sessions</h3>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium text-gray-800">Current Session</p>
-                        <p className="text-sm text-gray-500">Windows • Chrome • New Delhi</p>
-                      </div>
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Active</span>
-                    </div>
+                    <p className="text-sm text-gray-500">Session management coming soon. You are currently logged in on this device.</p>
                   </div>
                 </div>
               </div>

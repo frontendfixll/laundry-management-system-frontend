@@ -174,7 +174,7 @@ function SpendingChart({ orders }: { orders: any[] }) {
 const getSidebarNavigation = (tenantSlug: string) => [
   { name: 'Dashboard', href: `/${tenantSlug}/dashboard`, icon: Home, current: true },
   { name: 'My Orders', href: `/${tenantSlug}/orders`, icon: ShoppingBag, current: false },
-  { name: 'My Reviews', href: `/${tenantSlug}/reviews`, icon: MessageSquare, current: false },
+  { name: 'My Reviews', href: `/${tenantSlug}/all-reviews`, icon: MessageSquare, current: false },
   { name: 'Loyalty', href: `/${tenantSlug}/loyalty`, icon: Award, current: false },
   { name: 'Referrals', href: `/${tenantSlug}/referrals`, icon: Gift, current: false },
   { name: 'Wallet', href: `/${tenantSlug}/wallet`, icon: Wallet, current: false },

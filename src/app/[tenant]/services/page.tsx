@@ -20,13 +20,30 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Shirt, Sparkles, Award, Package, Clock, Truck, Phone, CheckCircle } from 'lucide-react'
 
-const services = [
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+
+// Fallback static services used only when live data cannot be fetched
+const fallbackServices = [
   { id: 'wash-fold', name: 'Wash & Fold', icon: Shirt, description: 'Regular washing and folding', price: '₹25/item', features: ['Same day pickup', 'Eco-friendly'] },
   { id: 'dry-cleaning', name: 'Dry Cleaning', icon: Sparkles, description: 'Professional dry cleaning', price: '₹60/item', features: ['Expert care', 'Stain removal'] },
   { id: 'laundry', name: 'Laundry Service', icon: Package, description: 'Complete laundry service', price: '₹30/item', features: ['Full service', 'Quick turnaround'] },
   { id: 'shoe-cleaning', name: 'Shoe Cleaning', icon: Award, description: 'Professional shoe care', price: '₹80/pair', features: ['Deep cleaning', 'Polish'] },
   { id: 'express', name: 'Express Service', icon: Clock, description: 'Same-day delivery', price: '₹45/item', features: ['4-6 hour delivery', 'Priority'] }
 ]
+
+// Icon map for mapping live service names to icons
+const serviceIconMap: Record<string, any> = {
+  'wash': Shirt, 'fold': Shirt, 'dry': Sparkles, 'cleaning': Sparkles,
+  'laundry': Package, 'shoe': Award, 'express': Clock, 'default': Package
+}
+
+function getServiceIcon(name: string) {
+  const lower = name.toLowerCase()
+  for (const [key, icon] of Object.entries(serviceIconMap)) {
+    if (lower.includes(key)) return icon
+  }
+  return serviceIconMap.default
+}
 
 type LandingPageTemplate = 'original' | 'minimal' | 'freshspin' | 'starter'
 
@@ -68,6 +85,7 @@ export default function TenantServicesPage() {
   const [themeColor, setThemeColor] = useState<ThemeColor>('teal')
   const [scheme, setScheme] = useState<SchemeMode>('light')
   const [language, setLanguage] = useState<Language>('en')
+  const [liveServices, setLiveServices] = useState<any[]>([])
 
   const theme = getThemeColors(themeColor, scheme)
   const t = (key: string) => translations[language]?.[key] || translations['en'][key] || key
@@ -77,6 +95,26 @@ export default function TenantServicesPage() {
     if (tenantData?.primaryColor) {
       setThemeColor(mapHexToThemeColor(tenantData.primaryColor))
     }
+  }, [tenantData])
+
+  // Fetch live services from the first available branch
+  useEffect(() => {
+    const fetchLiveServices = async () => {
+      const branches = tenantData?.branches
+      if (!branches || branches.length === 0) return
+      const branchId = branches[0]?._id || branches[0]?.id
+      if (!branchId) return
+      try {
+        const response = await fetch(`${API_URL}/branches/${branchId}/services/enabled`)
+        const data = await response.json()
+        if (data.success && data.data?.services?.length > 0) {
+          setLiveServices(data.data.services)
+        }
+      } catch {
+        // fall back to static list — no action needed
+      }
+    }
+    fetchLiveServices()
   }, [tenantData])
 
   // Load user preferences
@@ -176,7 +214,17 @@ export default function TenantServicesPage() {
                   </h2>
                 </div>
                 <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {services.map((service) => (
+                  {(liveServices.length > 0
+                    ? liveServices.map((svc: any) => ({
+                        id: svc._id || svc.id,
+                        name: svc.name,
+                        icon: getServiceIcon(svc.name),
+                        description: svc.description || svc.name,
+                        price: svc.pricing?.standard ? `₹${svc.pricing.standard}/item` : (svc.price || ''),
+                        features: svc.features || []
+                      }))
+                    : fallbackServices
+                  ).map((service) => (
                     <div
                       key={service.id}
                       className="rounded-xl p-4 hover:shadow-lg transition-all"
@@ -191,17 +239,21 @@ export default function TenantServicesPage() {
                       <p className="text-sm mb-2" style={{ color: theme.textMuted }}>
                         {service.description}
                       </p>
-                      <p className="text-sm font-bold mb-3" style={{ color: theme.accent }}>
-                        {service.price}
-                      </p>
-                      <ul className="space-y-1 mb-3">
-                        {service.features.map((f, j) => (
-                          <li key={j} className="flex items-center text-xs" style={{ color: theme.textSecondary }}>
-                            <CheckCircle className="w-3 h-3 mr-1" style={{ color: theme.accent }} />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
+                      {service.price && (
+                        <p className="text-sm font-bold mb-3" style={{ color: theme.accent }}>
+                          {service.price}
+                        </p>
+                      )}
+                      {service.features.length > 0 && (
+                        <ul className="space-y-1 mb-3">
+                          {service.features.map((f: string, j: number) => (
+                            <li key={j} className="flex items-center text-xs" style={{ color: theme.textSecondary }}>
+                              <CheckCircle className="w-3 h-3 mr-1" style={{ color: theme.accent }} />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                       <Button
                         size="sm"
                         className="w-full text-white"

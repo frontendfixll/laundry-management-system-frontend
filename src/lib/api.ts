@@ -144,6 +144,7 @@ export const servicesAPI = {
     api.get(`/services/availability/${pincode}`),
 }
 
+// @deprecated — use adminApi from @/lib/adminApi instead
 export const adminAPI = {
   getOrders: () => api.get('/admin/orders'),
   assignOrderToBranch: (orderId: string, branchId: string) =>

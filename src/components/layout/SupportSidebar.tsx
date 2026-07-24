@@ -103,7 +103,7 @@ export function SupportSidebar() {
   }
 
   const renderNavItem = (item: any, isMobile = false) => {
-    const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+    const isActive = pathname === item.href
     const Icon = item.icon
     const showText = isMobile || !isCollapsed
 

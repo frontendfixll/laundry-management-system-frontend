@@ -182,7 +182,7 @@ export default function TenantSupportPage() {
 
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {sidebarNavigation.map((item) => {
-              const href = item.external ? item.href : `/${tenant}/${item.href}`
+              const href = `/${tenant}/${item.href}`
               return (
                 <Link key={item.name} href={href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.current ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/30' : 'text-gray-600 hover:bg-gray-100'}`}

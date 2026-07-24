@@ -184,6 +184,28 @@ function LoyaltyPage() {
     setShowModal(true)
   }
 
+  const handleToggleProgram = async (id: string, isActive: boolean) => {
+    try {
+      const res = await fetch(`${API_BASE}/admin/loyalty/programs/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(`Program ${isActive ? 'activated' : 'deactivated'}`)
+        fetchPrograms()
+      } else {
+        toast.error(data.message || 'Failed to update program status')
+      }
+    } catch {
+      toast.error('Failed to update program status')
+    }
+  }
+
   const handleDelete = async (programId: string) => {
     if (!confirm('Are you sure you want to delete this loyalty program?')) return
 
@@ -475,6 +497,12 @@ function LoyaltyPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleToggleProgram(program._id, !program.isActive)}
+                          className={`px-2 py-1 rounded text-xs ${program.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}
+                        >
+                          {program.isActive ? 'Active' : 'Inactive'}
+                        </button>
                         <button
                           onClick={() => handleEdit(program)}
                           className="text-blue-600 hover:text-blue-900"

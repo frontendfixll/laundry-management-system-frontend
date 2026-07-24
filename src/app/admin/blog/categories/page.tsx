@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { tenantBlogApi, BlogCategory } from '@/services/tenantBlogApi'
 import { 
   Plus, 
@@ -14,7 +15,7 @@ import {
   Info
 } from 'lucide-react'
 
-export default function TenantBlogCategoriesPage() {
+function TenantBlogCategoriesPage() {
   const [categories, setCategories] = useState<{
     platformCategories: BlogCategory[]
     tenantCategories: BlogCategory[]
@@ -440,3 +441,9 @@ export default function TenantBlogCategoriesPage() {
     </div>
   )
 }
+
+export default withRouteGuard(TenantBlogCategoriesPage, {
+  module: 'settings',
+  action: 'view',
+  feature: 'blog'
+})

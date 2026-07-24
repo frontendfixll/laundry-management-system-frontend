@@ -438,9 +438,9 @@ function AdminScannerPage() {
             <Package className="w-4 h-4 text-blue-500" />
             <h3 className="font-semibold text-gray-900 text-sm">Items ({result.items.length})</h3>
           </div>
-          <div className="bg-gray-50 rounded-xl overflow-hidden max-h-48 overflow-y-auto">
+          <div className="bg-gray-50 rounded-xl overflow-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-100 sticky top-0">
+              <thead className="bg-gray-100">
                 <tr>
                   <th className="text-left px-3 py-2 text-xs font-medium text-gray-600">Item</th>
                   <th className="text-left px-3 py-2 text-xs font-medium text-gray-600">Tag</th>
@@ -457,16 +457,16 @@ function AdminScannerPage() {
                     </td>
                     <td className="px-3 py-2">
                       {item.tagCode && (
-                        <button 
+                        <button
                           onClick={() => handleScan(item.tagCode)}
-                          className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded hover:bg-blue-100 hover:text-blue-600"
+                          className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded hover:bg-blue-100 hover:text-blue-600 whitespace-nowrap"
                         >
                           {item.tagCode}
                         </button>
                       )}
                     </td>
                     <td className="px-3 py-2 text-center">
-                      <span className={`text-xs px-1.5 py-0.5 rounded-full ${getStatusColor(item.processingStatus)}`}>
+                      <span className={`text-xs px-1.5 py-0.5 rounded-full whitespace-nowrap ${getStatusColor(item.processingStatus)}`}>
                         {item.processingStatus}
                       </span>
                     </td>

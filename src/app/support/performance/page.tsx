@@ -52,7 +52,17 @@ export default function SupportPerformance() {
       })
       
       if (response.data.success) {
-        setMetrics(response.data.data || metrics)
+        const d = response.data.data || {}
+        setMetrics(prev => ({
+          ...prev,
+          ...d,
+          averageResponseTime: d.averageResponseTime ?? 0,
+          customerSatisfaction: d.customerSatisfaction ?? 0,
+          resolutionRate: d.resolutionRate ?? 0,
+          ticketsResolved: d.ticketsResolved ?? 0,
+          activeTickets: d.activeTickets ?? 0,
+          totalTickets: d.totalTickets ?? 0,
+        }))
       }
     } catch (error) {
       console.error('Error fetching performance metrics:', error)
@@ -62,6 +72,7 @@ export default function SupportPerformance() {
   }
 
   const getPerformanceColor = (value: number, target: number, reverse = false) => {
+    if (!value || !target) return 'text-gray-600'
     const percentage = reverse ? (target / value) * 100 : (value / target) * 100
     if (percentage >= 90) return 'text-green-600'
     if (percentage >= 70) return 'text-yellow-600'
@@ -69,6 +80,7 @@ export default function SupportPerformance() {
   }
 
   const getProgressColor = (value: number, target: number, reverse = false) => {
+    if (!value || !target) return 'bg-gray-300'
     const percentage = reverse ? (target / value) * 100 : (value / target) * 100
     if (percentage >= 90) return 'bg-green-500'
     if (percentage >= 70) return 'bg-yellow-500'

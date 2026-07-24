@@ -6,6 +6,7 @@ import { Gift, Tag, Percent, TrendingUp } from 'lucide-react';
 import { useActiveCampaigns } from '@/hooks/useCampaigns';
 import { useActiveDiscounts } from '@/hooks/useDiscounts';
 import BannerCarousel from '@/components/customer/BannerCarousel';
+import toast from 'react-hot-toast';
 
 export default function OffersPage() {
   const { getActiveCampaigns } = useActiveCampaigns();
@@ -74,7 +75,10 @@ export default function OffersPage() {
                         {campaign.discountType === 'PERCENTAGE' ? `${campaign.discountValue}%` : `₹${campaign.discountValue}`}
                       </p>
                     </div>
-                    <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium">
+                    <button
+                      onClick={() => toast('Offer details coming soon')}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium"
+                    >
                       View Details
                     </button>
                   </div>
