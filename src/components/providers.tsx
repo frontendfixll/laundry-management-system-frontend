@@ -23,46 +23,42 @@ export function Providers({ children }: { children: React.ReactNode }) {
           {children}
         </PermissionSyncProvider>
       </TenancyThemeProvider>
-      <Toaster 
+      {/* Single global Toaster — react-hot-toast uses a singleton store, so
+          mounting more than one renders every toast multiple times. Do NOT
+          add additional <Toaster /> components elsewhere in the tree. */}
+      <Toaster
         position="top-center"
-        containerStyle={{
-          zIndex: 99999, // Higher than modal z-index (9999)
-        }}
+        gutter={8}
+        containerStyle={{ top: 20, zIndex: 99999 }}
         toastOptions={{
-          duration: 15000, // Changed from 4000 to 15000 (15 seconds)
+          duration: 4000,
           style: {
             background: '#ffffff',
             color: '#374151',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            border: '1px solid #e5e7eb',
+            border: '1px solid #E5E7EB',
+            borderRadius: '12px',
+            padding: '16px',
             fontSize: '14px',
             fontWeight: '500',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            zIndex: 99999, // Ensure individual toasts also have high z-index
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            maxWidth: '380px',
+            width: '380px',
           },
           success: {
+            iconTheme: { primary: '#10B981', secondary: '#ffffff' },
             style: {
               background: '#f0fdf4',
               color: '#166534',
               border: '1px solid #22c55e',
-              zIndex: 99999,
-            },
-            iconTheme: {
-              primary: '#22c55e',
-              secondary: '#f0fdf4',
             },
           },
           error: {
+            duration: 6000,
+            iconTheme: { primary: '#EF4444', secondary: '#ffffff' },
             style: {
               background: '#fef2f2',
               color: '#991b1b',
               border: '1px solid #f87171',
-              zIndex: 99999,
-            },
-            iconTheme: {
-              primary: '#f87171',
-              secondary: '#fef2f2',
             },
           },
         }}

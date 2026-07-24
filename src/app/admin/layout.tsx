@@ -3,7 +3,6 @@
 import { SimpleSidebar } from '@/components/layout/SimpleSidebar'
 import AdminHeader from '@/components/layout/AdminHeader'
 import NotificationContainer from '@/components/NotificationContainer'
-import ModernToaster from '@/components/ModernToast'
 import ProgressLoader from '@/components/ui/ProgressLoader'
 import { useLoadingProgress } from '@/hooks/useLoadingProgress'
 import { useAuthStore } from '@/store/authStore'
@@ -38,7 +37,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     <div className="h-screen flex flex-col overflow-hidden bg-gray-50 admin-layout">
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <SimpleSidebar searchQuery={sidebarSearchQuery} />
+        <SimpleSidebar
+          searchQuery={sidebarSearchQuery}
+          mobileOpen={mobileOpen}
+          onMobileClose={() => setMobileOpen(false)}
+        />
 
         {/* Right Side Area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden main-content-area">
@@ -56,9 +59,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
-
-      {/* Modern Toast Notifications */}
-      <ModernToaster />
     </div>
   )
 }
@@ -71,29 +71,26 @@ export default function AdminLayout({
   const { isAuthenticated, user, _hasHydrated } = useAuthStore()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
+  const [accessDenied, setAccessDenied] = useState(false)
+
+  const allowedRoles = [
+    'admin', 'tenant_owner', 'tenant_admin', 'tenant_ops_manager',
+    'tenant_finance_manager', 'tenant_staff', 'super_admin',
+    'platform_support', 'platform_finance', 'platform_auditor',
+    'branch_admin', 'staff'
+  ];
 
   useEffect(() => {
-    // Wait for store to hydrate
-    if (!_hasHydrated) {
-      return;
-    }
+    if (!_hasHydrated) return;
 
-    // Quick check for better UX - no timeout needed
     if (!isAuthenticated || !user) {
       router.push('/auth/login');
       return;
     }
 
-    // Check if user has admin access (any admin role)
-    const allowedRoles = [
-      'admin', 'tenant_owner', 'tenant_admin', 'tenant_ops_manager',
-      'tenant_finance_manager', 'tenant_staff', 'super_admin',
-      'platform_support', 'platform_finance', 'platform_auditor',
-      'branch_admin', 'staff' // Legacy roles for backward compatibility
-    ];
-
     if (!allowedRoles.includes(user.role)) {
-      router.push('/auth/login');
+      setAccessDenied(true);
+      setIsLoading(false);
       return;
     }
 
@@ -101,8 +98,43 @@ export default function AdminLayout({
   }, [isAuthenticated, user, router, _hasHydrated]);
 
   const { loading: themeLoading } = useAdminTheme() // Load tenant theme
-  const isComplete = _hasHydrated && !isLoading && isAuthenticated && !!user && !themeLoading;
-  const { progress, message, subMessage } = useLoadingProgress(isComplete)
+
+  // Signal-driven progress: each stage waits for a real readiness event,
+  // not an arbitrary timer. Loader animates up to the threshold of the
+  // next unfilled signal and pauses there until it flips true.
+  const signals = [
+    _hasHydrated,                         // 1. auth state hydrated from storage
+    isAuthenticated && !!user,            // 2. token + user object resolved
+    !themeLoading,                        // 3. tenant theme/branding fetched
+    !isLoading,                           // 4. role check + access decision made
+  ]
+  const { progress, message, subMessage } = useLoadingProgress({ signals })
+  const isComplete = signals.every(Boolean)
+
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md px-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600 mb-1">You don&apos;t have permission to access the admin panel.</p>
+          <p className="text-sm text-gray-500 mb-6">Your role: <strong>{user?.role}</strong></p>
+          <div className="flex gap-3 justify-center">
+            <button onClick={() => router.back()} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+              Go Back
+            </button>
+            <button onClick={() => router.push('/auth/login')} className="px-4 py-2 text-sm font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700">
+              Switch Account
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (!isComplete || progress < 100) {
     return (

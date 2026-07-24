@@ -18,13 +18,19 @@ const RESERVED_ROUTES = [
   'track',
   'version',
   'releases',
+  'preview-templates',
   '_next',
   'favicon.ico',
   'images',
   'public',
   'www',
   'superadmin',
-  'marketing'
+  'marketing',
+  // 'tenacy' is the canonical no-tenant subdomain that hosts the
+  // "Find Your Laundry" search page. Treating it as a reserved
+  // segment keeps app/page.tsx routing it as the root, instead of
+  // looking up "tenacy" as a tenant.
+  'tenacy'
 ]
 
 export function middleware(request: NextRequest) {
@@ -36,18 +42,36 @@ export function middleware(request: NextRequest) {
   const firstSegment = pathSegments[0] || ''
   const secondSegment = pathSegments[1] || ''
 
-  // Extract subdomain from hostname
+  // Extract subdomain from hostname (only matches *.laundrylobby.com).
+  // Custom domain falls back: if a tenant configured `customDomain`
+  // (e.g. ramlaundry.com), middleware treats the full host as the tenant
+  // identifier. Backend's /branding/:identifier handler already does an OR
+  // match across slug/subdomain/customDomain, so the lookup just works.
   const subdomain = extractSubdomain(hostname)
+  const customDomain = !subdomain ? extractCustomDomain(hostname) : null
+  const hostTenant = subdomain || customDomain
+
+  // /auth/register is admin-only — unauthenticated users must register via /[tenant]/auth/register.
+  // If no token, send them to home so they pick a tenant first.
+  if (pathname === '/auth/register') {
+    const token = request.cookies.get('laundry_access_token')?.value
+    if (!token) {
+      const homeUrl = request.nextUrl.clone()
+      homeUrl.pathname = '/'
+      return NextResponse.redirect(homeUrl)
+    }
+  }
 
   // CRITICAL FIX: If path starts with a reserved route, treat it as a global route immediately.
   // This ensures /admin/* is NEVER rewritten to a tenant-specific path like /services.
   if (RESERVED_ROUTES.includes(firstSegment)) {
-    if (subdomain) {
+    if (hostTenant) {
       const response = NextResponse.next()
       // Set tenant headers for components to use (branding, etc.)
-      response.headers.set('x-tenant-slug', subdomain)
-      response.headers.set('x-tenant-subdomain', subdomain)
-      response.cookies.set('tenant-slug', subdomain, {
+      response.headers.set('x-tenant-slug', hostTenant)
+      if (subdomain) response.headers.set('x-tenant-subdomain', subdomain)
+      if (customDomain) response.headers.set('x-tenant-custom-domain', customDomain)
+      response.cookies.set('tenant-slug', hostTenant, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax'
@@ -59,11 +83,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Determine tenant identifier (subdomain or first path segment)
+  // Determine tenant identifier — prefer host (subdomain or customDomain)
+  // over path-based fallback, so e.g. ram.laundrylobby.com always wins
+  // over /someslug in the URL.
   let tenantIdentifier: string | null = null
 
-  if (subdomain && !RESERVED_ROUTES.includes(subdomain)) {
-    tenantIdentifier = subdomain
+  if (hostTenant) {
+    tenantIdentifier = hostTenant
   } else if (firstSegment && !RESERVED_ROUTES.includes(firstSegment)) {
     tenantIdentifier = firstSegment
   }
@@ -91,12 +117,33 @@ export function middleware(request: NextRequest) {
       return response
     }
 
-    // Standard tenant route (e.g., /dgsfg or subdomain access)
+    // Host-derived tenant access (subdomain like prakash.laundrylobby.com OR
+    // a custom domain like ramlaundry.com). Next.js's app/[tenant]/* routes
+    // need the slug in the path, so rewrite to inject it. Skip when the user
+    // already typed the slug redundantly (e.g. prakash.laundrylobby.com/prakash).
+    if (hostTenant && tenantIdentifier === hostTenant && firstSegment !== hostTenant) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${tenantIdentifier}${pathname === '/' ? '' : pathname}`
+
+      const response = NextResponse.rewrite(url)
+      response.headers.set('x-tenant-slug', tenantIdentifier)
+      if (subdomain) response.headers.set('x-tenant-subdomain', subdomain)
+      if (customDomain) response.headers.set('x-tenant-custom-domain', customDomain)
+      response.cookies.set('tenant-slug', tenantIdentifier, {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      })
+      return response
+    }
+
+    // Standard tenant route (e.g., /dgsfg path-based, or subdomain access where
+    // the path already starts with the slug, or custom-domain access where
+    // the rewrite branch above already returned)
     const response = NextResponse.next()
     response.headers.set('x-tenant-slug', tenantIdentifier)
-    if (subdomain) {
-      response.headers.set('x-tenant-subdomain', subdomain)
-    }
+    if (subdomain) response.headers.set('x-tenant-subdomain', subdomain)
+    if (customDomain) response.headers.set('x-tenant-custom-domain', customDomain)
 
     // Store in cookie for client-side access
     response.cookies.set('tenant-slug', tenantIdentifier, {
@@ -121,6 +168,29 @@ export function middleware(request: NextRequest) {
 
   // For protected routes, we'll handle authentication on the client side
   return NextResponse.next()
+}
+
+/**
+ * Returns the host as a tenant identifier when the request comes in via a
+ * tenant's CUSTOM domain (i.e. anything that isn't laundrylobby.com,
+ * vercel.app, localhost, or an IP). The middleware then rewrites the path
+ * so app/[tenant]/* matches and the layout fetches branding by customDomain.
+ *
+ * Examples:
+ * - ramlaundry.com → 'ramlaundry.com'
+ * - www.ramlaundry.com → 'www.ramlaundry.com'
+ * - prakash.laundrylobby.com → null (handled by extractSubdomain)
+ * - some-preview.vercel.app → null
+ * - localhost:3005 → null
+ */
+function extractCustomDomain(hostname: string): string | null {
+  const cleanHostname = hostname.split(':')[0]
+
+  if (cleanHostname === 'localhost' || /^\d+\.\d+\.\d+\.\d+$/.test(cleanHostname)) return null
+  if (cleanHostname.endsWith('.vercel.app')) return null
+  if (cleanHostname === 'laundrylobby.com' || cleanHostname.endsWith('.laundrylobby.com')) return null
+
+  return cleanHostname
 }
 
 /**

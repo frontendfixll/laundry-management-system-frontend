@@ -4,13 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/store/authStore'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { cn } from '@/lib/utils'
+import { TENANT_RESERVED_SEGMENTS } from '@/constants/reservedRoutes'
 import {
   Menu,
   Search,
-  User,
-  Settings,
   LogOut,
-  HelpCircle,
   X,
 } from 'lucide-react'
 
@@ -65,7 +63,7 @@ export default function AdminHeader({ onMenuClick, onSearchChange }: AdminHeader
       const pathSegments = window.location.pathname.split('/').filter(Boolean)
       const potentialSlug = pathSegments[0]
       // Check if the first segment is not a reserved route
-      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      const reserved = TENANT_RESERVED_SEGMENTS
       if (potentialSlug && !reserved.includes(potentialSlug)) {
         slug = potentialSlug
       }
@@ -161,38 +159,6 @@ export default function AdminHeader({ onMenuClick, onSearchChange }: AdminHeader
                     </div>
 
                     <div className="p-2">
-                      <button
-                        onClick={() => setShowUserDropdown(false)}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
-                      >
-                        <div className="p-1.5 bg-gray-50 rounded-lg group-hover:bg-white transition-colors">
-                          <User className="h-4 w-4" />
-                        </div>
-                        <span className="font-semibold">My Profile</span>
-                      </button>
-
-                      <button
-                        onClick={() => setShowUserDropdown(false)}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
-                      >
-                        <div className="p-1.5 bg-gray-50 rounded-lg group-hover:bg-white transition-colors">
-                          <Settings className="h-4 w-4" />
-                        </div>
-                        <span className="font-semibold">Settings</span>
-                      </button>
-
-                      <button
-                        onClick={() => setShowUserDropdown(false)}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
-                      >
-                        <div className="p-1.5 bg-gray-50 rounded-lg group-hover:bg-white transition-colors">
-                          <HelpCircle className="h-4 w-4" />
-                        </div>
-                        <span className="font-semibold">Support</span>
-                      </button>
-
-                      <div className="my-2 border-t border-gray-100"></div>
-
                       <button
                         onClick={handleLogout}
                         className="w-full flex items-center space-x-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"

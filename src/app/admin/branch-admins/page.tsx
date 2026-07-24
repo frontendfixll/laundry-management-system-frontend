@@ -108,7 +108,7 @@ export default function BranchAdminsPage() {
 
   const fetchBranches = async () => {
     try {
-      const response = await api.get('/admin/branches')
+      const response = await api.get('/admin/branches-management')
       if (response.data.success) {
         setBranches(response.data.data.branches || response.data.data || [])
       }

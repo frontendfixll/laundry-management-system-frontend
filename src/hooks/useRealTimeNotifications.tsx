@@ -32,6 +32,7 @@ interface Notification {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || API_URL.replace('/api', '')
 
 const getAuthToken = () => {
   try {
@@ -162,7 +163,7 @@ export const useRealTimeNotifications = () => {
     if (!token) return
 
     // Create socket connection
-    const socket = io(API_URL.replace('/api', ''), {
+    const socket = io(SOCKET_URL, {
       auth: { token },
       transports: ['websocket', 'polling'],
       timeout: 10000,

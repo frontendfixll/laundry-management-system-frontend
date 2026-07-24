@@ -45,6 +45,7 @@ import { usePermissions } from '@/hooks/usePermissions'
 import { useState, useEffect } from 'react'
 import { useBranding } from '@/hooks/useBranding'
 import { APP_VERSION } from '@/lib/version'
+import { TENANT_RESERVED_SEGMENTS } from '@/constants/reservedRoutes'
 
 interface NavigationItem {
   name: string;
@@ -128,9 +129,11 @@ const enhancedNavigation: NavigationItem[] = [
 
 interface SimpleSidebarProps {
   searchQuery?: string
+  mobileOpen?: boolean
+  onMobileClose?: () => void
 }
 
-export function SimpleSidebar({ searchQuery = '' }: SimpleSidebarProps) {
+export function SimpleSidebar({ searchQuery = '', mobileOpen: mobileOpenProp, onMobileClose }: SimpleSidebarProps) {
   // Debug: Confirm SimpleSidebar is loading
   // console.log('🚀 SimpleSidebar Component Loading - LIVE CHAT ADDED v3.0!', new Date().toISOString());
   // console.log('📋 SimpleSidebar Navigation Items:', enhancedNavigation.map(item => ({
@@ -193,7 +196,16 @@ export function SimpleSidebar({ searchQuery = '' }: SimpleSidebarProps) {
   }, [branding?.slug]);
 
   const [expandedItems, setExpandedItems] = useState<string[]>([])
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpenLocal, setMobileOpenLocal] = useState(false)
+  const isControlled = mobileOpenProp !== undefined
+  const mobileOpen = isControlled ? mobileOpenProp : mobileOpenLocal
+  const setMobileOpen = (open: boolean) => {
+    if (isControlled) {
+      if (!open && onMobileClose) onMobileClose()
+    } else {
+      setMobileOpenLocal(open)
+    }
+  }
 
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -259,7 +271,7 @@ export function SimpleSidebar({ searchQuery = '' }: SimpleSidebarProps) {
       const pathSegments = window.location.pathname.split('/').filter(Boolean)
       const potentialSlug = pathSegments[0]
       // Check if the first segment is not a reserved route
-      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      const reserved = TENANT_RESERVED_SEGMENTS
       if (potentialSlug && !reserved.includes(potentialSlug)) {
         slug = potentialSlug
       }
@@ -469,7 +481,7 @@ export function SimpleSidebar({ searchQuery = '' }: SimpleSidebarProps) {
       <div className={cn(
         "admin-sidebar lg:relative fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transition-all duration-300 flex flex-col w-56",
         sidebarWidth,
-        mobileOpen ? "translate-x-0" : "-translate-x-full",
+        mobileOpen ? "translate-x-0 mobile-open" : "-translate-x-full",
         "lg:translate-x-0",
         sidebarCollapsed ? "sidebar-collapsed" : ""
       )}>

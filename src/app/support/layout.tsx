@@ -8,7 +8,6 @@ import {
 import SupportHeader from '@/components/layout/SupportHeader'
 import NotificationContainer from '@/components/NotificationContainer'
 import RefreshPrompt from '@/components/RefreshPrompt'
-import ModernToaster from '@/components/ModernToast'
 import ConnectionStatus from '@/components/ConnectionStatus'
 import { useAuthStore } from '@/store/authStore'
 import { useRefreshPromptStore } from '@/store/refreshPromptStore'
@@ -69,9 +68,6 @@ function SupportLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Real-time Connection Status */}
       <ConnectionStatus isConnected={isConnected} />
-
-      {/* Modern Toast Notifications */}
-      <ModernToaster />
     </div>
   )
 }

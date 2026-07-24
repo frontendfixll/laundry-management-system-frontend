@@ -1,4 +1,9 @@
-import { useState, useEffect } from 'react'
+// Pricing hooks — React Query.
+// 5 separate hooks; each owns its own cache slot. Mutations on the main
+// usePricing() hook invalidate the list query so consumers see fresh data
+// without manual setState patching.
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { superAdminApi } from '@/lib/superAdminApi'
 
 interface PricingConfiguration {
@@ -43,226 +48,200 @@ interface PricingFilters {
   sortOrder?: string
 }
 
+const PRICING_LIST_KEY = ['superadmin', 'pricing', 'configurations'] as const
+const PRICING_ACTIVE_KEY = ['superadmin', 'pricing', 'active'] as const
+const SERVICE_ITEMS_KEY = ['superadmin', 'service-items'] as const
+const DISCOUNT_POLICIES_KEY = ['superadmin', 'discount-policies'] as const
+
+const pricingQueryDefaults = {
+  staleTime: 60_000,
+  gcTime: 5 * 60_000,
+  retry: (count: number, err: any) => {
+    const status = err?.response?.status
+    if (status >= 400 && status < 500) return false
+    return count < 2
+  },
+} as const
+
 export function usePricing(filters: PricingFilters = {}) {
-  const [pricingConfigs, setPricingConfigs] = useState<PricingConfiguration[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pages: 1,
-    total: 0,
-    limit: 10
+  const queryClient = useQueryClient()
+
+  const query = useQuery({
+    queryKey: [...PRICING_LIST_KEY, filters],
+    queryFn: async (): Promise<{
+      pricingConfigs: PricingConfiguration[]
+      pagination: { current: number; pages: number; total: number; limit: number }
+    }> => {
+      const response: any = await superAdminApi.getPricingConfigurations(filters)
+      return {
+        pricingConfigs: response?.data?.pricingConfigs ?? [],
+        pagination: response?.data?.pagination ?? { current: 1, pages: 1, total: 0, limit: 10 },
+      }
+    },
+    ...pricingQueryDefaults,
   })
 
-  const fetchPricingConfigurations = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await superAdminApi.getPricingConfigurations(filters)
-      setPricingConfigs(response.data.pricingConfigs)
-      setPagination(response.data.pagination)
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch pricing configurations')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: PRICING_LIST_KEY })
 
-  useEffect(() => {
-    fetchPricingConfigurations()
-  }, [JSON.stringify(filters)])
+  const createMutation = useMutation({
+    mutationFn: (pricingData: any) => superAdminApi.createPricingConfiguration(pricingData),
+    onSuccess: invalidate,
+  })
 
-  const createPricingConfiguration = async (pricingData: any) => {
-    try {
-      const response = await superAdminApi.createPricingConfiguration(pricingData)
-      await fetchPricingConfigurations()
-      return response
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to create pricing configuration')
-    }
-  }
+  const updateMutation = useMutation({
+    mutationFn: ({ pricingId, pricingData }: { pricingId: string; pricingData: any }) =>
+      superAdminApi.updatePricingConfiguration(pricingId, pricingData),
+    onSuccess: invalidate,
+  })
 
-  const updatePricingConfiguration = async (pricingId: string, pricingData: any) => {
-    try {
-      const response = await superAdminApi.updatePricingConfiguration(pricingId, pricingData)
-      await fetchPricingConfigurations()
-      return response
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to update pricing configuration')
-    }
-  }
+  const approveMutation = useMutation({
+    mutationFn: ({ pricingId, makeActive }: { pricingId: string; makeActive: boolean }) =>
+      superAdminApi.approvePricingConfiguration(pricingId, makeActive),
+    onSuccess: () => {
+      invalidate()
+      queryClient.invalidateQueries({ queryKey: PRICING_ACTIVE_KEY })
+    },
+  })
 
-  const approvePricingConfiguration = async (pricingId: string, makeActive: boolean = false) => {
-    try {
-      const response = await superAdminApi.approvePricingConfiguration(pricingId, makeActive)
-      await fetchPricingConfigurations()
-      return response
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to approve pricing configuration')
-    }
-  }
+  const activateMutation = useMutation({
+    mutationFn: (pricingId: string) => superAdminApi.activatePricingConfiguration(pricingId),
+    onSuccess: () => {
+      invalidate()
+      queryClient.invalidateQueries({ queryKey: PRICING_ACTIVE_KEY })
+    },
+  })
 
-  const activatePricingConfiguration = async (pricingId: string) => {
-    try {
-      const response = await superAdminApi.activatePricingConfiguration(pricingId)
-      await fetchPricingConfigurations()
-      return response
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to activate pricing configuration')
-    }
-  }
-
-  const clonePricingConfiguration = async (pricingId: string, newVersion: string, newName?: string) => {
-    try {
-      const response = await superAdminApi.clonePricingConfiguration(pricingId, newVersion, newName)
-      await fetchPricingConfigurations()
-      return response
-    } catch (err: any) {
-      throw new Error(err.message || 'Failed to clone pricing configuration')
-    }
-  }
+  const cloneMutation = useMutation({
+    mutationFn: ({ pricingId, newVersion, newName }: { pricingId: string; newVersion: string; newName?: string }) =>
+      superAdminApi.clonePricingConfiguration(pricingId, newVersion, newName),
+    onSuccess: invalidate,
+  })
 
   return {
-    pricingConfigs,
-    loading,
-    error,
-    pagination,
-    fetchPricingConfigurations,
-    createPricingConfiguration,
-    updatePricingConfiguration,
-    approvePricingConfiguration,
-    activatePricingConfiguration,
-    clonePricingConfiguration
+    pricingConfigs: query.data?.pricingConfigs ?? [],
+    pagination: query.data?.pagination ?? { current: 1, pages: 1, total: 0, limit: 10 },
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? null) : null,
+    fetchPricingConfigurations: async () => { await query.refetch() },
+    createPricingConfiguration: async (pricingData: any) => {
+      try {
+        return await createMutation.mutateAsync(pricingData)
+      } catch (err: any) {
+        throw new Error(err?.response?.data?.message ?? err?.message ?? 'Failed to create pricing configuration')
+      }
+    },
+    updatePricingConfiguration: async (pricingId: string, pricingData: any) => {
+      try {
+        return await updateMutation.mutateAsync({ pricingId, pricingData })
+      } catch (err: any) {
+        throw new Error(err?.response?.data?.message ?? err?.message ?? 'Failed to update pricing configuration')
+      }
+    },
+    approvePricingConfiguration: async (pricingId: string, makeActive: boolean = false) => {
+      try {
+        return await approveMutation.mutateAsync({ pricingId, makeActive })
+      } catch (err: any) {
+        throw new Error(err?.response?.data?.message ?? err?.message ?? 'Failed to approve pricing configuration')
+      }
+    },
+    activatePricingConfiguration: async (pricingId: string) => {
+      try {
+        return await activateMutation.mutateAsync(pricingId)
+      } catch (err: any) {
+        throw new Error(err?.response?.data?.message ?? err?.message ?? 'Failed to activate pricing configuration')
+      }
+    },
+    clonePricingConfiguration: async (pricingId: string, newVersion: string, newName?: string) => {
+      try {
+        return await cloneMutation.mutateAsync({ pricingId, newVersion, newName })
+      } catch (err: any) {
+        throw new Error(err?.response?.data?.message ?? err?.message ?? 'Failed to clone pricing configuration')
+      }
+    },
   }
 }
 
 export function useActivePricing() {
-  const [activePricing, setActivePricing] = useState<PricingConfiguration | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchActivePricing = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await superAdminApi.getActivePricing()
-      setActivePricing(response.data.pricing)
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch active pricing')
-      setActivePricing(null)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchActivePricing()
-  }, [])
+  const query = useQuery({
+    queryKey: PRICING_ACTIVE_KEY,
+    queryFn: async (): Promise<PricingConfiguration | null> => {
+      const response: any = await superAdminApi.getActivePricing()
+      return response?.data?.pricing ?? null
+    },
+    ...pricingQueryDefaults,
+  })
 
   return {
-    activePricing,
-    loading,
-    error,
-    fetchActivePricing
+    activePricing: query.data ?? null,
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? null) : null,
+    fetchActivePricing: async () => { await query.refetch() },
   }
 }
 
 export function usePriceCalculation() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const calcMutation = useMutation({
+    mutationFn: ({ items, options }: { items: any[]; options: any }) =>
+      superAdminApi.calculatePrice(items, options),
+  })
 
-  const calculatePrice = async (items: any[], options: any = {}) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await superAdminApi.calculatePrice(items, options)
-      return response.data
-    } catch (err: any) {
-      setError(err.message || 'Failed to calculate price')
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
+  const validateMutation = useMutation({
+    mutationFn: ({ code, orderValue, customerInfo }: { code: string; orderValue: number; customerInfo: any }) =>
+      superAdminApi.validateDiscountCode(code, orderValue, customerInfo),
+  })
 
-  const validateDiscountCode = async (code: string, orderValue: number = 0, customerInfo: any = {}) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await superAdminApi.validateDiscountCode(code, orderValue, customerInfo)
-      return response.data
-    } catch (err: any) {
-      setError(err.message || 'Failed to validate discount code')
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }
+  const loading = calcMutation.isPending || validateMutation.isPending
+  const error =
+    calcMutation.error?.message ??
+    validateMutation.error?.message ??
+    null
 
   return {
     loading,
     error,
-    calculatePrice,
-    validateDiscountCode
+    calculatePrice: async (items: any[], options: any = {}) => {
+      const response: any = await calcMutation.mutateAsync({ items, options })
+      return response?.data
+    },
+    validateDiscountCode: async (code: string, orderValue: number = 0, customerInfo: any = {}) => {
+      const response: any = await validateMutation.mutateAsync({ code, orderValue, customerInfo })
+      return response?.data
+    },
   }
 }
 
 export function useServiceItems(category?: string) {
-  const [serviceItems, setServiceItems] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchServiceItems = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await superAdminApi.getServiceItems(category)
-      setServiceItems(response.data.serviceItems)
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch service items')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchServiceItems()
-  }, [category])
+  const query = useQuery({
+    queryKey: [...SERVICE_ITEMS_KEY, category ?? null],
+    queryFn: async (): Promise<any[]> => {
+      const response: any = await superAdminApi.getServiceItems(category)
+      return response?.data?.serviceItems ?? []
+    },
+    ...pricingQueryDefaults,
+  })
 
   return {
-    serviceItems,
-    loading,
-    error,
-    fetchServiceItems
+    serviceItems: query.data ?? [],
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? null) : null,
+    fetchServiceItems: async () => { await query.refetch() },
   }
 }
 
 export function useDiscountPolicies(active: boolean = true) {
-  const [discountPolicies, setDiscountPolicies] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchDiscountPolicies = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await superAdminApi.getDiscountPolicies(active)
-      setDiscountPolicies(response.data.discountPolicies)
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch discount policies')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchDiscountPolicies()
-  }, [active])
+  const query = useQuery({
+    queryKey: [...DISCOUNT_POLICIES_KEY, { active }],
+    queryFn: async (): Promise<any[]> => {
+      const response: any = await superAdminApi.getDiscountPolicies(active)
+      return response?.data?.discountPolicies ?? []
+    },
+    ...pricingQueryDefaults,
+  })
 
   return {
-    discountPolicies,
-    loading,
-    error,
-    fetchDiscountPolicies
+    discountPolicies: query.data ?? [],
+    loading: query.isPending,
+    error: query.error ? (query.error.message ?? null) : null,
+    fetchDiscountPolicies: async () => { await query.refetch() },
   }
 }

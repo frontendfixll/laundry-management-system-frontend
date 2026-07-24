@@ -36,7 +36,10 @@ import {
   Package,
   CheckCircle,
   XCircle,
-  Loader
+  Loader,
+  UserPlus,
+  X,
+  EyeOff
 } from 'lucide-react'
 import { useAdminCustomers } from '@/hooks/useAdmin'
 import toast from 'react-hot-toast'
@@ -119,6 +122,7 @@ export default function AdminCustomersPage() {
 
 function AdminCustomersContent() {
   const { canUpdate, hasPermission } = usePermissions('customers')
+  const canCreate = hasPermission('customers', 'create')
   const canExportReports = hasPermission('reports', 'export')
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -139,6 +143,12 @@ function AdminCustomersContent() {
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails | null>(null)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [loadingDetails, setLoadingDetails] = useState(false)
+
+  // Create customer modal state
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createLoading, setCreateLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [newCustomer, setNewCustomer] = useState({ name: '', email: '', phone: '', password: '' })
 
   const { customers, pagination, stats, loading, error, toggleStatus, updateVIPStatus, refetch } = useAdminCustomers(filters)
 
@@ -263,6 +273,37 @@ function AdminCustomersContent() {
     window.URL.revokeObjectURL(url)
   }
 
+  const handleCreateCustomer = async () => {
+    if (!newCustomer.name || !newCustomer.email || !newCustomer.phone || !newCustomer.password) {
+      toast.error('All fields are required')
+      return
+    }
+    if (newCustomer.password.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
+    if (!/^[6-9]\d{9}$/.test(newCustomer.phone)) {
+      toast.error('Enter a valid 10-digit phone number')
+      return
+    }
+    try {
+      setCreateLoading(true)
+      const { adminApi } = await import('@/lib/adminApi')
+      const response = await adminApi.createCustomer(newCustomer)
+      if (response?.success) {
+        toast.success('Customer created successfully!')
+        setShowCreateModal(false)
+        setNewCustomer({ name: '', email: '', phone: '', password: '' })
+        setShowPassword(false)
+        refetch()
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to create customer')
+    } finally {
+      setCreateLoading(false)
+    }
+  }
+
   if (loading && customers.length === 0) {
     return (
       <div className="space-y-6 mt-16">
@@ -301,6 +342,12 @@ function AdminCustomersContent() {
             <Button variant="outline" onClick={handleExport}>
               <Download className="w-4 h-4 mr-2" />
               Export
+            </Button>
+          )}
+          {canCreate && (
+            <Button onClick={() => setShowCreateModal(true)}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              Add Customer
             </Button>
           )}
         </div>
@@ -954,6 +1001,78 @@ function AdminCustomersContent() {
             </div>
         )}
       </SlidePanel>
+
+      {/* Create Customer Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowCreateModal(false)}>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Add New Customer</h2>
+              <button onClick={() => setShowCreateModal(false)} className="p-1 hover:bg-gray-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={newCustomer.name}
+                  onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter customer name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newCustomer.email}
+                  onChange={e => setNewCustomer({ ...newCustomer, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="customer@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <input
+                  type="tel"
+                  value={newCustomer.phone}
+                  onChange={e => setNewCustomer({ ...newCustomer, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="9876543210"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={newCustomer.password}
+                    onChange={e => setNewCustomer({ ...newCustomer, password: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none pr-10"
+                    placeholder="Min 6 characters"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 p-4 border-t">
+              <Button variant="outline" onClick={() => setShowCreateModal(false)}>Cancel</Button>
+              <Button onClick={handleCreateCustomer} disabled={createLoading}>
+                {createLoading ? <RefreshCw className="w-4 h-4 mr-1 animate-spin" /> : <UserPlus className="w-4 h-4 mr-1" />}
+                Create Customer
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

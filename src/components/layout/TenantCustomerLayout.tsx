@@ -9,6 +9,7 @@ import {
   ArrowLeft, Menu, X
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
+import { TENANT_RESERVED_SEGMENTS } from '@/constants/reservedRoutes'
 
 interface TenantInfo {
   name: string
@@ -68,7 +69,7 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
     if (typeof window !== 'undefined') {
       const pathSegments = window.location.pathname.split('/').filter(Boolean)
       const potentialSlug = pathSegments[0]
-      const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+      const reserved = TENANT_RESERVED_SEGMENTS
       if (potentialSlug && !reserved.includes(potentialSlug)) {
         setTenant(potentialSlug)
       }
@@ -103,7 +104,7 @@ export default function TenantCustomerLayout({ children, tenantInfo: propTenantI
         // Try one last check on pathname before giving up
         const pathSegments = window.location.pathname.split('/').filter(Boolean)
         const potentialSlug = pathSegments[0]
-        const reserved = ['customer', 'admin', 'auth', 'api', 'login', 'register', '_next', 'static']
+        const reserved = TENANT_RESERVED_SEGMENTS
         if (potentialSlug && !reserved.includes(potentialSlug)) {
           router.push(`/${potentialSlug}`)
         } else {

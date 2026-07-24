@@ -1,6 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+// SuperAdmin settings hook — React Query.
+// Three parallel queries (settings, profile, system info) drive the read state;
+// three mutations (update settings / update profile / change password) write
+// back. Each mutation invalidates the relevant query so subsequent reads see
+// fresh data without manual setState patching.
+
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { superAdminApi } from '@/lib/superAdminApi'
 
 export interface SystemSettings {
@@ -83,131 +89,106 @@ export interface SystemInfo {
   features: Record<string, boolean>
 }
 
+const SETTINGS_KEY = ['superadmin', 'settings'] as const
+const PROFILE_KEY = ['superadmin', 'profile'] as const
+const SYSTEM_INFO_KEY = ['superadmin', 'system-info'] as const
+
+const settingsQueryDefaults = {
+  staleTime: 60_000,
+  gcTime: 5 * 60_000,
+  retry: (count: number, err: any) => {
+    const status = err?.response?.status
+    if (status >= 400 && status < 500) return false
+    return count < 2
+  },
+} as const
+
 export function useSettings() {
-  const [settings, setSettings] = useState<SystemSettings | null>(null)
-  const [profile, setProfile] = useState<AdminProfile | null>(null)
-  const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [updating, setUpdating] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  const fetchSettings = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await superAdminApi.getSystemSettings()
-      setSettings(response.data.settings)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch settings')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const settingsQuery = useQuery({
+    queryKey: SETTINGS_KEY,
+    queryFn: async (): Promise<SystemSettings | null> => {
+      const response: any = await superAdminApi.getSystemSettings()
+      return response?.data?.settings ?? null
+    },
+    ...settingsQueryDefaults,
+  })
 
-  const fetchProfile = async () => {
-    try {
-      const response = await superAdminApi.getProfileSettings()
-      setProfile(response.data.profile)
-    } catch (err) {
-      console.error('Failed to fetch profile:', err)
-    }
-  }
+  const profileQuery = useQuery({
+    queryKey: PROFILE_KEY,
+    queryFn: async (): Promise<AdminProfile | null> => {
+      const response: any = await superAdminApi.getProfileSettings()
+      return response?.data?.profile ?? null
+    },
+    ...settingsQueryDefaults,
+  })
 
-  const fetchSystemInfo = async () => {
-    try {
-      const response = await superAdminApi.getSystemInfo()
-      setSystemInfo(response.data.systemInfo)
-    } catch (err) {
-      console.error('Failed to fetch system info:', err)
-    }
-  }
+  const systemInfoQuery = useQuery({
+    queryKey: SYSTEM_INFO_KEY,
+    queryFn: async (): Promise<SystemInfo | null> => {
+      const response: any = await superAdminApi.getSystemInfo()
+      return response?.data?.systemInfo ?? null
+    },
+    ...settingsQueryDefaults,
+  })
 
-  const updateSettings = async (category: string, updatedSettings: any) => {
-    try {
-      setUpdating(true)
-      setError(null)
-      const response = await superAdminApi.updateSystemSettings(category, updatedSettings)
-      
-      // Update local state
-      if (settings) {
-        setSettings({
-          ...settings,
-          [category]: updatedSettings
-        })
-      }
-      
-      return response.data
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update settings'
-      setError(errorMessage)
-      throw new Error(errorMessage)
-    } finally {
-      setUpdating(false)
-    }
-  }
+  const updateSettingsMutation = useMutation({
+    mutationFn: ({ category, updatedSettings }: { category: string; updatedSettings: any }) =>
+      superAdminApi.updateSystemSettings(category, updatedSettings),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: SETTINGS_KEY }),
+  })
 
-  const updateProfile = async (profileData: Partial<AdminProfile>) => {
-    try {
-      setUpdating(true)
-      setError(null)
-      const response = await superAdminApi.updateProfile(profileData)
-      
-      // Update local state
-      if (profile) {
-        setProfile({
-          ...profile,
-          ...profileData
-        })
-      }
-      
-      return response.data
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update profile'
-      setError(errorMessage)
-      throw new Error(errorMessage)
-    } finally {
-      setUpdating(false)
-    }
-  }
+  const updateProfileMutation = useMutation({
+    mutationFn: (profileData: Partial<AdminProfile>) =>
+      superAdminApi.updateProfile(profileData),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: PROFILE_KEY }),
+  })
 
-  const changePassword = async (currentPassword: string, newPassword: string) => {
-    try {
-      setUpdating(true)
-      setError(null)
-      const response = await superAdminApi.changePassword({
-        currentPassword,
-        newPassword
-      })
-      return response.data
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to change password'
-      setError(errorMessage)
-      throw new Error(errorMessage)
-    } finally {
-      setUpdating(false)
-    }
-  }
+  const changePasswordMutation = useMutation({
+    mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) =>
+      superAdminApi.changePassword({ currentPassword, newPassword }),
+  })
 
-  useEffect(() => {
-    fetchSettings()
-    fetchProfile()
-    fetchSystemInfo()
-  }, [])
+  const updating =
+    updateSettingsMutation.isPending ||
+    updateProfileMutation.isPending ||
+    changePasswordMutation.isPending
+
+  // Surface the most relevant error: prefer mutation error (recent action),
+  // fall back to read-query error (initial load failure).
+  const error =
+    updateSettingsMutation.error?.message ??
+    updateProfileMutation.error?.message ??
+    changePasswordMutation.error?.message ??
+    settingsQuery.error?.message ??
+    null
 
   return {
-    settings,
-    profile,
-    systemInfo,
-    loading,
+    settings: settingsQuery.data ?? null,
+    profile: profileQuery.data ?? null,
+    systemInfo: systemInfoQuery.data ?? null,
+    loading: settingsQuery.isPending,
     updating,
     error,
-    updateSettings,
-    updateProfile,
-    changePassword,
-    refetch: () => {
-      fetchSettings()
-      fetchProfile()
-      fetchSystemInfo()
-    }
+    updateSettings: async (category: string, updatedSettings: any) => {
+      const response: any = await updateSettingsMutation.mutateAsync({ category, updatedSettings })
+      return response?.data
+    },
+    updateProfile: async (profileData: Partial<AdminProfile>) => {
+      const response: any = await updateProfileMutation.mutateAsync(profileData)
+      return response?.data
+    },
+    changePassword: async (currentPassword: string, newPassword: string) => {
+      const response: any = await changePasswordMutation.mutateAsync({ currentPassword, newPassword })
+      return response?.data
+    },
+    refetch: async () => {
+      await Promise.all([
+        settingsQuery.refetch(),
+        profileQuery.refetch(),
+        systemInfoQuery.refetch(),
+      ])
+    },
   }
 }
