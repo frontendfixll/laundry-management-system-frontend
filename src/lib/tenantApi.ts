@@ -25,16 +25,13 @@ tenantApi.interceptors.request.use(
           const authStore = useAuthStore.getState()
           token = authStore.token
         } catch (error) {
-          console.log('⚠️ Could not access Zustand store:', error)
+          console.error('Could not access Zustand store:', error)
         }
       }
     }
-    
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-      console.log('🔑 Adding token to request:', config.url, 'Token length:', token.length)
-    } else {
-      console.log('⚠️ No token found for request:', config.url)
     }
     
     // Always include credentials for cookie-based auth as fallback
@@ -55,10 +52,6 @@ tenantApi.interceptors.response.use(
   (error) => {
     // Handle common errors
     if (error.response?.status === 401) {
-      console.log('🔐 401 Unauthorized - Authentication required')
-      console.log('🔐 Request URL:', error.config?.url)
-      console.log('🔐 Request headers:', error.config?.headers)
-      
       // Only redirect if we're in the browser and not already on login page
       if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
         // Clear tokens from both store and localStorage
@@ -66,15 +59,10 @@ tenantApi.interceptors.response.use(
           const authStore = useAuthStore.getState()
           authStore.logout()
         } catch (storeError) {
-          console.log('⚠️ Could not access auth store for logout:', storeError)
+          console.error('Could not access auth store for logout:', storeError)
         }
-        
+
         localStorage.removeItem('token')
-        console.log('🔐 Cleared authentication tokens')
-        
-        // Don't redirect immediately to prevent infinite loops
-        // Let the component handle the error state
-        console.log('🔐 Authentication expired, component should handle login redirect')
       }
     }
     

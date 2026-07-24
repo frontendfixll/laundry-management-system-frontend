@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { withRouteGuard } from '@/components/withRouteGuard'
@@ -26,6 +27,7 @@ import {
   ArrowUpRight
 } from 'lucide-react'
 import { adminApi } from '@/lib/adminApi'
+import toast from 'react-hot-toast'
 
 const ITEMS_PER_PAGE = 8
 
@@ -53,6 +55,7 @@ interface PaymentStats {
 }
 
 function AdminPaymentsPage() {
+  const router = useRouter()
   const { hasPermission } = usePermissions('financial')
   const canExport = hasPermission('reports', 'export')
   const [payments, setPayments] = useState<Payment[]>([])
@@ -183,7 +186,7 @@ function AdminPaymentsPage() {
             Refresh
           </Button>
           {canExport && (
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => toast('Export coming soon')}>
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
@@ -468,10 +471,10 @@ function AdminPaymentsPage() {
               >
                 Close
               </Button>
-              <Button 
+              <Button
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                 size="sm"
-                onClick={() => window.location.href = `/admin/orders`}
+                onClick={() => router.push(`/admin/orders?orderId=${selectedPayment.orderId}`)}
               >
                 View Order
               </Button>
@@ -483,7 +486,7 @@ function AdminPaymentsPage() {
   )
 }
 export default withRouteGuard(AdminPaymentsPage, {
-  module: 'performance',
+  module: 'payments',
   action: 'view',
   feature: 'payments'
 })

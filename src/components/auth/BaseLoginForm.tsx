@@ -312,43 +312,80 @@ export default function BaseLoginForm({
               )}
             </div>
 
-            {/* Demo Accounts - hide Customer option only on generic login with customer intent */}
-            <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Demo Login:</h3>
-              <div className="space-y-2">
-                <div className={`grid ${redirectUrl && !hideDemoCredentials ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
-                  {redirectUrl && !hideDemoCredentials && (
+            {/* Demo Accounts section */}
+            {tenantSlug === 'demo' ? (
+              /* Enhanced demo panel — shown only on demo.laundrylobby.com */
+              <div className="mt-6 rounded-xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-indigo-50 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-sky-100 text-sky-700 border border-sky-200">
+                    DEMO
+                  </span>
+                  <h3 className="text-sm font-semibold text-gray-700">Try a demo account</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { role: 'Admin',          label: 'Full Dashboard',    email: 'admin@demo.com',     badge: 'bg-violet-100 text-violet-700' },
+                    { role: 'Branch Manager', label: 'Branch Operations', email: 'branch@demo.com',    badge: 'bg-amber-100 text-amber-700' },
+                    { role: 'Support',        label: 'Support Panel',     email: 'support@demo.com',   badge: 'bg-blue-100 text-blue-700' },
+                    { role: 'Customer',       label: 'Order & Track',     email: 'customer1@demo.com', badge: 'bg-emerald-100 text-emerald-700' },
+                  ].map(({ role, label, email, badge }) => (
+                    <button
+                      key={role}
+                      type="button"
+                      onClick={() => setFormData({ email, password: 'Demo@123' })}
+                      className="flex items-center justify-between w-full px-3 py-2.5 bg-white rounded-lg border border-gray-200 hover:border-sky-300 hover:shadow-sm transition-all text-left group"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge}`}>{role}</span>
+                        <span className="text-xs text-gray-400">{label}</span>
+                      </div>
+                      <span className="text-xs text-gray-400 font-mono group-hover:text-sky-600 transition-colors">{email}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2 text-center text-xs text-gray-400">
+                  Password: <span className="font-mono font-medium text-gray-600">Demo@123</span>
+                </p>
+              </div>
+            ) : (
+              /* Standard quick-login for non-demo tenants */
+              <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Quick Demo Login:</h3>
+                <div className="space-y-2">
+                  <div className={`grid ${redirectUrl && !hideDemoCredentials ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
+                    {redirectUrl && !hideDemoCredentials && (
+                      <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        <input
+                          type="radio"
+                          name="demoAccount"
+                          className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
+                          onChange={() => setFormData({ email: 'testcustomer@demo.com', password: 'password123' })}
+                        />
+                        <span className="text-xs text-gray-600">Customer</span>
+                      </label>
+                    )}
                     <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
                       <input
                         type="radio"
                         name="demoAccount"
                         className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
-                        onChange={() => setFormData({ email: 'testcustomer@demo.com', password: 'password123' })}
+                        onChange={() => setFormData({ email: 'admin@gmail.com', password: 'password123' })}
                       />
-                      <span className="text-xs text-gray-600">Customer</span>
+                      <span className="text-xs text-gray-600">Admin</span>
                     </label>
-                  )}
-                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <input
-                      type="radio"
-                      name="demoAccount"
-                      className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
-                      onChange={() => setFormData({ email: 'admin@gmail.com', password: 'password123' })}
-                    />
-                    <span className="text-xs text-gray-600">Admin</span>
-                  </label>
-                  <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <input
-                      type="radio"
-                      name="demoAccount"
-                      className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
-                      onChange={() => setFormData({ email: 'supportadmin@laundrypro.com', password: 'deep2025' })}
-                    />
-                    <span className="text-xs text-gray-600">Support</span>
-                  </label>
+                    <label className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                      <input
+                        type="radio"
+                        name="demoAccount"
+                        className={`w-4 h-4 text-${theme.primary}-600 focus:ring-${theme.primary}-500`}
+                        onChange={() => setFormData({ email: 'supportadmin@laundrypro.com', password: 'deep2025' })}
+                      />
+                      <span className="text-xs text-gray-600">Support</span>
+                    </label>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

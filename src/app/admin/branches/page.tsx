@@ -77,7 +77,7 @@ function BranchesPage() {
   const fetchBranches = async () => {
     try {
       const token = getAuthToken()
-      const response = await fetch(`${API_URL}/admin/branches-management`, {
+      const response = await fetch(`${API_URL}/admin/branches`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -86,12 +86,9 @@ function BranchesPage() {
       if (response.ok) {
         const data = await response.json()
         setBranches(data.data.branches)
-      } else {
-        const errorData = await response.text()
-        console.error('Fetch branches error:', response.status, errorData)
       }
     } catch (error) {
-      console.error('Error fetching branches:', error)
+      // silently fail — UI already shows empty state
     } finally {
       setLoading(false)
     }
@@ -125,10 +122,7 @@ function BranchesPage() {
 
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json()
-        console.log('📦 Services data:', servicesData)
         setServices(servicesData.data.services || [])
-      } else {
-        console.error('Failed to fetch services:', servicesResponse.status)
       }
 
       // Fetch branch-specific services
@@ -140,15 +134,12 @@ function BranchesPage() {
 
       if (branchServicesResponse.ok) {
         const branchServicesData = await branchServicesResponse.json()
-        console.log('🏢 Branch services data:', branchServicesData)
         setBranchServices(branchServicesData.data.services || branchServicesData.data || [])
       } else {
-        console.error('Failed to fetch branch services:', branchServicesResponse.status)
         // If endpoint doesn't exist, set empty array
         setBranchServices([])
       }
     } catch (error) {
-      console.error('Error fetching services:', error)
       toast.error('Failed to load services')
       setBranchServices([])
     } finally {
@@ -229,20 +220,16 @@ function BranchesPage() {
 
     try {
       const token = getAuthToken()
-      console.log('🗑️ Deleting branch:', branchId)
 
-      const response = await fetch(`${API_URL}/admin/branches-management/${branchId}`, {
+      const response = await fetch(`${API_URL}/admin/branches/${branchId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
 
-      console.log('Delete response status:', response.status)
-
       if (response.ok) {
-        const result = await response.json()
-        console.log('✅ Delete success:', result)
+        await response.json()
 
         // Dismiss loading toast and show success
         toast.dismiss(loadingToast)
@@ -267,7 +254,6 @@ function BranchesPage() {
         fetchBranches() // Refresh the list
       } else {
         const error = await response.json().catch(() => ({ message: 'Unknown error' }))
-        console.error('❌ Delete error:', error)
 
         // Dismiss loading toast and show error
         toast.dismiss(loadingToast)
@@ -290,8 +276,6 @@ function BranchesPage() {
         })
       }
     } catch (error) {
-      console.error('❌ Error deleting branch:', error)
-
       // Dismiss loading toast and show error
       toast.dismiss(loadingToast)
       toast.error('Failed to deactivate branch. Please try again.', {

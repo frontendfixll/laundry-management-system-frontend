@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuthStore } from '@/store/authStore'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import {
   Percent,
   Plus,
@@ -101,7 +102,7 @@ const DAYS_OF_WEEK = [
   { value: 6, label: 'Saturday' }
 ]
 
-export default function DiscountsPage() {
+function DiscountsPage() {
   const { token } = useAuthStore()
   const [discounts, setDiscounts] = useState<Discount[]>([])
   const [stats, setStats] = useState<DiscountStats>({
@@ -148,7 +149,7 @@ export default function DiscountsPage() {
   useEffect(() => {
     fetchDiscounts()
     fetchStats()
-  }, [])
+  }, [searchQuery, statusFilter, typeFilter])
 
   const fetchDiscounts = async () => {
     try {
@@ -410,7 +411,7 @@ export default function DiscountsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Savings</p>
-              <p className="text-2xl font-bold text-purple-600">${stats.totalSavings.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-purple-600">₹{stats.totalSavings.toFixed(2)}</p>
             </div>
             <DollarSign className="w-8 h-8 text-purple-600" />
           </div>
@@ -542,7 +543,7 @@ export default function DiscountsPage() {
                           <div key={index} className="text-sm">
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                               {rule.type === 'percentage' ? `${rule.value}% off` : 
-                               rule.type === 'fixed_amount' ? `$${rule.value} off` :
+                               rule.type === 'fixed_amount' ? `₹${rule.value} off` :
                                rule.type === 'tiered' ? 'Tiered discount' :
                                'Conditional discount'}
                             </span>
@@ -555,7 +556,7 @@ export default function DiscountsPage() {
                         {discount.usedCount} / {discount.usageLimit || '∞'}
                       </div>
                       <div className="text-xs text-gray-500">
-                        ${discount.totalSavings.toFixed(2)} saved
+                        ₹{discount.totalSavings.toFixed(2)} saved
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -723,7 +724,7 @@ export default function DiscountsPage() {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {rule.type === 'percentage' ? 'Percentage (%)' : 'Amount ($)'}
+                          {rule.type === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'}
                         </label>
                         <input
                           type="number"
@@ -766,7 +767,7 @@ export default function DiscountsPage() {
 
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Min Order Value ($)
+                              Min Order Value (₹)
                             </label>
                             <input
                               type="number"
@@ -986,3 +987,9 @@ export default function DiscountsPage() {
     </div>
   )
 }
+
+export default withRouteGuard(DiscountsPage, {
+  module: 'customers',
+  action: 'view',
+  feature: 'discounts'
+})

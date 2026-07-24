@@ -271,16 +271,16 @@ function AdminCampaignsPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Budget Spent</span>
-                <span className="font-medium">${analytics.tenant.totalBudgetSpent.toFixed(2)}</span>
+                <span className="font-medium">₹{analytics.tenant.totalBudgetSpent.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Customer Savings</span>
-                <span className="font-medium text-green-600">${analytics.tenant.totalSavings.toFixed(2)}</span>
+                <span className="font-medium text-green-600">₹{analytics.tenant.totalSavings.toFixed(2)}</span>
               </div>
               <div className="pt-2 border-t">
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-600">Revenue</span>
-                  <span className="font-medium text-green-600">${analytics.tenant.totalRevenue.toFixed(2)}</span>
+                  <span className="font-medium text-green-600">₹{analytics.tenant.totalRevenue.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -300,7 +300,7 @@ function AdminCampaignsPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Est. Savings</span>
-                <span className="font-medium text-purple-600">${analytics.global.estimatedGlobalSavings.toFixed(2)}</span>
+                <span className="font-medium text-purple-600">₹{analytics.global.estimatedGlobalSavings.toFixed(2)}</span>
               </div>
               <div className="pt-2 border-t">
                 <div className="text-xs text-gray-500">
@@ -460,7 +460,7 @@ function AdminCampaignsPage() {
                           {campaign.analytics?.conversions || 0} conversions
                         </div>
                         <div className="text-green-600">
-                          ${(campaign.analytics?.totalSavings || 0).toFixed(2)} saved
+                          ₹{(campaign.analytics?.totalSavings || 0).toFixed(2)} saved
                         </div>
                         <div className="text-xs text-gray-500">
                           {campaign.limits?.usedCount || 0} / {campaign.limits?.totalUsageLimit || '∞'} uses
@@ -470,10 +470,10 @@ function AdminCampaignsPage() {
                     <td className="px-6 py-4">
                       <div className="text-sm">
                         <div className="text-gray-900">
-                          {campaign.budget?.type === 'UNLIMITED' ? 'Unlimited' : `$${campaign.budget?.totalAmount || 0}`}
+                          {campaign.budget?.type === 'UNLIMITED' ? 'Unlimited' : `₹${campaign.budget?.totalAmount || 0}`}
                         </div>
                         <div className="text-red-600">
-                          ${(campaign.budget?.spentAmount || 0).toFixed(2)} spent
+                          ₹{(campaign.budget?.spentAmount || 0).toFixed(2)} spent
                         </div>
                         {campaign.budget?.type !== 'UNLIMITED' && campaign.budget?.totalAmount > 0 && (
                           <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
@@ -496,15 +496,15 @@ function AdminCampaignsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => {/* Handle view */}}
+                          onClick={() => toast('Campaign management coming soon')}
                           className="text-blue-600 hover:text-blue-900"
                           title="View campaign"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        
+
                         <button
-                          onClick={() => {/* Handle edit */}}
+                          onClick={() => toast('Campaign management coming soon')}
                           className="text-blue-600 hover:text-blue-900"
                           title="Edit campaign"
                         >
@@ -542,7 +542,7 @@ function AdminCampaignsPage() {
                         )}
                         
                         <button
-                          onClick={() => {/* Handle analytics */}}
+                          onClick={() => toast('Campaign analytics coming soon')}
                           className="text-purple-600 hover:text-purple-900"
                           title="View analytics"
                         >

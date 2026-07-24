@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { tenantBlogApi, BlogCategory } from '@/services/tenantBlogApi'
 import { 
   Save, 
@@ -15,7 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-export default function EditTenantBlogPostPage() {
+function EditTenantBlogPostPage() {
   const router = useRouter()
   const params = useParams()
   const postId = params.id as string
@@ -467,3 +468,9 @@ export default function EditTenantBlogPostPage() {
     </div>
   )
 }
+
+export default withRouteGuard(EditTenantBlogPostPage, {
+  module: 'settings',
+  action: 'view',
+  feature: 'blog'
+})

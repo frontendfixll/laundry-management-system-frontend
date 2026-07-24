@@ -51,12 +51,6 @@ export function middleware(request: NextRequest) {
   const customDomain = !subdomain ? extractCustomDomain(hostname) : null
   const hostTenant = subdomain || customDomain
 
-  // Enhanced logging for production troubleshooting
-  // Always log in development, and log important transitions in production (especially for admin routes)
-  if (process.env.NODE_ENV === 'development' || (pathname.includes('admin') && !pathname.includes('_next'))) {
-    console.log(`🌐 [Middleware] Host: ${hostname} | Sub: ${subdomain} | Path: ${pathname} | Seg1: ${firstSegment} | Seg2: ${secondSegment}`)
-  }
-
   // /auth/register is admin-only — unauthenticated users must register via /[tenant]/auth/register.
   // If no token, send them to home so they pick a tenant first.
   if (pathname === '/auth/register') {
@@ -72,7 +66,6 @@ export function middleware(request: NextRequest) {
   // This ensures /admin/* is NEVER rewritten to a tenant-specific path like /services.
   if (RESERVED_ROUTES.includes(firstSegment)) {
     if (hostTenant) {
-      console.log(`🔧 [Middleware] Reserved route '${firstSegment}' on host '${hostname}' -> Passing as global route with tenant context`)
       const response = NextResponse.next()
       // Set tenant headers for components to use (branding, etc.)
       response.headers.set('x-tenant-slug', hostTenant)
@@ -103,11 +96,12 @@ export function middleware(request: NextRequest) {
 
   // If we have a tenant identifier, handle tenant routing/context
   if (tenantIdentifier) {
-    console.log('🏢 Tenant detected:', tenantIdentifier)
 
-    // Check if the next segment is a reserved route (e.g., /dgsfg/admin)
+    // Check if the next segment is a reserved route — ONLY strip prefix when
+    // the first path segment IS the tenant slug (path-based tenant routing).
+    // When tenant comes from subdomain, do NOT strip path segments.
     const secondSegment = pathSegments[1]
-    if (secondSegment && RESERVED_ROUTES.includes(secondSegment)) {
+    if (firstSegment === tenantIdentifier && secondSegment && RESERVED_ROUTES.includes(secondSegment)) {
       // Rewrite to the global route but keep the tenant context
       const newPathname = '/' + pathSegments.slice(1).join('/')
       const url = request.nextUrl.clone()

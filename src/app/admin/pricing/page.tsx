@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import toast from 'react-hot-toast'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { withRouteGuard } from '@/components/withRouteGuard'
 
 interface PriceItem {
   _id?: string
@@ -37,7 +38,7 @@ const categories = [
   { id: 'others', label: 'Others' },
 ]
 
-export default function AdminPricingPage() {
+function AdminPricingPage() {
   const [prices, setPrices] = useState<PriceItem[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('men')
@@ -368,3 +369,9 @@ export default function AdminPricingPage() {
     </div>
   )
 }
+
+export default withRouteGuard(AdminPricingPage, {
+  module: 'services',
+  action: 'view',
+  feature: 'pricing'
+})

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { tenantBlogApi, BlogPost, BlogCategory } from '@/services/tenantBlogApi'
+import { withRouteGuard } from '@/components/withRouteGuard'
+import toast from 'react-hot-toast'
 import { 
   Plus, 
   Search, 
@@ -17,7 +19,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-export default function TenantBlogPostsPage() {
+function TenantBlogPostsPage() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [categories, setCategories] = useState<BlogCategory[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,9 +40,10 @@ export default function TenantBlogPostsPage() {
         page: currentPage,
         limit: 10,
         ...(searchTerm && { search: searchTerm }),
-        ...(categoryFilter && { category: categoryFilter })
+        ...(categoryFilter && { category: categoryFilter }),
+        ...(statusFilter && statusFilter !== 'all' && { status: statusFilter })
       }
-      
+
       const response = await tenantBlogApi.getTenantPosts(params)
       setPosts(response.data || [])
       setTotalPages(response.pagination?.pages || 1)
@@ -67,7 +70,7 @@ export default function TenantBlogPostsPage() {
 
   useEffect(() => {
     fetchPosts()
-  }, [currentPage, searchTerm, categoryFilter])
+  }, [currentPage, searchTerm, categoryFilter, statusFilter])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this blog post?')) return
@@ -76,7 +79,7 @@ export default function TenantBlogPostsPage() {
       await tenantBlogApi.deleteTenantPost(id)
       fetchPosts() // Refresh the list
     } catch (err: any) {
-      alert(err.message || 'Failed to delete blog post')
+      toast.error(err.message || 'Failed to delete blog post')
     }
   }
 
@@ -390,3 +393,9 @@ export default function TenantBlogPostsPage() {
     </div>
   )
 }
+
+export default withRouteGuard(TenantBlogPostsPage, {
+  module: 'settings',
+  action: 'view',
+  feature: 'blog'
+})

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import { Pagination } from '@/components/ui/Pagination'
 import { SlidePanel } from '@/components/ui/slide-panel'
 import { api } from '@/lib/api'
@@ -26,7 +27,7 @@ interface Staff {
   createdAt: string
 }
 
-export default function AdminStaffPage() {
+function AdminStaffPage() {
   const [staff, setStaff] = useState<Staff[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -37,13 +38,18 @@ export default function AdminStaffPage() {
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
 
-  useEffect(() => { fetchStaff() }, [])
+  useEffect(() => { fetchStaff() }, [search, roleFilter, statusFilter])
 
   const fetchStaff = async () => {
     setLoading(true)
     setError(null)
     try {
-      const { data } = await api.get('/admin/staff')
+      const params: Record<string, string> = {}
+      if (search) params.search = search
+      if (roleFilter) params.role = roleFilter
+      if (statusFilter) params.isActive = statusFilter === 'active' ? 'true' : 'false'
+      const query = new URLSearchParams(params).toString()
+      const { data } = await api.get(`/admin/staff${query ? `?${query}` : ''}`)
       const users = data.data?.data || data.data?.staff || data.data || []
       setStaff(Array.isArray(users) ? users : [])
     } catch (err: any) {
@@ -356,3 +362,9 @@ export default function AdminStaffPage() {
     </div>
   )
 }
+
+export default withRouteGuard(AdminStaffPage, {
+  module: 'staff',
+  action: 'view',
+  feature: 'staff'
+})

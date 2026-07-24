@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/authStore'
 import { showToast } from '@/components/ModernToast'
 import { 
@@ -52,6 +53,7 @@ interface ChatMessage {
 }
 
 export default function TenantChatPage() {
+  const router = useRouter()
   const { user } = useAuthStore()
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -76,13 +78,7 @@ export default function TenantChatPage() {
       // PRIORITY FIX: Use MongoDB ObjectId (id) first, then fallback to custom sessionId
       // This ensures we use the same identifier that platform support uses
       const sessionIdentifier = selectedChat.id || selectedChat.sessionId;
-      console.log('🔄 [Tenant Admin] Using session identifier:', sessionIdentifier);
-      console.log('🔍 [Tenant Admin] Available IDs:', {
-        id: selectedChat.id,
-        sessionId: selectedChat.sessionId,
-        chosen: sessionIdentifier
-      });
-      
+
       fetchChatHistory(sessionIdentifier);
       
       // Set up interval to refresh messages every 5 seconds when a chat is selected
@@ -103,41 +99,26 @@ export default function TenantChatPage() {
   }
 
   const fetchChatSessions = async () => {
-    console.log('🔄 [Tenant Admin] Fetching chat sessions...');
     setRefreshing(true);
-    
+
     try {
       // Try multiple token sources
       let token = null;
-      
+
       // Method 1: Direct token from localStorage
       token = localStorage.getItem('token');
-      console.log('🔑 [Tenant Admin] Direct token:', !!token);
-      
+
       // Method 2: From auth-storage (Zustand persist)
       if (!token) {
         const authStorage = localStorage.getItem('auth-storage');
         if (authStorage) {
           const parsed = JSON.parse(authStorage);
           token = parsed.state?.token;
-          console.log('🔑 [Tenant Admin] Zustand token:', !!token);
-          
-          // Also log user info for debugging
-          const user = parsed.state?.user;
-          console.log('👤 [Tenant Admin] Current User Debug:', {
-            id: user?._id,
-            name: user?.name,
-            email: user?.email,
-            role: user?.role,
-            tenancyId: user?.tenancy?._id,
-            tenancyName: user?.tenancy?.name
-          });
         }
       }
-      
+
       // Method 3: From auth store
       if (!token && user) {
-        // Try to get from auth store directly
         const authStore = localStorage.getItem('auth-storage');
         if (authStore) {
           const parsedStore = JSON.parse(authStore);
@@ -145,38 +126,13 @@ export default function TenantChatPage() {
         }
       }
 
-      console.log('🔑 [Tenant Admin] Final token found:', !!token);
-      console.log('🔑 [Tenant Admin] Token preview:', token ? token.substring(0, 20) + '...' : 'null');
-
       if (!token) {
-        console.log('❌ [Tenant Admin] No token found in any location');
-        console.log('🔍 [Tenant Admin] Available localStorage keys:', Object.keys(localStorage));
-        
-        // Show mock data for testing UI
-        console.log('🔄 [Tenant Admin] Using mock data for UI testing...');
-        setChatSessions([
-          {
-            sessionId: 'mock_session_1',
-            ticketNumber: 'TKT-MOCK-001',
-            subject: 'Mock Chat Session (No API Token)',
-            lastMessage: {
-              message: 'This is a mock chat session because no authentication token was found.',
-              timestamp: new Date(Date.now() - 10 * 60 * 1000),
-              sender: 'System',
-              isFromSupport: true
-            },
-            unreadCount: 0,
-            status: 'open',
-            priority: 'medium',
-            createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000)
-          }
-        ]);
+        router.push('/auth/login');
         return;
       }
 
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-      console.log('🌐 [Tenant Admin] Fetching from:', `${API_URL}/tenant/chat/sessions`);
-      
+
       const response = await fetch(`${API_URL}/tenant/chat/sessions`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -184,126 +140,18 @@ export default function TenantChatPage() {
         }
       })
 
-      console.log('📥 [Tenant Admin] Sessions response status:', response.status);
-      console.log('📥 [Tenant Admin] Sessions response ok:', response.ok);
-
       if (response.ok) {
         const data = await response.json()
-        console.log('✅ [Tenant Admin] Sessions data:', data);
-        
         if (data.success) {
           const sessions = data.data.sessions || [];
           setChatSessions(sessions);
-          console.log('✅ [Tenant Admin] Chat sessions updated:', sessions.length);
-          console.log('📋 [Tenant Admin] Chat sessions list:', sessions.map(s => ({
-            id: s.sessionId || s.id,
-            subject: s.subject,
-            ticket: s.ticketNumber,
-            status: s.status,
-            hasLastMessage: !!s.lastMessage,
-            lastMessageText: s.lastMessage?.message?.substring(0, 50) + '...',
-            createdAt: s.createdAt
-          })) || []);
-          
-          // Debug the actual sessions array structure
-          console.log('🔍 [Tenant Admin] Raw sessions data:', sessions);
-          console.log('🔍 [Tenant Admin] First session structure:', sessions?.[0]);
         }
       } else {
-        console.log('❌ [Tenant Admin] Sessions API error:', response.status);
-        const errorText = await response.text();
-        console.log('❌ [Tenant Admin] Error details:', errorText);
-        
-        // Show error toast for debugging
-        if (typeof showToast !== 'undefined') {
-          showToast.error(`API Error: ${response.status} - Check console for details`);
-        }
-        
-        // Test if backend is running
-        try {
-          const healthCheck = await fetch(`${API_URL.replace('/api', '')}/api/health`);
-          console.log('🏥 [Tenant Admin] Backend health check:', healthCheck.ok ? 'ONLINE' : 'OFFLINE');
-        } catch (healthError) {
-          console.log('🏥 [Tenant Admin] Backend health check: OFFLINE -', healthError.message);
-        }
-        
-        // Fallback to mock data for demonstration
-        console.log('🔄 [Tenant Admin] Using mock data...');
-        setChatSessions([
-          {
-            sessionId: 'session_1',
-            ticketNumber: 'TKT-2026-001',
-            subject: 'Payment Gateway Integration Issue',
-            lastMessage: {
-              message: 'I have checked the logs and found the issue. The API key was expired. I have updated it and the payment gateway should work now.',
-              timestamp: new Date(Date.now() - 10 * 60 * 1000),
-              sender: 'Platform Support',
-              isFromSupport: true
-            },
-            unreadCount: 1,
-            status: 'in_progress',
-            priority: 'high',
-            createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-          },
-          {
-            sessionId: 'session_2',
-            ticketNumber: 'TKT-2026-002',
-            subject: 'Customer Data Export Request',
-            lastMessage: {
-              message: 'Thank you for the quick response. The export feature is working perfectly now.',
-              timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-              sender: user?.name || 'You',
-              isFromSupport: false
-            },
-            unreadCount: 0,
-            status: 'resolved',
-            priority: 'medium',
-            createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-          },
-          {
-            sessionId: 'session_3',
-            ticketNumber: 'TKT-2026-003',
-            subject: 'Mobile App Login Issues',
-            lastMessage: {
-              message: 'We are investigating the mobile app login issues. Will update you within 2 hours.',
-              timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-              sender: 'Platform Support',
-              isFromSupport: true
-            },
-            unreadCount: 0,
-            status: 'waiting',
-            priority: 'critical',
-            createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-          }
-        ])
+        showToast.error(`Failed to load chat sessions (${response.status})`);
       }
     } catch (error) {
-      console.error('❌ [Tenant Admin] Error fetching chat sessions:', error)
-      
-      // Show error toast
-      if (typeof showToast !== 'undefined') {
-        showToast.error('Network error: ' + error.message);
-      }
-      
-      // Fallback to mock data
-      console.log('🔄 [Tenant Admin] Using mock data due to network error...');
-      setChatSessions([
-        {
-          sessionId: 'error_session_1',
-          ticketNumber: 'TKT-ERROR-001',
-          subject: 'Network Error - Mock Session',
-          lastMessage: {
-            message: 'This is a mock session due to network error: ' + error.message,
-            timestamp: new Date(),
-            sender: 'System',
-            isFromSupport: true
-          },
-          unreadCount: 0,
-          status: 'open',
-          priority: 'high',
-          createdAt: new Date()
-        }
-      ]);
+      console.error('Error fetching chat sessions:', error)
+      showToast.error('Network error. Please check your connection and try again.');
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -311,15 +159,13 @@ export default function TenantChatPage() {
   }
 
   const fetchChatHistory = async (sessionId: string) => {
-    console.log('🔄 [Tenant Admin] Fetching chat history for session:', sessionId);
-    
     try {
       // Try multiple token sources
       let token = null;
-      
+
       // Method 1: Direct token from localStorage
       token = localStorage.getItem('token');
-      
+
       // Method 2: From auth-storage (Zustand persist)
       if (!token) {
         const authStorage = localStorage.getItem('auth-storage');
@@ -330,13 +176,11 @@ export default function TenantChatPage() {
       }
 
       if (!token) {
-        console.log('❌ [Tenant Admin] No token found for chat history');
         return;
       }
 
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-      console.log('🌐 [Tenant Admin] Fetching from:', `${API_URL}/tenant/chat/${sessionId}/messages`);
-      
+
       const response = await fetch(`${API_URL}/tenant/chat/${sessionId}/messages`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -344,128 +188,32 @@ export default function TenantChatPage() {
         }
       })
 
-      console.log('📥 [Tenant Admin] Chat history response status:', response.status);
-
       if (response.ok) {
         const data = await response.json()
-        console.log('✅ [Tenant Admin] Chat history data:', data);
-        
+
         if (data.success) {
           const newMessages = data.data.messages || []
-          console.log('📨 [Tenant Admin] Received messages:', newMessages.length);
-          
-          // Enhanced message logging
-          console.log('📋 [Tenant Admin] Message details:');
-          newMessages.forEach((msg, index) => {
-            console.log(`   ${index + 1}. [${msg.sender?.role}] ${msg.sender?.name}: "${msg.message?.substring(0, 50)}..."`);
-            console.log(`      ID: ${msg.id}, isFromSupport: ${msg.isFromSupport}, timestamp: ${msg.timestamp}`);
-            console.log(`      Raw sender object:`, msg.sender);
-          });
-          
-          // Count support messages specifically
-          const supportMessages = newMessages.filter(msg => msg.isFromSupport === true);
-          console.log(`🎯 [Tenant Admin] Support messages found: ${supportMessages.length}`);
-          supportMessages.forEach((msg, index) => {
-            console.log(`   Support ${index + 1}: "${msg.message?.substring(0, 50)}..." at ${msg.timestamp}`);
-          });
-          
-          // Log session info if available
-          if (data.data.sessionInfo) {
-            console.log('� [Tenant Admin] Session info:', data.data.sessionInfo);
-          }
-          
+
           // Preserve optimistic messages (messages with temp IDs) during refresh
           setMessages(prev => {
-            // Get all optimistic messages (temp IDs start with 'temp_')
             const optimisticMessages = prev.filter(msg => msg.id.startsWith('temp_'))
-            console.log('🔄 [Tenant Admin] Optimistic messages:', optimisticMessages.length);
-            
-            // Check if there are new messages (only show notification if we had messages before)
+
+            // Show notification if new messages arrived
             if (prev.length > 0 && newMessages.length > (prev.length - optimisticMessages.length)) {
               const newMessageCount = newMessages.length - (prev.length - optimisticMessages.length)
-              console.log(`📨 [Tenant Admin] ${newMessageCount} new message(s) received!`)
-              
-              // Show toast notification for new messages
-              if (typeof showToast !== 'undefined') {
-                showToast.info(`${newMessageCount} new message(s) from support`)
-              }
+              showToast.info(`${newMessageCount} new message(s) from support`)
             }
-            
-            // Merge server messages with optimistic messages
-            // Server messages come first, then optimistic messages
-            const mergedMessages = [...newMessages, ...optimisticMessages]
-              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()); // Sort by timestamp ascending
-            console.log('🔗 [Tenant Admin] Merged messages total:', mergedMessages.length);
-            console.log('� [Tenant Admin] Final message breakdown:');
-            console.log(`   - Server messages: ${newMessages.length}`);
-            console.log(`   - Optimistic messages: ${optimisticMessages.length}`);
-            console.log(`   - Support messages in final list: ${mergedMessages.filter(m => m.isFromSupport).length}`);
-            console.log('🕐 [Tenant Admin] Message chronological order:');
-            mergedMessages.forEach((msg, index) => {
-              const time = new Date(msg.timestamp).toLocaleTimeString();
-              console.log(`   ${index + 1}. [${time}] ${msg.sender?.name}: "${msg.message?.substring(0, 30)}..."`);
-            });
-            
-            return mergedMessages;
+
+            // Merge server messages with optimistic messages, sorted by timestamp
+            return [...newMessages, ...optimisticMessages]
+              .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
           })
         }
       } else {
-        console.log('❌ [Tenant Admin] Chat history API error:', response.status);
-        const errorText = await response.text();
-        console.log('❌ [Tenant Admin] Error details:', errorText);
-        
-        // Only use fallback if we don't have any messages yet
-        if (messages.length === 0) {
-          // Fallback to mock data based on selected session
-          if (sessionId === 'session_1') {
-            console.log('🔄 [Tenant Admin] Using mock data for session_1');
-            setMessages([
-              {
-                id: 'msg_1',
-                sender: { name: user?.name || 'You', role: 'tenant_admin' },
-                message: 'Hi, I am facing issues with the payment gateway. Customers are unable to complete payments and getting error "Payment failed - Invalid API key".',
-                timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-                isFromSupport: false,
-                messageType: 'text'
-              },
-              {
-                id: 'msg_2',
-                sender: { name: 'Platform Support', role: 'support' },
-                message: 'Hello! I understand you are facing payment gateway issues. Let me check the configuration and logs for your account.',
-                timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000),
-                isFromSupport: true,
-                messageType: 'text'
-              },
-              {
-                id: 'msg_3',
-                sender: { name: 'Platform Support', role: 'support' },
-                message: 'I can see the issue in our logs. It appears your Razorpay API key has expired. I am updating it with the new key from your account settings.',
-                timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 45 * 60 * 1000),
-                isFromSupport: true,
-                messageType: 'text'
-              },
-              {
-                id: 'msg_4',
-                sender: { name: user?.name || 'You', role: 'tenant_admin' },
-                message: 'Thank you for the quick response! I can see the payments are working now. However, I noticed that the webhook URL might also need to be updated.',
-                timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000),
-                isFromSupport: false,
-                messageType: 'text'
-              },
-              {
-                id: 'msg_5',
-                sender: { name: 'Platform Support', role: 'support' },
-                message: 'I have checked the logs and found the issue. The API key was expired. I have updated it and the payment gateway should work now.',
-                timestamp: new Date(Date.now() - 10 * 60 * 1000),
-                isFromSupport: true,
-                messageType: 'text'
-              }
-            ])
-          }
-        }
+        console.error('Chat history API error:', response.status);
       }
     } catch (error) {
-      console.error('❌ [Tenant Admin] Error fetching chat history:', error)
+      console.error('Error fetching chat history:', error)
     }
   }
 
@@ -475,13 +223,6 @@ export default function TenantChatPage() {
     const messageText = newMessage.trim()
     // PRIORITY FIX: Use MongoDB ObjectId (id) first, then fallback to custom sessionId
     const sessionId = selectedChat.id || selectedChat.sessionId;
-    
-    console.log('📤 [Tenant Admin] Sending message to session:', sessionId);
-    console.log('🔍 [Tenant Admin] Session ID priority:', {
-      id: selectedChat.id,
-      sessionId: selectedChat.sessionId,
-      chosen: sessionId
-    });
 
     // Create optimistic message with a unique temporary ID
     const optimisticId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -515,7 +256,6 @@ export default function TenantChatPage() {
       }
 
       if (!token) {
-        console.log('❌ No token found for sending message');
         showToast.error('Authentication required. Please refresh the page.');
         // Remove the optimistic message since we can't send
         setMessages(prev => prev.filter(msg => msg.id !== optimisticId))
@@ -563,10 +303,6 @@ export default function TenantChatPage() {
           setNewMessage(messageText) // Restore the message text
         }
       } else {
-        console.log('❌ Send message API error:', response.status);
-        const errorText = await response.text();
-        console.log('❌ Error details:', errorText);
-        
         // Remove optimistic message on API error
         setMessages(prev => prev.filter(msg => msg.id !== optimisticId))
         showToast.error(`Failed to send message (${response.status}). Please try again.`)
@@ -583,52 +319,39 @@ export default function TenantChatPage() {
   }
 
   const createNewChat = async () => {
-    console.log('🚀 Creating new chat...', { subject: newChatSubject, priority: newChatPriority });
-    
     if (!newChatSubject.trim()) {
-      console.log('❌ No subject provided');
       return;
     }
 
     try {
       // Try multiple token sources
       let token = null;
-      
+
       // Method 1: Direct token from localStorage
       token = localStorage.getItem('token');
-      console.log('🔑 Direct token:', !!token);
-      
+
       // Method 2: From auth-storage (Zustand persist)
       if (!token) {
         const authStorage = localStorage.getItem('auth-storage');
         if (authStorage) {
           const parsed = JSON.parse(authStorage);
           token = parsed.state?.token;
-          console.log('🔑 Zustand token:', !!token);
         }
       }
-      
-      console.log('🔑 Final token found:', !!token);
-      console.log('🔑 Token preview:', token ? token.substring(0, 20) + '...' : 'null');
 
       if (!token) {
-        console.log('❌ No auth token found in any location');
-        console.log('🔍 Available localStorage keys:', Object.keys(localStorage));
         showToast.error('Authentication required. Please login again.');
         return;
       }
 
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
-      console.log('🌐 API URL:', `${API_URL}/tenant/chat/create`);
-      
+
       const requestBody = {
         subject: newChatSubject,
         priority: newChatPriority,
         initialMessage: `Hi, I need help with: ${newChatSubject}`
       };
-      
-      console.log('📤 Request body:', requestBody);
-      
+
       const response = await fetch(`${API_URL}/tenant/chat/create`, {
         method: 'POST',
         headers: {
@@ -638,43 +361,34 @@ export default function TenantChatPage() {
         body: JSON.stringify(requestBody)
       })
 
-      console.log('📥 Response status:', response.status);
-      console.log('📥 Response ok:', response.ok);
-
       if (response.ok) {
         const data = await response.json()
-        console.log('✅ Response data:', data);
-        
+
         if (data.success) {
-          console.log('✅ Chat created successfully');
           showToast.success('Chat session created successfully!');
-          
+
           // If the API returns the created chat, add it immediately
           if (data.data && data.data.session) {
-            console.log('📝 Adding new chat to list immediately:', data.data.session);
             setChatSessions(prev => [data.data.session, ...prev]);
             setSelectedChat(data.data.session); // Auto-select the new chat
           }
-          
+
           setShowNewChatModal(false)
           setNewChatSubject('')
           setNewChatPriority('medium')
-          
+
           // Refresh the list to ensure we have the latest data
           setTimeout(() => {
             fetchChatSessions()
-          }, 1000); // Small delay to ensure backend has processed
+          }, 1000);
         } else {
-          console.log('❌ API returned success: false', data);
           showToast.error('Failed to create chat: ' + (data.message || 'Unknown error'));
         }
       } else {
-        const errorText = await response.text();
-        console.log('❌ API error response:', errorText);
         showToast.error(`Failed to create chat. Status: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Error creating new chat:', error)
+      console.error('Error creating new chat:', error)
       showToast.error('Network error: ' + error.message);
     }
   }
@@ -710,15 +424,6 @@ export default function TenantChatPage() {
       subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ticketNumber.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  });
-
-  // Debug filtered chats
-  console.log('🔍 Debug Info:', {
-    totalSessions: chatSessions.length,
-    filteredChats: filteredChats.length,
-    searchQuery,
-    firstSession: chatSessions[0],
-    firstFiltered: filteredChats[0]
   });
 
   if (loading) {
@@ -881,29 +586,6 @@ export default function TenantChatPage() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {/* Debug Info - Remove this after fixing */}
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
-                  <div className="font-medium text-yellow-800 mb-2">🔍 Debug Info:</div>
-                  <div className="text-yellow-700">
-                    <div>Total messages: {messages.length}</div>
-                    <div>Support messages: {messages.filter(m => m.isFromSupport).length}</div>
-                    <div>Tenant messages: {messages.filter(m => !m.isFromSupport).length}</div>
-                    <div>Session ID (MongoDB): {selectedChat.id}</div>
-                    <div>Session ID (Custom): {selectedChat.sessionId}</div>
-                    <div>Using ID: {selectedChat.id || selectedChat.sessionId}</div>
-                  </div>
-                  {messages.length > 0 && (
-                    <div className="mt-2">
-                      <div className="font-medium text-yellow-800">Message breakdown:</div>
-                      {messages.slice(-3).map((msg, index) => (
-                        <div key={index} className="text-xs text-yellow-600">
-                          {index + 1}. [{msg.sender?.role}] {msg.sender?.name}: "{msg.message?.substring(0, 30)}..." (isFromSupport: {msg.isFromSupport ? 'true' : 'false'})
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
                 {messages.map((message) => (
                   <div
                     key={message.id}

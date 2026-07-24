@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
+import { withRouteGuard } from '@/components/withRouteGuard'
 import {
   Tag,
   Plus,
@@ -44,7 +45,7 @@ interface Coupon {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'
 
-export default function CouponsPage() {
+function CouponsPage() {
   const { token } = useAuthStore()
   const [coupons, setCoupons] = useState<Coupon[]>([])
   const [loading, setLoading] = useState(true)
@@ -134,7 +135,6 @@ export default function CouponsPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this coupon?')) return
     try {
       const res = await fetch(`${API_BASE}/admin/coupons/${id}`, {
         method: 'DELETE',
@@ -142,7 +142,7 @@ export default function CouponsPage() {
       })
       const data = await res.json()
       if (data.success) {
-        toast.success('Coupon deleted!')
+        toast.success('Coupon deleted')
         fetchCoupons()
       } else {
         toast.error(data.message || 'Failed to delete')
@@ -575,3 +575,9 @@ export default function CouponsPage() {
     </div>
   )
 }
+
+export default withRouteGuard(CouponsPage, {
+  module: 'customers',
+  action: 'view',
+  feature: 'coupons'
+})

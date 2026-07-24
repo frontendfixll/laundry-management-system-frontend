@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Search, Eye, Edit, Trash2, BarChart3, Power } from 'lucide-react';
+import { withRouteGuard } from '@/components/withRouteGuard';
 import { useTenantBanners, useDeleteBanner, useToggleBannerStatus } from '@/hooks/useBanners';
 import CreateTemplateBannerModal from '@/components/banners/CreateTemplateBannerModal';
 import EditBannerModal from '@/components/banners/EditBannerModal';
@@ -10,7 +11,7 @@ import BannerPreview from '@/components/banners/BannerPreview';
 import { toast } from 'react-hot-toast'
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
-export default function AdminBannersPage() {
+function AdminBannersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [typeFilter, setTypeFilter] = useState('ALL');
@@ -23,7 +24,6 @@ export default function AdminBannersPage() {
   const [banners, setBanners] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{ isOpen: boolean; bannerId: string; title: string; message: string } | null>(null);
 
   const { getBanners, loading } = useTenantBanners();
@@ -46,12 +46,11 @@ export default function AdminBannersPage() {
       if (pageFilter !== 'ALL') params.targetPage = pageFilter;
 
       const result = await getBanners(params);
-      console.log('API Response:', result); // Debug log
       setBanners(result.data?.banners || []);
       setTotalPages(result.data?.pagination?.pages || 1);
     } catch (error) {
       console.error('Failed to load banners:', error);
-      setToast({ message: 'Failed to load banners', type: 'error' });
+      toast.error('Failed to load banners');
     }
   };
 
@@ -69,10 +68,10 @@ export default function AdminBannersPage() {
     
     try {
       await deleteBanner(confirmDialog.bannerId);
-      setToast({ message: 'Banner deleted successfully', type: 'success' });
+      toast.success('Banner deleted successfully');
       loadBanners();
     } catch (error: any) {
-      setToast({ message: error.response?.data?.message || 'Failed to delete banner', type: 'error' });
+      toast.error(error.response?.data?.message || 'Failed to delete banner');
     } finally {
       setConfirmDialog(null);
     }
@@ -81,10 +80,10 @@ export default function AdminBannersPage() {
   const handleToggleStatus = async (banner: any) => {
     try {
       const result = await toggleStatus(banner._id, banner.state);
-      setToast({ message: result.message || 'Banner status updated', type: 'success' });
+      toast.success(result.message || 'Banner status updated');
       loadBanners();
     } catch (error: any) {
-      setToast({ message: error.response?.data?.message || 'Failed to toggle status', type: 'error' });
+      toast.error(error.response?.data?.message || 'Failed to toggle status');
     }
   };
 
@@ -346,7 +345,7 @@ export default function AdminBannersPage() {
         onClose={() => setShowCreateModal(false)}
         onSuccess={() => {
           loadBanners();
-          setToast({ message: 'Banner created successfully', type: 'success' });
+          toast.success('Banner created successfully');
         }}
       />
 
@@ -360,7 +359,7 @@ export default function AdminBannersPage() {
             }}
             onSuccess={() => {
               loadBanners();
-              setToast({ message: 'Banner updated successfully', type: 'success' });
+              toast.success('Banner updated successfully');
             }}
             banner={selectedBanner}
           />
@@ -386,15 +385,6 @@ export default function AdminBannersPage() {
         </>
       )}
 
-      {/* Toast Notification */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-
       {/* Confirm Dialog */}
       {confirmDialog && (
         <ConfirmDialog
@@ -411,3 +401,9 @@ export default function AdminBannersPage() {
     </div>
   );
 }
+
+export default withRouteGuard(AdminBannersPage, {
+  module: 'settings',
+  action: 'view',
+  feature: 'banners'
+});
