@@ -347,6 +347,49 @@ export default function BaseLoginForm({
                   Password: <span className="font-mono font-medium text-gray-600">Demo@123</span>
                 </p>
               </div>
+            ) : (['purepress', 'linenlab', 'washcraft'].includes(tenantSlug ?? '')) ? (
+              /* Demo panel for seeded demo tenants */
+              (() => {
+                const demoCustomers: Record<string, string> = {
+                  purepress: 'priya.sharma@gmail.com',
+                  linenlab:  'arjun.reddy@gmail.com',
+                  washcraft: 'rohit.sharma.del@gmail.com',
+                };
+                const customerEmail = demoCustomers[tenantSlug ?? ''] ?? '';
+                return (
+                  <div className="mt-6 rounded-xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-indigo-50 p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-sky-100 text-sky-700 border border-sky-200">
+                        DEMO
+                      </span>
+                      <h3 className="text-sm font-semibold text-gray-700">Try a demo account</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        { role: 'Admin', label: 'Full Dashboard', email: `admin@${tenantSlug}.com`, password: 'Admin@123', badge: 'bg-violet-100 text-violet-700' },
+                        { role: 'Customer', label: 'Order & Track', email: customerEmail, password: 'Customer@123', badge: 'bg-emerald-100 text-emerald-700' },
+                      ].map(({ role, label, email, password, badge }) => (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={() => setFormData({ email, password })}
+                          className="flex items-center justify-between w-full px-3 py-2.5 bg-white rounded-lg border border-gray-200 hover:border-sky-300 hover:shadow-sm transition-all text-left group"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${badge}`}>{role}</span>
+                            <span className="text-xs text-gray-400">{label}</span>
+                          </div>
+                          <span className="text-xs text-gray-400 font-mono group-hover:text-sky-600 transition-colors">{email}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <p className="mt-2 text-center text-xs text-gray-400">
+                      Admin: <span className="font-mono font-medium text-gray-600">Admin@123</span>
+                      {' · '}Customer: <span className="font-mono font-medium text-gray-600">Customer@123</span>
+                    </p>
+                  </div>
+                );
+              })()
             ) : (
               /* Standard quick-login for non-demo tenants */
               <div className="mt-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
